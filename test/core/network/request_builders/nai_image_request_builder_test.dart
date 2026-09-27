@@ -13,6 +13,33 @@ import 'package:nai_launcher/data/models/vibe/vibe_reference.dart';
 
 void main() {
   group('NAIImageRequestBuilder.build', () {
+    test('uses the parameter version supported by each model family', () async {
+      const cases = <({String model, int version})>[
+        (model: ImageModels.animeDiffusionV4Full, version: 3),
+        (model: ImageModels.animeDiffusionV45Full, version: 3),
+        (model: ImageModels.animeDiffusionV5Full, version: 4),
+        (model: ImageModels.animeDiffusionV5Curated, version: 4),
+      ];
+
+      for (final entry in cases) {
+        final builder = NAIImageRequestBuilder(
+          params: ImageParams(model: entry.model),
+          encodeVibe: _fakeEncodeVibe,
+        );
+        for (final isStream in [false, true]) {
+          final result = await builder.build(
+            sampler: Samplers.kEuler,
+            isStream: isStream,
+          );
+          expect(
+            result.requestParameters['params_version'],
+            entry.version,
+            reason: '${entry.model}, stream: $isStream',
+          );
+        }
+      }
+    });
+
     test('should keep provided sampler and stream mode difference', () async {
       const params = ImageParams(model: 'nai-diffusion-4-full');
       final builder = NAIImageRequestBuilder(

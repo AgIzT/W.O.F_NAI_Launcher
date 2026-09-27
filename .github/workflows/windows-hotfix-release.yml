@@ -1,0 +1,101 @@
+name: Temporary Windows V5 relay fix
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: windows-2022
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.44.2"
+          channel: stable
+          cache: true
+
+      - name: Set up NuGet
+        uses: NuGet/setup-nuget@v4
+        with:
+          nuget-version: latest
+
+      - name: Verify NuGet
+        shell: pwsh
+        run: ./scripts/verify_nuget.ps1
+
+      - name: Install NSIS
+        shell: pwsh
+        run: choco install nsis -y --no-progress
+
+      - name: Fetch bundled databases
+        shell: pwsh
+        run: |
+          git lfs install
+          git lfs pull --include="assets/databases/*.db"
+
+      - name: Resolve dependencies
+        run: flutter pub get
+
+      - name: Validate bundled databases
+        run: dart run tool/tag_catalog/verify_bundled_databases.dart
+
+      - name: Generate localizations and code
+        shell: pwsh
+        run: |
+          flutter gen-l10n
+          dart run build_runner build --delete-conflicting-outputs
+
+      - name: Test request versions
+        run: flutter test test/core/network/request_builders/nai_image_request_builder_test.dart
+
+      - name: Build Windows application
+        run: flutter build windows --release
+
+      - name: Package installer and portable archive
+        shell: pwsh
+        run: ./scripts/package_windows_release.ps1 -Version '1.1.2-rc.1+6' -SkipFlutterBuild
+
+      - name: Write checksums
+        shell: pwsh
+        run: |
+          $files = Get-ChildItem dist/NAI_Launcher_Windows_1.1.2-rc.1+6_*
+          $files | ForEach-Object {
+            "$((Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant())  $($_.Name)"
+          } | Set-Content -Path dist/checksums.txt -Encoding utf8
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-v5-relay-fix
+          path: |
+            dist/NAI_Launcher_Windows_1.1.2-rc.1+6_Setup.exe
+            dist/NAI_Launcher_Windows_1.1.2-rc.1+6_Portable.zip
+            dist/checksums.txt
+          if-no-files-found: error
+
+      - name: Publish temporary release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.1.2-rc.1
+          target_commitish: ${{ github.sha }}
+          name: W.O.F NAI Launcher v1.1.2-rc.1 (V5 中转临时修复)
+          prerelease: true
+          body: |
+            此版本由 AgIzT 从 W.O.F_NAI_Launcher v1.1.1 临时构建，非原作者发行版。
+            修复第三方中转使用 V5 生图时的 params_version 错误；V4/V4.5 参数保持原样。
+            优先使用 Portable 便携版。安装包未配置原作者的签名证书。
+            应用内更新源仍指向 W.O.F 原作者仓库，后续请以原作者正式更新为准。
+          files: |
+            dist/NAI_Launcher_Windows_1.1.2-rc.1+6_Setup.exe
+            dist/NAI_Launcher_Windows_1.1.2-rc.1+6_Portable.zip
+            dist/checksums.txt
+          fail_on_unmatched_files: true
