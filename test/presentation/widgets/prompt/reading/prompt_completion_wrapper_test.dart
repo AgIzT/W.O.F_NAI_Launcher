@@ -764,6 +764,80 @@ void main() {
     }
   }
 
+  for (final keep in [true, false]) {
+    testWidgets(
+      'preview opened during the debounce ${keep ? 'stays when fresh rows keep its tag' : 'closes when fresh rows drop its tag'}',
+      (tester) async {
+        final editor = TextEditingController(), focus = FocusNode();
+        addTearDown(editor.dispose);
+        addTearDown(focus.dispose);
+        final pending = Completer<List<CompletionCandidate>>();
+        await pumpEditor(
+          tester,
+          editor,
+          focus,
+          (q) async => q.token == 'lo'
+              ? [tag('lowres'), tag('long_hair')]
+              : pending.future,
+        );
+        await typeAndSettle(tester, 'lo');
+        await tester.enterText(find.byKey(const Key('editor')), 'lon');
+        await tester.pump();
+        // Right-click a dimmed row before the 250ms debounce ends.
+        await tester.tap(
+          find.byKey(const ValueKey('prompt-completion-chip-long_hair')),
+          buttons: kSecondaryButton,
+        );
+        await tester.pump();
+        await tester.pump();
+        final preview = find.byKey(const Key('prompt-completion-preview'));
+        expect(preview, findsOneWidget);
+        // The search for the same text starts; the preview is not dropped.
+        await tester.pump(const Duration(milliseconds: 260));
+        await tester.pump();
+        expect(preview, findsOneWidget);
+        pending.complete([tag(keep ? 'long_hair' : 'longer_tag')]);
+        await tester.pump();
+        await tester.pump();
+        expect(preview, keep ? findsOneWidget : findsNothing);
+        expect(editor.text, 'lon');
+        expect(focus.hasFocus, isTrue);
+      },
+    );
+  }
+
+  testWidgets('Enter on a preview opened during the debounce inserts it', (
+    tester,
+  ) async {
+    final editor = TextEditingController(), focus = FocusNode();
+    addTearDown(editor.dispose);
+    addTearDown(focus.dispose);
+    final pending = Completer<List<CompletionCandidate>>();
+    await pumpEditor(
+      tester,
+      editor,
+      focus,
+      (q) async =>
+          q.token == 'lo' ? [tag('lowres'), tag('long_hair')] : pending.future,
+    );
+    await typeAndSettle(tester, 'lo');
+    await tester.enterText(find.byKey(const Key('editor')), 'lon');
+    await tester.pump();
+    await tester.tap(
+      find.byKey(const ValueKey('prompt-completion-chip-long_hair')),
+      buttons: kSecondaryButton,
+    );
+    await tester.pump();
+    await tester.pump();
+    expect(find.byKey(const Key('prompt-completion-preview')), findsOneWidget);
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pump();
+    // The previewed row is the explicit choice, not the first fresh result.
+    expect(editor.text, 'long hair, ');
+    expect(find.byKey(const Key('prompt-completion-preview')), findsNothing);
+    expect(focus.hasFocus, isTrue);
+  });
+
   testWidgets('right-clicking a chip previews it directly', (tester) async {
     final editor = TextEditingController(), focus = FocusNode();
     addTearDown(editor.dispose);

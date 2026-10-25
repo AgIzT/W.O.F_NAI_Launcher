@@ -73,6 +73,9 @@ class _PromptCompletionWrapperState
   AutoTagTranslationController? _translations;
   OverlayEntry? _overlay;
   CompletionCandidate? _preview;
+
+  /// Editor text when [_preview] opened; any later edit closes the preview.
+  String? _previewText;
   _Placement? _placement;
   bool _expandedShown = false;
   bool _visibleScheduled = false, _placementScheduled = false;
@@ -171,7 +174,9 @@ class _PromptCompletionWrapperState
           return KeyEventResult.handled;
         }
         if (key == LogicalKeyboardKey.enter || key == LogicalKeyboardKey.tab) {
-          if (_session.pending) {
+          // An open preview always belongs to the current text (see
+          // [_changed]), so it is an explicit choice like clicking its row.
+          if (_preview == null && _session.pending) {
             if (event is KeyDownEvent) _session.acceptWhenReady();
             return KeyEventResult.handled;
           }
@@ -198,10 +203,12 @@ class _PromptCompletionWrapperState
       if (_scroll.hasClients) _scroll.jumpTo(0);
     }
     final tags = _session.candidates.map((c) => c.stableId).toSet();
-    // A preview belongs to the completed query, even while its old rows are
-    // retained during typing. Do not let it accept a stale tag for new text.
+    // A preview belongs to the text it was opened for. It survives a pending
+    // search for that text (opened during the debounce), but an edit, or
+    // fresh rows without its tag, close it so it never applies to new text.
     if (_preview != null &&
-        (_session.pending || !tags.contains(_preview!.stableId))) {
+        (widget.controller.text != _previewText ||
+            (!_session.pending && !tags.contains(_preview!.stableId)))) {
       _preview = null;
     }
     if (_translations == null) {
@@ -266,6 +273,7 @@ class _PromptCompletionWrapperState
   void _openPreview(CompletionCandidate candidate) {
     _session.setExpanded(true);
     _preview = candidate;
+    _previewText = widget.controller.text;
     _translations?.clearSurface(_surface);
     _overlay?.markNeedsBuild();
   }
