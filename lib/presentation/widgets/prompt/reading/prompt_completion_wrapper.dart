@@ -171,7 +171,7 @@ class _PromptCompletionWrapperState
           return KeyEventResult.handled;
         }
         if (key == LogicalKeyboardKey.enter || key == LogicalKeyboardKey.tab) {
-          if (_preview == null && _session.pending) {
+          if (_session.pending) {
             if (event is KeyDownEvent) _session.acceptWhenReady();
             return KeyEventResult.handled;
           }
@@ -198,7 +198,12 @@ class _PromptCompletionWrapperState
       if (_scroll.hasClients) _scroll.jumpTo(0);
     }
     final tags = _session.candidates.map((c) => c.stableId).toSet();
-    if (_preview != null && !tags.contains(_preview!.stableId)) _preview = null;
+    // A preview belongs to the completed query, even while its old rows are
+    // retained during typing. Do not let it accept a stale tag for new text.
+    if (_preview != null &&
+        (_session.pending || !tags.contains(_preview!.stableId))) {
+      _preview = null;
+    }
     if (_translations == null) {
       final translations = ref.read(autoTagTranslationProvider);
       _translations = translations;

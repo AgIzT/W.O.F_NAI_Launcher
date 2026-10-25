@@ -598,6 +598,50 @@ void main() {
     },
   );
 
+  for (final key in [LogicalKeyboardKey.enter, LogicalKeyboardKey.tab]) {
+    for (final delay in [20, 260]) {
+      testWidgets(
+        'typing after Wiki preview waits for fresh ${key.keyLabel} result at ${delay}ms',
+        (tester) async {
+          final editor = TextEditingController(), focus = FocusNode();
+          addTearDown(editor.dispose);
+          addTearDown(focus.dispose);
+          final pending = Completer<List<CompletionCandidate>>();
+          await pumpEditor(
+            tester,
+            editor,
+            focus,
+            (q) async => q.token == 'lo' ? [tag('lowres')] : pending.future,
+          );
+          await typeAndSettle(tester, 'lo');
+          await tester.tap(
+            find.byKey(const ValueKey('prompt-completion-chip-lowres')),
+            buttons: kSecondaryButton,
+          );
+          await tester.pumpAndSettle();
+          expect(
+            find.byKey(const Key('prompt-completion-preview')),
+            findsOneWidget,
+          );
+
+          await tester.enterText(find.byKey(const Key('editor')), 'long');
+          await tester.pump(Duration(milliseconds: delay));
+          expect(
+            find.byKey(const Key('prompt-completion-preview')),
+            findsNothing,
+          );
+          await tester.sendKeyEvent(key);
+          await tester.pump();
+          expect(editor.text, 'long');
+          pending.complete([tag('long_hair')]);
+          await tester.pumpAndSettle();
+          expect(editor.text, 'long hair, ');
+          expect(focus.hasFocus, isTrue);
+        },
+      );
+    }
+  }
+
   testWidgets('right-clicking a chip previews it directly', (tester) async {
     final editor = TextEditingController(), focus = FocusNode();
     addTearDown(editor.dispose);
