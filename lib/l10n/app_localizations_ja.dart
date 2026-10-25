@@ -21084,7 +21084,11 @@ class AppLocalizationsJa extends AppLocalizations {
   String get promptReading_completionHint => '中国語・英語でタグ、キャラクター、作品を検索します。';
 
   @override
-  String get promptReading_fillMissing => '表示中のタグの未翻訳名を補完';
+  String get promptReading_fillMissing => '表示中のタグと文の未翻訳を補完';
+
+  @override
+  String get promptReading_autoTranslateHint =>
+      'プロンプト内の表示中のタグと自然文を自動翻訳します（「モデルとAPI」でタグ翻訳モデルの設定が必要）。オフの場合はローカル辞書とキャッシュの訳のみ表示します。';
 
   @override
   String get modelSettings_promptReadingHint => '全文翻訳は閲覧用です。プロンプトは変更しません。';

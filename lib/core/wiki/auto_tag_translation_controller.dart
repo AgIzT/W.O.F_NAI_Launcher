@@ -263,6 +263,7 @@ class AutoTagTranslationController extends ChangeNotifier {
 
   void routeChanged() {
     _routeEpoch++;
+    _resetPhrases();
     _pending.clear();
     _readingChecked.clear();
     _readingPending.clear();
@@ -280,12 +281,14 @@ class AutoTagTranslationController extends ChangeNotifier {
     _wikiErrors.clear();
     notifyListeners();
     _reloadNameReadings();
+    _loadPhrases(_visiblePhraseKeys);
     _queueVisible();
   }
 
   /// Explicit maintenance does not enqueue fresh model calls or change drafts.
   Future<void> clearCache() async {
     _routeEpoch++;
+    _resetPhrases();
     _pending.clear();
     _readingPending.clear();
     _readingLoading.clear();
@@ -307,6 +310,7 @@ class AutoTagTranslationController extends ChangeNotifier {
       // Clearing a cache may reload bundled names, but never starts new model
       // work until the user observes or explicitly requests missing names.
       _reloadNameReadings(allowRemote: false);
+      _loadPhrases(_visiblePhraseKeys, allowRemote: false);
       notifyListeners();
     }
   }
@@ -325,6 +329,10 @@ class AutoTagTranslationController extends ChangeNotifier {
     if (!enabled) {
       _pending.clear();
       for (final session in _sessions.values) {
+        unawaited(_assistant.cancelCurrentTask(sessionId: session));
+      }
+      _phraseQueue.retainWhere(_phraseForced.contains);
+      if (_phraseSession case final session?) {
         unawaited(_assistant.cancelCurrentTask(sessionId: session));
       }
     }
@@ -409,7 +417,241 @@ class AutoTagTranslationController extends ChangeNotifier {
       }
     }
     _scheduleNameReadings(tags);
+    final phrases = _phrasesBySurface[surface] ?? const <String>{};
+    for (final key in phrases) {
+      if (!_phraseReadings.containsKey(key)) {
+        _phraseForced.add(key);
+        _phraseErrors.remove(key);
+      }
+    }
+    _loadPhrases(phrases);
     notifyListeners();
+  }
+
+  // ---- Natural-language phrases ------------------------------------------
+  //
+  // Prompt sentences that are not tags read like Plana's: every visible one
+  // is queued, batched after a short pause and cached. They follow the same
+  // automatic switch, route, language and cache invalidation as tag names.
+
+  static const _phraseBatchSize = 8, _phraseBatchChars = 2400;
+  static const _phraseDebounce = Duration(milliseconds: 700);
+  final Map<String, Set<String>> _phrasesBySurface = {};
+  final Map<String, String> _phraseSources = {};
+  final Map<String, String> _phraseReadings = {};
+  final Map<String, String> _phraseErrors = {};
+  final Set<String> _phraseChecked = {},
+      _phraseLoading = {},
+      _phraseQueue = {},
+      _phraseForced = {};
+  Timer? _phraseTimer;
+  String? _phraseSession;
+
+  /// Whitespace and letter case do not change a phrase's reading.
+  static String phraseKey(String text) =>
+      text.trim().replaceAll(RegExp(r'\s+'), ' ').toLowerCase();
+
+  /// Phrase rows share the reading cache without colliding with tag rows.
+  static String _phraseCacheKey(String key) => 'phrase:$key';
+
+  String? phraseFor(String text) => _phraseReadings[phraseKey(text)];
+
+  /// Replaces a prompt's currently visible natural-language phrases.
+  void observePhrases({
+    required String surface,
+    required Iterable<String> phrases,
+  }) {
+    final next = <String>{};
+    for (final phrase in phrases) {
+      final key = phraseKey(phrase);
+      if (key.isEmpty) continue;
+      next.add(key);
+      _phraseSources.putIfAbsent(key, () => phrase.trim());
+    }
+    _phrasesBySurface[surface] = next;
+    _phraseQueue.retainWhere(_phraseVisible);
+    _phraseForced.retainWhere(_phraseVisible);
+    _loadPhrases(next);
+  }
+
+  Iterable<String> get _visiblePhraseKeys =>
+      _phrasesBySurface.values.expand((keys) => keys).toSet();
+
+  bool _phraseVisible(String key) =>
+      _phrasesBySurface.values.any((keys) => keys.contains(key));
+
+  void _resetPhrases() {
+    _phraseTimer?.cancel();
+    if (_phraseSession case final session?) {
+      unawaited(_assistant.cancelCurrentTask(sessionId: session));
+    }
+    _phraseSession = null;
+    _phraseReadings.clear();
+    _phraseErrors.clear();
+    _phraseChecked.clear();
+    _phraseLoading.clear();
+    _phraseQueue.clear();
+    _phraseForced.clear();
+  }
+
+  /// Reads cached phrases once per route, then queues what is still missing.
+  void _loadPhrases(Iterable<String> keys, {bool allowRemote = true}) {
+    final unchecked = <String>[];
+    for (final key in keys) {
+      if (_phraseChecked.add(key)) {
+        unchecked.add(key);
+      } else if (allowRemote) {
+        _queuePhrase(key);
+      }
+    }
+    if (unchecked.isEmpty) return;
+    _phraseLoading.addAll(unchecked);
+    unawaited(_readCachedPhrases(unchecked, allowRemote: allowRemote));
+  }
+
+  Future<void> _readCachedPhrases(
+    List<String> keys, {
+    required bool allowRemote,
+  }) async {
+    final epoch = _routeEpoch;
+    final generation = _cache.generation;
+    final language = _reading.code;
+    final route = _assistant.translateRouteFingerprint();
+    Map<String, String> cached;
+    try {
+      cached = await _cache.namesFor(
+        tags: keys.map(_phraseCacheKey),
+        language: language,
+        route: route.isEmpty ? null : route,
+        maxPromptVersion:
+            PromptAssistantService.promptPhraseTranslationPromptVersion,
+      );
+    } catch (_) {
+      cached = const {};
+    }
+    if (_disposed ||
+        epoch != _routeEpoch ||
+        generation != _cache.generation ||
+        language != _reading.code) {
+      return;
+    }
+    for (final key in keys) {
+      _phraseLoading.remove(key);
+      final reading = cached[_phraseCacheKey(key)];
+      if (reading != null && reading.trim().isNotEmpty) {
+        _phraseReadings[key] = reading;
+      }
+      if (allowRemote) _queuePhrase(key);
+    }
+    notifyListeners();
+  }
+
+  void _queuePhrase(String key) {
+    if (_phraseReadings.containsKey(key)) {
+      _phraseForced.remove(key);
+      return;
+    }
+    if (_phraseLoading.contains(key) || !_phraseVisible(key)) return;
+    final force = _phraseForced.contains(key);
+    if (!_enabled && !force) return;
+    if (_phraseErrors.containsKey(key) && !force) return;
+    if (_assistant.translateRouteFingerprint().isEmpty) {
+      if (force) _phraseErrors[key] = currentL10n.wiki_configureTagModel;
+      _phraseForced.remove(key);
+      return;
+    }
+    if (_phraseQueue.add(key) && !(_phraseTimer?.isActive ?? false)) {
+      _phraseTimer = Timer(_phraseDebounce, _flushPhrases);
+    }
+  }
+
+  Future<void> _flushPhrases() async {
+    if (_disposed || _phraseSession != null) return;
+    final batch = <String>[];
+    var chars = 0;
+    for (final key in _phraseQueue.toList()) {
+      if (!_phraseVisible(key) || _phraseReadings.containsKey(key)) {
+        _phraseQueue.remove(key);
+        continue;
+      }
+      final length = _phraseSources[key]!.length;
+      if (batch.isNotEmpty &&
+          (batch.length >= _phraseBatchSize ||
+              chars + length > _phraseBatchChars)) {
+        break;
+      }
+      batch.add(key);
+      chars += length;
+    }
+    if (batch.isEmpty) return;
+    _phraseQueue.removeAll(batch);
+    final forced = batch.where(_phraseForced.contains).toSet();
+    final epoch = _routeEpoch;
+    final generation = _cache.generation;
+    final language = _reading.code;
+    final route = _assistant.translateRouteFingerprint();
+    bool current() =>
+        !_disposed &&
+        epoch == _routeEpoch &&
+        generation == _cache.generation &&
+        language == _reading.code &&
+        route == _assistant.translateRouteFingerprint();
+    final session = 'prompt-phrases-${DateTime.now().microsecondsSinceEpoch}';
+    _phraseSession = session;
+    try {
+      final keyBySource = {for (final key in batch) _phraseSources[key]!: key};
+      final result = await _assistant.translatePromptPhrases(
+        keyBySource.keys.toList(),
+        sessionId: session,
+      );
+      if (!current() || (!_enabled && forced.isEmpty)) return;
+      for (final MapEntry(key: source, value: reading) in result.entries) {
+        final key = keyBySource[source];
+        if (key == null) continue;
+        _phraseReadings[key] = reading;
+        try {
+          await _cache.put(
+            expectedGeneration: generation,
+            tag: _phraseCacheKey(key),
+            route: route,
+            promptVersion:
+                PromptAssistantService.promptPhraseTranslationPromptVersion,
+            wikiHash: '',
+            nameZh: reading,
+            nameLanguage: language,
+            definitionLanguage: language,
+          );
+        } catch (_) {
+          // The reading is still shown; only the persisted copy is missing.
+        }
+      }
+      // A phrase the model skipped is not retried automatically.
+      for (final key in batch) {
+        if (!_phraseReadings.containsKey(key)) {
+          _phraseErrors[key] = 'missing';
+        }
+      }
+    } catch (error) {
+      if (!current() || (!_enabled && forced.isEmpty)) return;
+      final message = FatalDiagnostics.redactSensitiveText(
+        '$error'.replaceAll(RegExp(r'https?://[^\s]+'), '[URL]'),
+      );
+      for (final key in batch) {
+        _phraseErrors[key] = message;
+      }
+    } finally {
+      if (_phraseSession == session) _phraseSession = null;
+      _phraseForced.removeAll(batch);
+      if (!_disposed) {
+        notifyListeners();
+        if (_phraseQueue.isNotEmpty && !(_phraseTimer?.isActive ?? false)) {
+          _phraseTimer = Timer(
+            const Duration(milliseconds: 300),
+            _flushPhrases,
+          );
+        }
+      }
+    }
   }
 
   void _reloadNameReadings({bool allowRemote = true}) => _scheduleNameReadings(
@@ -550,6 +792,10 @@ class AutoTagTranslationController extends ChangeNotifier {
   }
 
   void clearSurface(String surface) {
+    if (_phrasesBySurface.remove(surface) != null) {
+      _phraseQueue.retainWhere(_phraseVisible);
+      _phraseForced.retainWhere(_phraseVisible);
+    }
     _nameOnlyBySurface.remove(surface);
     final removed = _visibleBySurface.remove(surface);
     final oldWiki = _wikiBySurface.remove(surface);
@@ -603,6 +849,9 @@ class AutoTagTranslationController extends ChangeNotifier {
 
   void _queueVisible() {
     if (!_enabled) return;
+    for (final key in _visiblePhraseKeys) {
+      _queuePhrase(key);
+    }
     for (final tag in _wikiBySurface.values) {
       if (!_wikiBodies.containsKey(tag)) _enqueue(tag, wiki: true);
     }
@@ -1169,6 +1418,7 @@ class AutoTagTranslationController extends ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
+    _phraseTimer?.cancel();
     if (closeCacheOnDispose) unawaited(_cache.close());
     super.dispose();
   }

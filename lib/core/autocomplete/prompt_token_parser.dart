@@ -117,10 +117,8 @@ class PromptTokenParser {
       final range = _contentRange(text, segment, false);
       final content = text.substring(range.start, range.end);
       if (content.isEmpty ||
-          content.contains(RegExp(r'[<>\uFFFC\uE000-\uF8FF]')) ||
-          content.runes.length > 120 ||
-          content.split(RegExp(r'\s+')).length > 8 ||
-          RegExp(r'[.!?。！？](?:\s|$)').hasMatch(content)) {
+          content.contains(_readingBoundary) ||
+          !_isTagLike(content)) {
         continue;
       }
       final tag = TagNormalizer.normalize(content);
@@ -130,6 +128,58 @@ class PromptTokenParser {
     }
     return result;
   }
+
+  /// Natural-language text that [annotationRanges] does not treat as a tag:
+  /// sentences, long clauses and phrases. Comma-free paragraphs are split at
+  /// sentence ends so each reading starts under its own sentence. Manual
+  /// blocks, aliases and text without Latin letters have no reading.
+  static List<({int start, int end, String text})> phraseRanges(String text) {
+    final result = <({int start, int end, String text})>[];
+    for (final segment in _segments(text, false)) {
+      final range = _contentRange(text, segment, false);
+      final content = text.substring(range.start, range.end);
+      if (content.isEmpty ||
+          content.contains(_readingBoundary) ||
+          _isTagLike(content)) {
+        continue;
+      }
+      var start = range.start;
+      for (final end in [
+        for (final match in _sentenceEnd.allMatches(content))
+          range.start + match.end,
+        range.end,
+      ]) {
+        var from = start, to = end;
+        start = end;
+        while (from < to && text[from].trim().isEmpty) {
+          from++;
+        }
+        while (to > from && text[to - 1].trim().isEmpty) {
+          to--;
+        }
+        final sentence = text.substring(from, to);
+        if (sentence.length <= _maxPhraseLength && sentence.contains(_latin)) {
+          result.add((start: from, end: to, text: sentence));
+        }
+      }
+    }
+    return result;
+  }
+
+  static final _readingBoundary = RegExp(r'[<>\uFFFC\uE000-\uF8FF]');
+  static final _sentenceEnd = RegExp(r'[.!?\u3002\uFF01\uFF1F](?=\s)');
+  static final _sentenceEndAnywhere = RegExp(
+    r'[.!?\u3002\uFF01\uFF1F](?:\s|$)',
+  );
+  static final _latin = RegExp('[A-Za-z]');
+
+  /// Longer comma- and period-free text is pasted material, not a sentence.
+  static const _maxPhraseLength = 600;
+
+  static bool _isTagLike(String content) =>
+      content.runes.length <= 120 &&
+      content.split(RegExp(r'\s+')).length <= 8 &&
+      !_sentenceEndAnywhere.hasMatch(content);
 
   /// Inserts after the source tag and its closing syntax, without rewriting it.
   static CompletionQuery? parseRelated({

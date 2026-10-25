@@ -10,6 +10,7 @@ import '../../../../core/wiki/auto_tag_translation_controller.dart';
 import 'prompt_reading_spacing.dart';
 
 typedef PromptAnnotationRange = ({int start, int end, String tag});
+typedef PromptPhraseRange = ({int start, int end, String text});
 
 /// Paints readings over the actual editable geometry. Source text, selection,
 /// composing ranges, undo history and inline manual blocks stay editor-owned.
@@ -17,7 +18,8 @@ typedef PromptAnnotationRange = ({int start, int end, String tag});
 /// Readings hang just under the baseline, in the lower half of an evenly
 /// distributed line. When the controller is a [PromptReadingSpacingHost], a
 /// reading wider than its tag pushes the next word right, so readings are
-/// never clipped to the width of short tags.
+/// never clipped to the width of short tags. Natural-language sentences get a
+/// reading too; it flows under the sentence's lines instead of one line.
 class PromptReadingLayer extends ConsumerStatefulWidget {
   const PromptReadingLayer({
     super.key,
@@ -49,9 +51,10 @@ class PromptReadingLayerState extends ConsumerState<PromptReadingLayer> {
   late final String _surface = 'prompt-reading-${identityHashCode(this)}';
   AutoTagTranslationController? _readings;
   List<PromptAnnotationRange> _ranges = const [];
+  List<PromptPhraseRange> _phrases = const [];
   String _text = '';
   TextRange _composing = TextRange.empty;
-  Set<String> _visible = {};
+  Set<String> _visible = {}, _visiblePhrases = {};
   int _visibilityRevision = 0;
   int? _appliedSpacing;
   bool _spacingCheckScheduled = false;
@@ -102,9 +105,10 @@ class PromptReadingLayerState extends ConsumerState<PromptReadingLayer> {
 
   void _readText() {
     final value = widget.controller.value;
-    if (_text != value.text || _ranges.isEmpty) {
+    if (_text != value.text || (_ranges.isEmpty && _phrases.isEmpty)) {
       _text = value.text;
       _ranges = PromptTokenParser.annotationRanges(_text);
+      _phrases = PromptTokenParser.phraseRanges(_text);
     }
     _composing = value.composing;
   }
@@ -127,43 +131,50 @@ class PromptReadingLayerState extends ConsumerState<PromptReadingLayer> {
     }
   }
 
-  /// Tags and names that decide the spacing of [text]; equal signatures mean
-  /// the spans already built for the editor are still right.
-  int _spacingSignature(String text) {
+  /// Ranges of [text] with their current readings, tags and phrases alike.
+  List<({int start, int end, String reading, bool phrase})> _readingsOf(
+    String text,
+  ) {
     final readings = _readings;
-    if (!widget.enabled || readings == null) return 0;
-    final ranges = text == _text
-        ? _ranges
-        : PromptTokenParser.annotationRanges(text);
-    return Object.hash(
-      text,
-      Object.hashAll([
-        for (final range in ranges)
-          if (readings.nameFor(range.tag) case final String name
-              when name.isNotEmpty)
-            (range.start, name),
-      ]),
-    );
+    if (!widget.enabled || readings == null) return const [];
+    final current = text == _text;
+    return [
+      for (final range
+          in current ? _ranges : PromptTokenParser.annotationRanges(text))
+        if (readings.nameFor(range.tag) case final String name
+            when name.isNotEmpty)
+          (start: range.start, end: range.end, reading: name, phrase: false),
+      for (final range
+          in current ? _phrases : PromptTokenParser.phraseRanges(text))
+        if (readings.phraseFor(range.text) case final String reading
+            when reading.isNotEmpty)
+          (start: range.start, end: range.end, reading: reading, phrase: true),
+    ];
   }
+
+  /// Ranges and readings that decide the spacing of [text]; equal signatures
+  /// mean the spans already built for the editor are still right.
+  int _spacingSignature(String text) => Object.hash(
+    text,
+    Object.hashAll([
+      for (final item in _readingsOf(text)) (item.start, item.reading),
+    ]),
+  );
 
   Map<int, double> _spacing(String text, TextStyle style, TextScaler scaler) {
     _appliedSpacing = _spacingSignature(text);
-    final readings = _readings;
-    if (!widget.enabled || readings == null) return const {};
-    final ranges = text == _text
-        ? _ranges
-        : PromptTokenParser.annotationRanges(text);
     final out = <int, double>{};
-    for (final range in ranges) {
-      final name = readings.nameFor(range.tag);
-      if (name == null || name.isEmpty) continue;
+    for (final item in _readingsOf(text)) {
       // Reserve room up to the separator, so closing weight syntax and the
-      // budget stay one unbreakable run with the tag.
-      var end = range.end;
-      while (end < text.length && !_separator(text.codeUnitAt(end))) {
+      // budget stay one unbreakable run with the tag. A sentence stops at its
+      // own end: the next sentence of the same clause follows a space.
+      var end = item.end;
+      while (end < text.length &&
+          !_separator(text.codeUnitAt(end)) &&
+          !(item.phrase && _space(text.codeUnitAt(end)))) {
         end++;
       }
-      while (end > range.end && _space(text.codeUnitAt(end - 1))) {
+      while (end > item.end && _space(text.codeUnitAt(end - 1))) {
         end--;
       }
       final separator = _gapAfter(text, end);
@@ -176,10 +187,10 @@ class PromptReadingLayerState extends ConsumerState<PromptReadingLayer> {
       final unit = text.codeUnitAt(at);
       if (unit >= 0xD800 && unit <= 0xDFFF) continue;
       final extra =
-          promptReadingTextWidth(name, widget.style, scaler) +
+          promptReadingTextWidth(item.reading, widget.style, scaler) +
           PromptReadingLayer._readingGap -
           promptReadingTextWidth(
-            text.substring(range.start, end),
+            text.substring(item.start, end),
             style,
             scaler,
           ) -
@@ -237,17 +248,21 @@ class PromptReadingLayerState extends ConsumerState<PromptReadingLayer> {
       _attachSpacing(widget.controller);
       _readText();
     }
-    if (!widget.enabled && oldWidget.enabled) _updateVisible({});
+    if (!widget.enabled && oldWidget.enabled) _updateVisible({}, {});
   }
 
-  void _updateVisible(Set<String> tags) {
-    if (setEquals(tags, _visible)) return;
+  void _updateVisible(Set<String> tags, Set<String> phrases) {
+    if (setEquals(tags, _visible) && setEquals(phrases, _visiblePhrases)) {
+      return;
+    }
     _visible = tags;
+    _visiblePhrases = phrases;
     final revision = ++_visibilityRevision;
     // Render geometry is available during paint; never notify providers there.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || revision != _visibilityRevision) return;
       _readings?.observeNames(surface: _surface, tags: _visible);
+      _readings?.observePhrases(surface: _surface, phrases: _visiblePhrases);
     });
   }
 
@@ -270,17 +285,21 @@ class PromptReadingLayerState extends ConsumerState<PromptReadingLayer> {
       }
       return true;
     });
+    bool outsideComposing(({int start, int end}) range) =>
+        !_composing.isValid ||
+        _composing.isCollapsed ||
+        range.end <= _composing.start ||
+        range.start >= _composing.end;
     final ranges = widget.enabled
         ? _ranges
-              .where(
-                (range) =>
-                    !_composing.isValid ||
-                    _composing.isCollapsed ||
-                    range.end <= _composing.start ||
-                    range.start >= _composing.end,
-              )
+              .where((r) => outsideComposing((start: r.start, end: r.end)))
               .toList()
         : const <PromptAnnotationRange>[];
+    final phrases = widget.enabled
+        ? _phrases
+              .where((r) => outsideComposing((start: r.start, end: r.end)))
+              .toList()
+        : const <PromptPhraseRange>[];
     final scaler = MediaQuery.textScalerOf(context);
     final bottomInset = _trailingInset(scaler);
     return _ReadingPaint(
@@ -289,6 +308,12 @@ class PromptReadingLayerState extends ConsumerState<PromptReadingLayer> {
         for (final range in ranges)
           if (_readings!.nameFor(range.tag) case final String name)
             range.tag: name,
+      },
+      phrases: phrases,
+      phraseReadings: {
+        for (final range in phrases)
+          if (_readings!.phraseFor(range.text) case final String reading)
+            range.text: reading,
       },
       style: widget.style,
       scaler: scaler,
@@ -308,6 +333,8 @@ class _ReadingPaint extends SingleChildRenderObjectWidget {
   const _ReadingPaint({
     required this.ranges,
     required this.names,
+    required this.phrases,
+    required this.phraseReadings,
     required this.style,
     required this.scaler,
     required this.bottomInset,
@@ -319,12 +346,14 @@ class _ReadingPaint extends SingleChildRenderObjectWidget {
 
   final List<PromptAnnotationRange> ranges;
   final Map<String, String> names;
+  final List<PromptPhraseRange> phrases;
+  final Map<String, String> phraseReadings;
   final TextStyle style;
   final TextScaler scaler;
   final double bottomInset;
   final TextDirection direction;
   final List<ViewportOffset> ancestorOffsets;
-  final ValueChanged<Set<String>> onVisible;
+  final void Function(Set<String> tags, Set<String> phrases) onVisible;
 
   @override
   _RenderReadings createRenderObject(BuildContext context) =>
@@ -413,9 +442,11 @@ class _RenderReadings extends RenderProxyBox {
     // EditableText repaints inside its own boundary while scrolling. The
     // annotation ancestor must repaint as well to track the same viewport.
     _watchScroll(editable);
-    final visible = <String>{};
-    if (editable == null || !editable.hasSize || config.ranges.isEmpty) {
-      config.onVisible(visible);
+    final visible = <String>{}, visiblePhrases = <String>{};
+    if (editable == null ||
+        !editable.hasSize ||
+        (config.ranges.isEmpty && config.phrases.isEmpty)) {
+      config.onVisible(visible, visiblePhrases);
       return;
     }
     final transform = editable.getTransformTo(this);
@@ -450,7 +481,7 @@ class _RenderReadings extends RenderProxyBox {
       readingViewport = readingViewport.intersect(ancestorViewport);
     }
     if (viewport.isEmpty) {
-      config.onVisible(visible);
+      config.onVisible(visible, visiblePhrases);
       return;
     }
     final first = editable
@@ -463,34 +494,34 @@ class _RenderReadings extends RenderProxyBox {
     final sourceSize = config.scaler.scale(
       editable.text?.style?.fontSize ?? 14,
     );
+    final minRoom = config.scaler.scale(config.style.fontSize ?? 10);
     final canvas = context.canvas;
     canvas.save();
     // Include the reserved final-line room, but never extend an ancestor's
     // scrolling viewport into the next panel.
     canvas.clipRect(readingViewport.shift(offset));
     var lineTop = double.nan, lineRight = double.negativeInfinity;
-    for (final range in config.ranges) {
-      if (range.end < math.min(first, last) ||
-          range.start > math.max(first, last)) {
-        continue;
+
+    /// Readings on one source line never overlap, in document order.
+    double startOnLine(double left, double top) {
+      if (top != lineTop) {
+        lineTop = top;
+        lineRight = double.negativeInfinity;
       }
-      final rects = editable
-          .getBoxesForSelection(
-            TextSelection(baseOffset: range.start, extentOffset: range.end),
-          )
-          .map((box) => MatrixUtils.transformRect(transform, box.toRect()))
-          .where((rect) => rect.overlaps(viewport) && rect.width > 1)
-          .toList();
-      if (rects.isEmpty) continue;
-      visible.add(range.tag);
-      final name = config.names[range.tag];
-      if (name == null || name.isEmpty) continue;
-      final painter = TextPainter(
-        text: TextSpan(text: name, style: config.style),
-        textDirection: config.direction,
-        textScaler: config.scaler,
-        maxLines: 1,
-      )..layout();
+      return math.max(left, lineRight + PromptReadingLayer._readingGap);
+    }
+
+    TextPainter layout(String text, {double? maxWidth, bool single = true}) =>
+        TextPainter(
+          text: TextSpan(text: text, style: config.style),
+          textDirection: config.direction,
+          textScaler: config.scaler,
+          maxLines: single ? 1 : null,
+          ellipsis: single && maxWidth != null ? '…' : null,
+        )..layout(maxWidth: maxWidth ?? double.infinity);
+
+    void paintTag(List<Rect> rects, String name) {
+      final painter = layout(name);
       // A tag wrapped across lines reads from its first fragment when the
       // reading fits there, otherwise from the fragment that ends the tag.
       final rect =
@@ -499,13 +530,9 @@ class _RenderReadings extends RenderProxyBox {
           ? rects.first
           : rects.last;
       final top = rect.bottom - descent + sourceSize * .22;
-      if (top != lineTop) {
-        lineTop = top;
-        lineRight = double.negativeInfinity;
-      }
       // Spacing already reserves the room; this only guards the frame before
       // fresh spans arrive and controllers that cannot reserve room.
-      var x = math.max(rect.left, lineRight + PromptReadingLayer._readingGap);
+      var x = startOnLine(rect.left, top);
       if (x + painter.width > viewport.right) {
         x = math.max(
           math.max(viewport.left, viewport.right - painter.width),
@@ -516,24 +543,91 @@ class _RenderReadings extends RenderProxyBox {
       if (painter.width > room) {
         // Only a reading wider than the remaining line is shortened.
         painter.dispose();
-        if (room < config.scaler.scale(config.style.fontSize ?? 10)) continue;
-        final short = TextPainter(
-          text: TextSpan(text: name, style: config.style),
-          textDirection: config.direction,
-          textScaler: config.scaler,
-          maxLines: 1,
-          ellipsis: '…',
-        )..layout(maxWidth: room);
+        if (room < minRoom) return;
+        final short = layout(name, maxWidth: room);
         short.paint(canvas, offset + Offset(x, top));
         lineRight = x + short.width;
         short.dispose();
-        continue;
+        return;
       }
       painter.paint(canvas, offset + Offset(x, top));
       lineRight = x + painter.width;
       painter.dispose();
     }
+
+    /// A sentence reading starts under the sentence and continues under its
+    /// following lines; only what exceeds the last line is shortened.
+    void paintPhrase(List<Rect> lines, String reading) {
+      var rest = reading;
+      for (var i = 0; i < lines.length && rest.isNotEmpty; i++) {
+        final line = lines[i];
+        final top = line.bottom - descent + sourceSize * .22;
+        final x = startOnLine(line.left, top);
+        final room = viewport.right - x;
+        if (room < minRoom) continue;
+        if (i == lines.length - 1) {
+          final painter = layout(rest, maxWidth: room);
+          painter.paint(canvas, offset + Offset(x, top));
+          lineRight = x + painter.width;
+          painter.dispose();
+          return;
+        }
+        final paragraph = layout(rest, maxWidth: room, single: false);
+        final end = paragraph
+            .getLineBoundary(const TextPosition(offset: 0))
+            .end;
+        paragraph.dispose();
+        if (end <= 0) continue;
+        final piece = layout(rest.substring(0, end).trimRight());
+        piece.paint(canvas, offset + Offset(x, top));
+        lineRight = x + piece.width;
+        piece.dispose();
+        rest = rest.substring(end).trimLeft();
+      }
+    }
+
+    final items = <({int start, int end, String key, bool phrase})>[
+      for (final range in config.ranges)
+        (start: range.start, end: range.end, key: range.tag, phrase: false),
+      for (final range in config.phrases)
+        (start: range.start, end: range.end, key: range.text, phrase: true),
+    ]..sort((a, b) => a.start.compareTo(b.start));
+    for (final item in items) {
+      if (item.end < math.min(first, last) ||
+          item.start > math.max(first, last)) {
+        continue;
+      }
+      final boxes = editable
+          .getBoxesForSelection(
+            TextSelection(baseOffset: item.start, extentOffset: item.end),
+          )
+          .map((box) => MatrixUtils.transformRect(transform, box.toRect()))
+          .where((rect) => rect.width > 1)
+          .toList();
+      if (!boxes.any((rect) => rect.overlaps(viewport))) continue;
+      if (!item.phrase) {
+        visible.add(item.key);
+        final name = config.names[item.key];
+        if (name == null || name.isEmpty) continue;
+        paintTag(boxes.where((rect) => rect.overlaps(viewport)).toList(), name);
+        continue;
+      }
+      visiblePhrases.add(item.key);
+      final reading = config.phraseReadings[item.key];
+      if (reading == null || reading.isEmpty) continue;
+      // One slot per visual line; a line scrolled out keeps its share so the
+      // visible part of the reading does not jump while scrolling.
+      final lines = <Rect>[];
+      for (final box in boxes) {
+        if (lines.isNotEmpty && (lines.last.top - box.top).abs() < 1) {
+          lines.last = lines.last.expandToInclude(box);
+        } else {
+          lines.add(box);
+        }
+      }
+      paintPhrase(lines, reading);
+    }
     canvas.restore();
-    config.onVisible(visible);
+    config.onVisible(visible, visiblePhrases);
   }
 }

@@ -16,6 +16,13 @@ class _Assistant extends Mock implements PromptAssistantService {}
 class _Wiki extends Mock implements TagWikiRepository {}
 
 class _Readings extends AutoTagTranslationController {
+  @override
+  String? phraseFor(String text) => null;
+  @override
+  void observePhrases({
+    required String surface,
+    required Iterable<String> phrases,
+  }) {}
   _Readings()
     : super(
         assistant: _Assistant(),

@@ -70,4 +70,34 @@ void main() {
       );
     }
   });
+
+  test('natural-language sentences become phrase ranges beside tags', () {
+    const text =
+        'masterpiece, a girl sitting on a bench in the park at sunset, '
+        'smile,\nShe stands in a flower field. The sky is full of soft clouds.';
+    expect(PromptTokenParser.annotationRanges(text).map((r) => r.tag), [
+      'masterpiece',
+      'smile',
+    ]);
+    final phrases = PromptTokenParser.phraseRanges(text);
+    expect(phrases.map((r) => r.text), [
+      'a girl sitting on a bench in the park at sunset',
+      'She stands in a flower field.',
+      'The sky is full of soft clouds.',
+    ]);
+    for (final range in phrases) {
+      expect(text.substring(range.start, range.end), range.text);
+    }
+  });
+
+  test('phrase ranges skip weights, macros, blocks and non-Latin text', () {
+    const text =
+        '1.2::a girl sitting on a long wooden bench by the lake::, '
+        '<preset:a long natural sentence with many many words here>, '
+        '\uFFFC, \u8FD9\u662F\u4E00\u53E5\u5F88\u957F\u7684\u4E2D\u6587\u53E5\u5B50\u3002, '
+        '1.5::solo::';
+    expect(PromptTokenParser.phraseRanges(text).map((r) => r.text), [
+      'a girl sitting on a long wooden bench by the lake',
+    ]);
+  });
 }

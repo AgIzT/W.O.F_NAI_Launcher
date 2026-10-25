@@ -11160,7 +11160,8 @@
   "promptReading_displayHint": "원문 아래에 사용 가능한 번역을 표시합니다.",
   "promptReading_completion": "입력 중 태그 자동 완성",
   "promptReading_completionHint": "중국어와 영어로 태그, 캐릭터, 작품을 검색합니다.",
-  "promptReading_fillMissing": "표시된 태그의 누락된 번역 채우기",
+  "promptReading_fillMissing": "표시된 태그와 문장의 누락된 번역 채우기",
+  "promptReading_autoTranslateHint": "프롬프트에 보이는 태그와 자연어 문장을 자동 번역합니다(모델 및 API에서 태그 번역 모델 설정 필요). 끄면 로컬 사전과 캐시된 번역만 표시합니다.",
   "modelSettings_promptReadingHint": "전체 번역은 읽기용이며 프롬프트를 변경하지 않습니다.",
   "promptCompletion_works": "작품",
   "promptCompletion_expand": "전체 목록 및 Wiki 미리보기 (후보를 우클릭하면 바로 미리보기)"

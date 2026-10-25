@@ -44,11 +44,39 @@ class _Readings extends AutoTagTranslationController {
   void requestMissingNames({required String surface}) => requests.add(surface);
   @override
   void clearSurface(String surface) => surfaces.remove(surface);
+  final phrases = <String, String>{};
+  final phraseSurfaces = <String, Set<String>>{};
+  Set<String> get visiblePhrases => {
+    for (final phrases in phraseSurfaces.values) ...phrases,
+  };
+  @override
+  String? phraseFor(String text) =>
+      phrases[AutoTagTranslationController.phraseKey(text)];
+  @override
+  void observePhrases({
+    required String surface,
+    required Iterable<String> phrases,
+  }) {
+    phraseSurfaces[surface] = phrases.toSet();
+  }
+
+  void revealPhrases(Map<String, String> readings) {
+    phrases.addAll({
+      for (final entry in readings.entries)
+        AutoTagTranslationController.phraseKey(entry.key): entry.value,
+    });
+    notifyListeners();
+  }
+
   void reveal(Map<String, String> translations) {
     names.addAll(translations);
     notifyListeners();
   }
 }
+
+const _sentence = 'a girl sitting on a wooden bench in the park at sunset';
+const _field1 = 'She stands in a flower field.';
+const _sky = 'The sky behind her is full of soft pink clouds and warm light.';
 
 const _font = TextStyle(
   fontFamily: 'Geist',
@@ -367,9 +395,19 @@ void main() {
   testWidgets(
     'capture real-font annotations with manual blocks and large narrow text',
     (tester) async {
-      await tester.binding.setSurfaceSize(const Size(1040, 760));
+      await tester.binding.setSurfaceSize(const Size(1040, 980));
       addTearDown(() => tester.binding.setSurfaceSize(null));
       final readings = _Readings();
+      readings.phrases.addAll({
+        AutoTagTranslationController.phraseKey(_sentence):
+            '一个女孩在日落时分坐在公园的木制长椅上',
+        AutoTagTranslationController.phraseKey(_field1): '她站在一片花田里。',
+        AutoTagTranslationController.phraseKey(_sky): '她身后的天空布满柔和的粉色云朵与温暖的光线。',
+      });
+      final prose = NaiSyntaxController(
+        text: 'masterpiece, 1girl, $_sentence, smile,\n$_field1 $_sky',
+      );
+      addTearDown(prose.dispose);
       readings.names.addAll({
         '1girl': '1个女孩',
         'long_hair': '长发',
@@ -444,6 +482,8 @@ void main() {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 28),
+                    SizedBox(width: 520, child: _field(prose, maxLines: 8)),
                   ],
                 ),
               ),
@@ -536,6 +576,61 @@ void main() {
       caretX(tester, 7) - caretX(tester, 0),
       lessThan(readingWidth(wideName)),
     );
+  });
+
+  testWidgets('sentences are observed as phrases and never as tags', (
+    tester,
+  ) async {
+    final readings = _Readings();
+    final controller = NaiSyntaxController(
+      text: 'masterpiece, $_sentence, smile,\n$_field1 $_sky',
+    );
+    addTearDown(controller.dispose);
+    await tester.pumpWidget(
+      _app(
+        readings,
+        Center(
+          child: SizedBox(width: 640, child: _field(controller, maxLines: 8)),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+    expect(readings.visible, {'masterpiece', 'smile'});
+    expect(readings.visiblePhrases, {_sentence, _field1, _sky});
+    final before = controller.value;
+    readings.revealPhrases({_sentence: '一个女孩坐在长椅上'});
+    await tester.pump();
+    await tester.pump();
+    expect(controller.value, before);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('a phrase reading wider than its sentence pushes the next tag', (
+    tester,
+  ) async {
+    final readings = _Readings();
+    const short = 'A cat sits.';
+    final controller = NaiSyntaxController(text: '$short, solo, smile');
+    addTearDown(controller.dispose);
+    await tester.pumpWidget(
+      _app(
+        readings,
+        Center(child: SizedBox(width: 900, child: _field(controller))),
+      ),
+    );
+    await tester.pump();
+    const next = short.length + 2;
+    final narrowGap = caretX(tester, next) - caretX(tester, 0);
+    readings.revealPhrases({short: wideName + wideName});
+    await tester.pump();
+    await tester.pump();
+    expect(
+      caretX(tester, next) - caretX(tester, 0),
+      greaterThanOrEqualTo(readingWidth(wideName + wideName) + 4 - .5),
+    );
+    expect(caretX(tester, next) - caretX(tester, 0), greaterThan(narrowGap));
+    expect(controller.text, '$short, solo, smile');
   });
 
   testWidgets('disabling readings removes the reserved room', (tester) async {

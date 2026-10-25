@@ -175,6 +175,7 @@ class _GenerationSettingsSectionState
             SettingsSwitchTile(
               secondary: const Icon(Icons.auto_awesome_outlined),
               title: Text(l10n.wiki_autoTranslateTagsArticles),
+              subtitle: Text(l10n.promptReading_autoTranslateHint),
               value: translations.enabled,
               onChanged: translations.setEnabled,
             ),

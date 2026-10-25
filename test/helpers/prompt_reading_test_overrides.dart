@@ -57,6 +57,19 @@ class PromptReadingTestController extends ChangeNotifier
   @override
   void clearSurface(String surface) => surfaces.remove(surface);
 
+  final phrases = <String, String>{};
+  final phraseSurfaces = <String, Set<String>>{};
+  @override
+  String? phraseFor(String text) =>
+      phrases[AutoTagTranslationController.phraseKey(text)];
+  @override
+  void observePhrases({
+    required String surface,
+    required Iterable<String> phrases,
+  }) {
+    phraseSurfaces[surface] = phrases.toSet();
+  }
+
   void reveal(Map<String, String> values) {
     names.addAll(values);
     notifyListeners();

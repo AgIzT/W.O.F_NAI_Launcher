@@ -48,6 +48,13 @@ void main() {
 }
 
 class _Readings extends AutoTagTranslationController {
+  @override
+  String? phraseFor(String text) => null;
+  @override
+  void observePhrases({
+    required String surface,
+    required Iterable<String> phrases,
+  }) {}
   _Readings()
     : super(
         assistant: _Assistant(),

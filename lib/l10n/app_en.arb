@@ -11172,7 +11172,8 @@
   "promptReading_displayHint": "Show available translations below the original text.",
   "promptReading_completion": "Complete tags while typing",
   "promptReading_completionHint": "Search tags, characters and series in Chinese or English.",
-  "promptReading_fillMissing": "Fill missing visible readings",
+  "promptReading_fillMissing": "Fill missing readings for visible tags and sentences",
+  "promptReading_autoTranslateHint": "Visible tags and natural-language sentences in prompts are translated automatically once a tag translation model is set in Models & APIs. When off, only local dictionary and cached readings are shown.",
   "modelSettings_promptReadingHint": "Full-text translation is for reading and does not modify prompts.",
   "promptCompletion_works": "Works",
   "promptCompletion_expand": "Full list and Wiki preview (right-click a suggestion to preview it)"

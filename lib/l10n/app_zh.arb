@@ -11160,7 +11160,8 @@
   "promptReading_displayHint": "在原文下方显示已有译名。",
   "promptReading_completion": "输入时补全标签",
   "promptReading_completionHint": "支持中英文搜索标签、角色和作品。",
-  "promptReading_fillMissing": "补齐可见标签的缺失译名",
+  "promptReading_fillMissing": "补齐可见标签与句子的缺失译名",
+  "promptReading_autoTranslateHint": "提示词中可见的标签和自然语言句子会自动翻译，需先在「模型与接口」配置标签翻译模型；关闭时只显示本地词库和缓存里的译名。",
   "modelSettings_promptReadingHint": "全文翻译仅供阅读，不修改提示词。",
   "promptCompletion_works": "作品",
   "promptCompletion_expand": "完整列表与 Wiki 预览（右键候选可直接预览）"

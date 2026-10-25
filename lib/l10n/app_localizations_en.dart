@@ -21816,7 +21816,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'Search tags, characters and series in Chinese or English.';
 
   @override
-  String get promptReading_fillMissing => 'Fill missing visible readings';
+  String get promptReading_fillMissing =>
+      'Fill missing readings for visible tags and sentences';
+
+  @override
+  String get promptReading_autoTranslateHint =>
+      'Visible tags and natural-language sentences in prompts are translated automatically once a tag translation model is set in Models & APIs. When off, only local dictionary and cached readings are shown.';
 
   @override
   String get modelSettings_promptReadingHint =>

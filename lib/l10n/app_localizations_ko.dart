@@ -21156,7 +21156,11 @@ class AppLocalizationsKo extends AppLocalizations {
   String get promptReading_completionHint => '중국어와 영어로 태그, 캐릭터, 작품을 검색합니다.';
 
   @override
-  String get promptReading_fillMissing => '표시된 태그의 누락된 번역 채우기';
+  String get promptReading_fillMissing => '표시된 태그와 문장의 누락된 번역 채우기';
+
+  @override
+  String get promptReading_autoTranslateHint =>
+      '프롬프트에 보이는 태그와 자연어 문장을 자동 번역합니다(모델 및 API에서 태그 번역 모델 설정 필요). 끄면 로컬 사전과 캐시된 번역만 표시합니다.';
 
   @override
   String get modelSettings_promptReadingHint => '전체 번역은 읽기용이며 프롬프트를 변경하지 않습니다.';

@@ -20853,7 +20853,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get promptReading_completionHint => '支持中英文搜索标签、角色和作品。';
 
   @override
-  String get promptReading_fillMissing => '补齐可见标签的缺失译名';
+  String get promptReading_fillMissing => '补齐可见标签与句子的缺失译名';
+
+  @override
+  String get promptReading_autoTranslateHint =>
+      '提示词中可见的标签和自然语言句子会自动翻译，需先在「模型与接口」配置标签翻译模型；关闭时只显示本地词库和缓存里的译名。';
 
   @override
   String get modelSettings_promptReadingHint => '全文翻译仅供阅读，不修改提示词。';
@@ -41714,7 +41718,11 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get promptReading_completionHint => '支援中英文搜尋標籤、角色和作品。';
 
   @override
-  String get promptReading_fillMissing => '補齊可見標籤的缺失譯名';
+  String get promptReading_fillMissing => '補齊可見標籤與句子的缺失譯名';
+
+  @override
+  String get promptReading_autoTranslateHint =>
+      '提示詞中可見的標籤和自然語言句子會自動翻譯，需先在「模型與介面」配置標籤翻譯模型；關閉時只顯示本地詞庫和快取裡的譯名。';
 
   @override
   String get modelSettings_promptReadingHint => '全文翻譯僅供閱讀，不修改提示詞。';

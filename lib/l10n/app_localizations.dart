@@ -37921,8 +37921,14 @@ abstract class AppLocalizations {
   /// No description provided for @promptReading_fillMissing.
   ///
   /// In en, this message translates to:
-  /// **'Fill missing visible readings'**
+  /// **'Fill missing readings for visible tags and sentences'**
   String get promptReading_fillMissing;
+
+  /// No description provided for @promptReading_autoTranslateHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Visible tags and natural-language sentences in prompts are translated automatically once a tag translation model is set in Models & APIs. When off, only local dictionary and cached readings are shown.'**
+  String get promptReading_autoTranslateHint;
 
   /// No description provided for @modelSettings_promptReadingHint.
   ///
