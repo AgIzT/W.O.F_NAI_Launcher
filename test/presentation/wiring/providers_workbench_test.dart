@@ -176,10 +176,7 @@ void main() {
       final p = h.view.providers.single,
           m = h.state.settings['p']!.models.single;
       expect(p.apiKeyMasked, 'sk-••••-key');
-      expect(p.models['m']!.usedFor, {
-        SettingsModelTask.promptTranslate,
-        SettingsModelTask.promptReverse,
-      });
+      expect(p.models['m']!.usedFor, {SettingsModelTask.promptTranslate});
       expect(m.reasoningLevels, ['high']);
       expect(m.capabilities, isEmpty);
       expect(m.body.single.value, '{"old":true}');

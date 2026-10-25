@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'app_language.dart';
 
-/// Reading language is stored on each block, independently of the UI locale.
+/// Language shared by tag readings, Wiki translations and read-only prompt text.
 enum PromptTranslationLanguage {
   chinese('zh', 'Simplified Chinese'),
   traditionalChinese('zh-TW', 'Traditional Chinese (Taiwan)'),

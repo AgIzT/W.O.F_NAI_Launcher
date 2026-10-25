@@ -175,8 +175,6 @@ class BlockData {
     this.sourcePath,
     this.importedAt,
     this.sourceState = BlockSourceState.none,
-    this.reading,
-    this.readingNeedsReview = false,
   });
 
   final String id;
@@ -212,12 +210,6 @@ class BlockData {
   final String? sourcePath;
   final DateTime? importedAt;
   final BlockSourceState sourceState;
-
-  /// 翻译阅读（`readingTranslationZh`），只在详情里显示。
-  final String? reading;
-
-  /// 原文改过、翻译待复核。
-  final bool readingNeedsReview;
 
   /// 项数：正面原子数；只有负面的块（负面词块）算负面原子数。
   int get itemCount => atoms.isEmpty ? negativeAtoms.length : atoms.length;

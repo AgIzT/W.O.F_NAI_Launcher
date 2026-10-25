@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../autocomplete/autocomplete_providers.dart';
+import '../autocomplete/chinese_tag_completion_source.dart';
 import '../autocomplete/completion_models.dart';
 import '../autocomplete/unified_tag_repository.dart';
 import '../database/services/service_providers.dart';
@@ -18,29 +19,25 @@ final localTagExpansionServiceProvider = Provider<LocalTagExpansionService>((
   ref,
 ) {
   final catalog = ref.watch(unifiedTagRepositoryProvider);
+  final semanticNames = ChineseTagCompletionSource(
+    searchNames:
+        (input, {limit = 80, categoryFilter = CompletionCategoryFilter.all}) =>
+            ref
+                .read(tagSemanticsRepositoryProvider)
+                .searchNameMatches(
+                  input,
+                  limit: limit,
+                  categoryFilter: categoryFilter,
+                ),
+    resolveNames: catalog.resolveExact,
+  );
   return LocalTagExpansionService(
     catalog: catalog,
     relatedTags: ref.watch(cooccurrenceCompletionSourceProvider),
     substringSearch: catalog.searchContains,
     popularSearch: catalog.popular,
-    semanticNames: (input, {limit = 80}) async {
-      final repository = ref.read(tagSemanticsRepositoryProvider);
-      final candidates = await catalog.byNames(
-        await repository.searchNames(input, limit: limit),
-      );
-      final profiles = await repository.findAll(
-        candidates.map((c) => c.canonicalTag),
-      );
-      return [
-        for (final candidate in candidates)
-          candidate.copyWith(
-            translation: profiles[candidate.canonicalTag]?.coreZh,
-            retrievalOrigins: const ['chinese-name'],
-            matchKind: profiles[candidate.canonicalTag]?.coreZh == input.trim()
-                ? CompletionMatchKind.chineseExact
-                : CompletionMatchKind.chineseContains,
-          ),
-      ];
-    },
+    filteredSubstringSearch: catalog.searchContains,
+    semanticNames: semanticNames.search,
+    filteredSemanticNames: semanticNames.search,
   );
 });

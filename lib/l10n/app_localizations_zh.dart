@@ -5606,7 +5606,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get promptBlockPalette_emptyHint =>
-      '把常用的提示词块或翻译块拖进来收纳；用时点一下插到光标处，或直接拖进提示词框。';
+      '把常用提示词块拖进来收纳；用时点击插到光标处，或直接拖进提示词框。';
 
   @override
   String get promptBlockPalette_remove => '从积木移除';
@@ -5789,8 +5789,7 @@ class AppLocalizationsZh extends AppLocalizations {
       '一次点击发几次请求、每次出几张，是两个不同的数。按钮上显示的是总张数，Anlas 也按总张数算——看清楚再按，别问我是怎么知道的。';
 
   @override
-  String get tips_studio_trick_6 =>
-      '在翻译块上按一下鼠标中键，原文和译文来回切换。AI 翻得再好，偶尔也值得偷看一眼原文，确认它没把 cat ears 翻成什么奇怪的东西。';
+  String get tips_studio_trick_6 => '标签译名显示在提示词下方，可随时开关；原文始终可以直接编辑。';
 
   @override
   String get tips_studio_trick_7 =>
@@ -7277,74 +7276,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get tagExpansion_autoTranslateVisible => '自动翻译可见标签';
 
   @override
-  String get translationEditor_title => '翻译块';
-
-  @override
-  String get translationEditor_source => '原文';
-
-  @override
-  String get translationEditor_sourcePrefix => '原';
-
-  @override
-  String get translationEditor_generation => '生图使用';
-
-  @override
-  String get translationEditor_editable => '可改写';
-
-  @override
-  String get translationEditor_modified => '被修改';
-
-  @override
-  String get translationEditor_edited => '已编辑';
-
-  @override
-  String get translationEditor_close => '关闭';
-
-  @override
-  String get translationEditor_save => '保存';
-
-  @override
-  String get translationEditor_delete => '删除整块';
-
-  @override
-  String get translationEditor_restore => '还原为原文文本';
-
-  @override
-  String get translationEditor_configure => '配置翻译模型';
-
-  @override
-  String translationEditor_readingFieldTitle(Object language) {
-    return '$language阅读文本';
-  }
-
-  @override
-  String translationEditor_sourceWarning(Object language) {
-    return '原文已修改，$language待同步';
-  }
-
-  @override
-  String get translationEditor_editHint => '译文已手工编辑；这是编辑记录，不触发原文修改提醒';
-
-  @override
-  String get translationLanguage_chinese => '中文';
-
-  @override
-  String get translationLanguage_english => '英语';
-
-  @override
-  String get translationLanguage_japanese => '日语';
-
-  @override
-  String get translationLanguage_korean => '韩语';
-
-  @override
-  String get translationLanguage_traditionalChinese => '繁体中文';
-
-  @override
-  String get modelTask_translateTitle => '原文 → 阅读语言';
-
-  @override
-  String get modelTask_promptReverseTitle => '阅读语言 → 原文';
+  String get modelTask_translateTitle => '全文阅读翻译';
 
   @override
   String get modelTask_tagTranslateTitle => '标签翻译与语义补充';
@@ -7353,10 +7285,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get modelTask_wikiTranslateTitle => '百科正文翻译';
 
   @override
-  String get modelTask_translateDescription => '翻译提示词与积木，保留权重、分组和标签语义。';
-
-  @override
-  String get modelTask_promptReverseDescription => '结合原文落实译文中的增删修改，结果填回原文供确认。';
+  String get modelTask_translateDescription => '将完整提示词翻译为独立阅读对照，保留原文。';
 
   @override
   String get modelTask_tagTranslateDescription =>
@@ -7675,15 +7604,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get modelRequest_emptyResponse => '模型返回了空内容。';
 
   @override
-  String get modelService_testFieldsIncomplete => '测试返回的字段不完整。';
-
-  @override
-  String get modelService_testFieldsInvalid => '测试返回的字段不正确。';
-
-  @override
-  String get modelService_testGroupsInvalid => '测试返回的分组不正确。';
-
-  @override
   String get modelService_testSourceEmpty => '测试返回的原文为空。';
 
   @override
@@ -7882,15 +7802,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get modelSettings_usePreset => '使用预设';
 
   @override
-  String get modelSettings_outputLanguage => '输出语言';
-
-  @override
-  String get modelSettings_englishPrompt => '英文生成提示词';
-
-  @override
-  String get modelSettings_englishPromptHelp => '结合原文落实修改，输出英文生成提示词。';
-
-  @override
   String get modelSettings_targetLanguage => '目标语言';
 
   @override
@@ -7908,9 +7819,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String modelSettings_reasoningSummaryModel(Object level) {
     return '思考：$level（跟随模型）';
   }
-
-  @override
-  String get modelSettings_promptBlocksHint => '无需翻译时，也可将提示词拆分为模块，通过积木功能自由拼装。';
 
   @override
   String get modelSettings_wikiFormatHint => '无需翻译时，也可整理排版并为相关标签添加链接。';
@@ -8447,153 +8355,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get modelOverrides_addHeader => '添加请求头';
 
   @override
-  String get promptTranslation_translating => '正在翻译';
-
-  @override
-  String get promptTranslation_needsModel => '翻译 · 先配置模型';
-
-  @override
-  String promptTranslation_withRoute(Object provider, Object model) {
-    return '翻译 · $provider / $model';
-  }
-
-  @override
-  String get promptTranslation_actions => '翻译操作';
-
-  @override
-  String get promptTranslation_promptChanged => '提示词已变化，未覆盖新编辑';
-
-  @override
-  String get promptTranslation_nothingToTranslate => '当前没有需要翻译的普通文字';
-
-  @override
-  String promptTranslation_failed(Object error) {
-    return '翻译失败：$error';
-  }
-
-  @override
-  String get promptTranslation_setupTitle => '先配置翻译模型';
-
-  @override
-  String get promptTranslation_setupBody =>
-      '翻译需要明确选择服务商和模型。前往「设置 → 集成 → 模型与接口」，先添加服务商并取得模型列表，再在「提示词翻译」卡片中完成选择。';
-
-  @override
-  String get promptTranslation_later => '稍后';
-
-  @override
-  String get promptTranslation_openSettings => '前往设置';
-
-  @override
-  String get promptTranslation_toolTitle => '翻译';
-
-  @override
-  String get promptTranslation_noModel => '未配置模型';
-
-  @override
-  String get promptTranslation_configureModel => '配置翻译模型';
-
-  @override
-  String get promptTranslation_translateNew => '翻译新增内容';
-
-  @override
-  String get promptTranslation_undoRestore => '撤销原文还原，恢复翻译块';
-
-  @override
-  String get promptTranslation_restoreAll => '全部翻译块还原为原文文本';
-
-  @override
-  String get promptTranslation_tutorial => '操作教程';
-
-  @override
-  String get promptTranslation_guideBack => '返回操作';
-
-  @override
-  String get promptTranslation_guideMiddleTitle => '中键点块';
-
-  @override
-  String get promptTranslation_guideMiddleText => '切换原文与译文';
-
-  @override
-  String get promptTranslation_guideSourceTitle => '左键点原文';
-
-  @override
-  String get promptTranslation_guideSourceText => '定位光标，直接修改';
-
-  @override
-  String get promptTranslation_guideReadingTitle => '左键点译文';
-
-  @override
-  String get promptTranslation_guideReadingText => '打开块编辑窗';
-
-  @override
-  String get promptTranslation_guideCtrlTitle => 'Ctrl + 点击 / 拖选';
-
-  @override
-  String get promptTranslation_guideCtrlText => '编辑窗内搜索标签 / 查关联';
-
-  @override
-  String get promptTranslation_guideConvertTitle => '↑ 中文转原文';
-
-  @override
-  String get promptTranslation_guideConvertText => '↓ 原文转中文，检查后保存';
-
-  @override
-  String get promptTranslation_guideRestoreTitle => '切换整组显示';
-
-  @override
-  String get promptTranslation_guideRestoreText => '在翻译菜单中切换全部原文 / 译文';
-
-  @override
-  String get promptTranslation_middleButton => '鼠标中键';
-
-  @override
-  String get promptTranslation_leftButton => '鼠标左键';
-
-  @override
-  String get promptTranslation_blockShowingOriginal => '翻译块，显示原文';
-
-  @override
-  String get promptTranslation_blockShowingReading => '翻译块，显示译文';
-
-  @override
-  String get promptTranslation_blockNeedsReview => '原文已修改 · 译文待更新';
-
-  @override
-  String get promptTranslation_badgeTooltip => '原文已修改，中文待同步';
-
-  @override
-  String get promptTranslation_sourceChanged => '原文已变化，请重新打开翻译块';
-
-  @override
-  String promptTranslation_retranslateFailed(Object error) {
-    return '重新翻译失败：$error';
-  }
-
-  @override
-  String get promptTranslation_draftChanged => '内容已修改，请重新转换；新草稿已保留';
-
-  @override
-  String promptTranslation_convertFailed(Object error) {
-    return '转换失败，草稿已保留：$error';
-  }
-
-  @override
-  String get promptTranslation_invalidResultFormat => '转换结果格式不正确，草稿已保留';
-
-  @override
-  String get promptTranslation_noValidText => '模型没有返回有效文字，草稿已保留';
-
-  @override
-  String get promptTranslation_invalidResultContent => '转换结果包含无效格式，草稿已保留';
-
-  @override
-  String get promptTranslation_incompleteStructure => '转换结果的权重或分组不完整，草稿已保留';
-
-  @override
-  String get promptTranslation_inputRequired => '请先输入需要转换的内容';
-
-  @override
   String get wiki_configureTagModel => '请先在「模型与接口」配置可用的标签翻译模型。';
 
   @override
@@ -8630,9 +8391,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get blockAppearance_gradient => '渐变';
-
-  @override
-  String get blockAppearance_translation => '翻译';
 
   @override
   String opusUsage_regularRemaining(Object percent) {
@@ -9111,9 +8869,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get imageMenu_fileActions => '文件操作';
-
-  @override
-  String get imageMenu_saveToBlock => '存入积木';
 
   @override
   String get settings_highAnlasCostEstimate => '预计消耗';
@@ -12055,9 +11810,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get blocks_title => '块库';
 
   @override
-  String get blocks_translationMark => '译';
-
-  @override
   String get blocks_add => '添加';
 
   @override
@@ -12213,9 +11965,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get blocks_lookGradient => '渐变';
-
-  @override
-  String get blocks_lookTranslation => '翻译';
 
   @override
   String get blocks_hasParams => '附带参数';
@@ -12761,12 +12510,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get blocks_changeThumb => '更换 / 调整';
-
-  @override
-  String get blocks_reading => '翻译阅读';
-
-  @override
-  String get blocks_needsReview => '需复核';
 
   @override
   String get blocks_applyToCurrent => '应用到当前';
@@ -14308,32 +14051,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get gen_relatedSub => '补全时推荐常一起出现的标签';
-
-  @override
-  String get gen_translating => '正在翻译…';
-
-  @override
-  String get gen_translateNeedsModel => '还没配翻译模型，点一下去设置';
-
-  @override
-  String get gen_translateRestore => '显示原文';
-
-  @override
-  String gen_translateWith(Object route) {
-    return '翻译（$route）';
-  }
-
-  @override
-  String get gen_translateNew => '翻译新增内容';
-
-  @override
-  String get gen_translateShowOriginal => '全部显示原文';
-
-  @override
-  String get gen_translateShowTranslated => '全部显示译文';
-
-  @override
-  String get gen_translateSettings => '翻译模型设置';
 
   @override
   String get gen_qualityPreset => '质量词预设';
@@ -17960,9 +17677,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get set_mdTaskPrompt => '提示词翻译';
 
   @override
-  String get set_mdTaskReverse => '提示词反推';
-
-  @override
   String get set_mdTaskTag => '标签翻译与语义补充';
 
   @override
@@ -21110,6 +20824,45 @@ class AppLocalizationsZh extends AppLocalizations {
   String startup_dataActionFailed(String error) {
     return '操作失败：$error';
   }
+
+  @override
+  String get promptCompletion_all => '全部';
+
+  @override
+  String get promptCompletion_tags => '标签';
+
+  @override
+  String get promptCompletion_summary => '词库简释义';
+
+  @override
+  String get promptCompletion_synonyms => '中文同义词';
+
+  @override
+  String get promptReading_showReadings => '显示标签译名';
+
+  @override
+  String get promptReading_hideReadings => '隐藏标签译名';
+
+  @override
+  String get promptReading_displayHint => '在原文下方显示已有译名。';
+
+  @override
+  String get promptReading_completion => '输入时补全标签';
+
+  @override
+  String get promptReading_completionHint => '支持中英文搜索标签、角色和作品。';
+
+  @override
+  String get promptReading_fillMissing => '补齐可见标签的缺失译名';
+
+  @override
+  String get modelSettings_promptReadingHint => '全文翻译仅供阅读，不修改提示词。';
+
+  @override
+  String get promptCompletion_works => '作品';
+
+  @override
+  String get promptCompletion_expand => '完整列表与 Wiki 预览（右键候选可直接预览）';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -26714,7 +26467,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get promptBlockPalette_emptyHint =>
-      '把常用的提示詞塊或翻譯塊拖進來收納；用時點一下插到游標處，或直接拖進提示詞框。';
+      '把常用提示詞塊拖進來收納；用時點選插到游標處，或直接拖進提示詞框。';
 
   @override
   String get promptBlockPalette_remove => '從積木移除';
@@ -26897,8 +26650,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
       '一次點擊發幾次請求、每次出幾張，是兩個不同的數。按鈕上顯示的是總張數，Anlas 也按總張數算——看清楚再按，別問我是怎麼知道的。';
 
   @override
-  String get tips_studio_trick_6 =>
-      '在翻譯塊上按一下滑鼠中鍵，原文和譯文來回切換。AI 翻得再好，偶爾也值得偷看一眼原文，確認它沒把 cat ears 翻成什麼奇怪的東西。';
+  String get tips_studio_trick_6 => '標籤譯名顯示在提示詞下方，可隨時開關；原文始終可以直接編輯。';
 
   @override
   String get tips_studio_trick_7 =>
@@ -28385,74 +28137,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get tagExpansion_autoTranslateVisible => '自動翻譯可見標籤';
 
   @override
-  String get translationEditor_title => '翻譯塊';
-
-  @override
-  String get translationEditor_source => '原文';
-
-  @override
-  String get translationEditor_sourcePrefix => '原';
-
-  @override
-  String get translationEditor_generation => '生圖使用';
-
-  @override
-  String get translationEditor_editable => '可改寫';
-
-  @override
-  String get translationEditor_modified => '被修改';
-
-  @override
-  String get translationEditor_edited => '已編輯';
-
-  @override
-  String get translationEditor_close => '關閉';
-
-  @override
-  String get translationEditor_save => '儲存';
-
-  @override
-  String get translationEditor_delete => '刪除整塊';
-
-  @override
-  String get translationEditor_restore => '還原為原文文本';
-
-  @override
-  String get translationEditor_configure => '配置翻譯模型';
-
-  @override
-  String translationEditor_readingFieldTitle(Object language) {
-    return '$language閱讀文本';
-  }
-
-  @override
-  String translationEditor_sourceWarning(Object language) {
-    return '原文已修改，$language待同步';
-  }
-
-  @override
-  String get translationEditor_editHint => '譯文已手工編輯；這是編輯記錄，不觸發原文修改提醒';
-
-  @override
-  String get translationLanguage_chinese => '中文';
-
-  @override
-  String get translationLanguage_english => '英語';
-
-  @override
-  String get translationLanguage_japanese => '日語';
-
-  @override
-  String get translationLanguage_korean => '韓語';
-
-  @override
-  String get translationLanguage_traditionalChinese => '繁體中文';
-
-  @override
-  String get modelTask_translateTitle => '原文 → 閱讀語言';
-
-  @override
-  String get modelTask_promptReverseTitle => '閱讀語言 → 原文';
+  String get modelTask_translateTitle => '全文閱讀翻譯';
 
   @override
   String get modelTask_tagTranslateTitle => '標籤翻譯與語義補充';
@@ -28461,10 +28146,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get modelTask_wikiTranslateTitle => '百科正文翻譯';
 
   @override
-  String get modelTask_translateDescription => '翻譯提示詞與積木，保留權重、分組和標籤語義。';
-
-  @override
-  String get modelTask_promptReverseDescription => '結合原文落實譯文中的增刪修改，結果填回原文供確認。';
+  String get modelTask_translateDescription => '將完整提示詞翻譯為獨立閱讀對照，保留原文。';
 
   @override
   String get modelTask_tagTranslateDescription =>
@@ -28783,15 +28465,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get modelRequest_emptyResponse => '模型返回了空內容。';
 
   @override
-  String get modelService_testFieldsIncomplete => '測試返回的欄位不完整。';
-
-  @override
-  String get modelService_testFieldsInvalid => '測試返回的欄位不正確。';
-
-  @override
-  String get modelService_testGroupsInvalid => '測試返回的分組不正確。';
-
-  @override
   String get modelService_testSourceEmpty => '測試返回的原文為空。';
 
   @override
@@ -28990,15 +28663,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get modelSettings_usePreset => '使用預設';
 
   @override
-  String get modelSettings_outputLanguage => '輸出語言';
-
-  @override
-  String get modelSettings_englishPrompt => '英文生成提示詞';
-
-  @override
-  String get modelSettings_englishPromptHelp => '結合原文落實修改，輸出英文生成提示詞。';
-
-  @override
   String get modelSettings_targetLanguage => '目標語言';
 
   @override
@@ -29016,9 +28680,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String modelSettings_reasoningSummaryModel(Object level) {
     return '思考：$level（跟隨模型）';
   }
-
-  @override
-  String get modelSettings_promptBlocksHint => '無需翻譯時，也可將提示詞拆分為模組，通過積木功能自由拼裝。';
 
   @override
   String get modelSettings_wikiFormatHint => '無需翻譯時，也可整理排版併為相關標籤新增連結。';
@@ -29555,153 +29216,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get modelOverrides_addHeader => '新增請求標頭';
 
   @override
-  String get promptTranslation_translating => '正在翻譯';
-
-  @override
-  String get promptTranslation_needsModel => '翻譯 · 先配置模型';
-
-  @override
-  String promptTranslation_withRoute(Object provider, Object model) {
-    return '翻譯 · $provider / $model';
-  }
-
-  @override
-  String get promptTranslation_actions => '翻譯操作';
-
-  @override
-  String get promptTranslation_promptChanged => '提示詞已變化，未覆蓋新編輯';
-
-  @override
-  String get promptTranslation_nothingToTranslate => '當前沒有需要翻譯的普通文字';
-
-  @override
-  String promptTranslation_failed(Object error) {
-    return '翻譯失敗：$error';
-  }
-
-  @override
-  String get promptTranslation_setupTitle => '先配置翻譯模型';
-
-  @override
-  String get promptTranslation_setupBody =>
-      '翻譯需要明確選擇服務商和模型。前往「設定 → 整合 → 模型與介面」，先新增服務商並取得模型列表，再在「提示詞翻譯」卡片中完成選擇。';
-
-  @override
-  String get promptTranslation_later => '稍後';
-
-  @override
-  String get promptTranslation_openSettings => '前往設定';
-
-  @override
-  String get promptTranslation_toolTitle => '翻譯';
-
-  @override
-  String get promptTranslation_noModel => '未配置模型';
-
-  @override
-  String get promptTranslation_configureModel => '配置翻譯模型';
-
-  @override
-  String get promptTranslation_translateNew => '翻譯新增內容';
-
-  @override
-  String get promptTranslation_undoRestore => '復原原文還原，恢復翻譯塊';
-
-  @override
-  String get promptTranslation_restoreAll => '全部翻譯塊還原為原文文本';
-
-  @override
-  String get promptTranslation_tutorial => '操作教程';
-
-  @override
-  String get promptTranslation_guideBack => '返回操作';
-
-  @override
-  String get promptTranslation_guideMiddleTitle => '中鍵點塊';
-
-  @override
-  String get promptTranslation_guideMiddleText => '切換原文與譯文';
-
-  @override
-  String get promptTranslation_guideSourceTitle => '左鍵點原文';
-
-  @override
-  String get promptTranslation_guideSourceText => '定位游標，直接修改';
-
-  @override
-  String get promptTranslation_guideReadingTitle => '左鍵點譯文';
-
-  @override
-  String get promptTranslation_guideReadingText => '開啟塊編輯窗';
-
-  @override
-  String get promptTranslation_guideCtrlTitle => 'Ctrl + 點選 / 拖選';
-
-  @override
-  String get promptTranslation_guideCtrlText => '編輯窗內搜尋標籤 / 查關聯';
-
-  @override
-  String get promptTranslation_guideConvertTitle => '↑ 中文轉原文';
-
-  @override
-  String get promptTranslation_guideConvertText => '↓ 原文轉中文，檢查後儲存';
-
-  @override
-  String get promptTranslation_guideRestoreTitle => '切換整組顯示';
-
-  @override
-  String get promptTranslation_guideRestoreText => '在翻譯選單中切換全部原文 / 譯文';
-
-  @override
-  String get promptTranslation_middleButton => '滑鼠中鍵';
-
-  @override
-  String get promptTranslation_leftButton => '滑鼠左鍵';
-
-  @override
-  String get promptTranslation_blockShowingOriginal => '翻譯塊，顯示原文';
-
-  @override
-  String get promptTranslation_blockShowingReading => '翻譯塊，顯示譯文';
-
-  @override
-  String get promptTranslation_blockNeedsReview => '原文已修改 · 譯文待更新';
-
-  @override
-  String get promptTranslation_badgeTooltip => '原文已修改，中文待同步';
-
-  @override
-  String get promptTranslation_sourceChanged => '原文已變化，請重新開啟翻譯塊';
-
-  @override
-  String promptTranslation_retranslateFailed(Object error) {
-    return '重新翻譯失敗：$error';
-  }
-
-  @override
-  String get promptTranslation_draftChanged => '內容已修改，請重新轉換；新草稿已保留';
-
-  @override
-  String promptTranslation_convertFailed(Object error) {
-    return '轉換失敗，草稿已保留：$error';
-  }
-
-  @override
-  String get promptTranslation_invalidResultFormat => '轉換結果格式不正確，草稿已保留';
-
-  @override
-  String get promptTranslation_noValidText => '模型沒有返回有效文字，草稿已保留';
-
-  @override
-  String get promptTranslation_invalidResultContent => '轉換結果包含無效格式，草稿已保留';
-
-  @override
-  String get promptTranslation_incompleteStructure => '轉換結果的權重或分組不完整，草稿已保留';
-
-  @override
-  String get promptTranslation_inputRequired => '請先輸入需要轉換的內容';
-
-  @override
   String get wiki_configureTagModel => '請先在「模型與介面」配置可用的標籤翻譯模型。';
 
   @override
@@ -29738,9 +29252,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get blockAppearance_gradient => '漸變';
-
-  @override
-  String get blockAppearance_translation => '翻譯';
 
   @override
   String opusUsage_regularRemaining(Object percent) {
@@ -30219,9 +29730,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get imageMenu_fileActions => '檔案操作';
-
-  @override
-  String get imageMenu_saveToBlock => '存入積木';
 
   @override
   String get settings_highAnlasCostEstimate => '預計消耗';
@@ -33163,9 +32671,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get blocks_title => '塊庫';
 
   @override
-  String get blocks_translationMark => '譯';
-
-  @override
   String get blocks_add => '新增';
 
   @override
@@ -33321,9 +32826,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get blocks_lookGradient => '漸變';
-
-  @override
-  String get blocks_lookTranslation => '翻譯';
 
   @override
   String get blocks_hasParams => '附帶參數';
@@ -33869,12 +33371,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get blocks_changeThumb => '更換 / 調整';
-
-  @override
-  String get blocks_reading => '翻譯閱讀';
-
-  @override
-  String get blocks_needsReview => '需複核';
 
   @override
   String get blocks_applyToCurrent => '應用到當前';
@@ -35416,32 +34912,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get gen_relatedSub => '補全時推薦常一起出現的標籤';
-
-  @override
-  String get gen_translating => '正在翻譯…';
-
-  @override
-  String get gen_translateNeedsModel => '還沒配翻譯模型，點一下去設定';
-
-  @override
-  String get gen_translateRestore => '顯示原文';
-
-  @override
-  String gen_translateWith(Object route) {
-    return '翻譯（$route）';
-  }
-
-  @override
-  String get gen_translateNew => '翻譯新增內容';
-
-  @override
-  String get gen_translateShowOriginal => '全部顯示原文';
-
-  @override
-  String get gen_translateShowTranslated => '全部顯示譯文';
-
-  @override
-  String get gen_translateSettings => '翻譯模型設定';
 
   @override
   String get gen_qualityPreset => '品質詞預設';
@@ -39068,9 +38538,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get set_mdTaskPrompt => '提示詞翻譯';
 
   @override
-  String get set_mdTaskReverse => '提示詞反推';
-
-  @override
   String get set_mdTaskTag => '標籤翻譯與語義補充';
 
   @override
@@ -42218,4 +41685,43 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String startup_dataActionFailed(String error) {
     return '操作失敗：$error';
   }
+
+  @override
+  String get promptCompletion_all => '全部';
+
+  @override
+  String get promptCompletion_tags => '標籤';
+
+  @override
+  String get promptCompletion_summary => '詞庫簡釋義';
+
+  @override
+  String get promptCompletion_synonyms => '中文同義詞';
+
+  @override
+  String get promptReading_showReadings => '顯示標籤譯名';
+
+  @override
+  String get promptReading_hideReadings => '隱藏標籤譯名';
+
+  @override
+  String get promptReading_displayHint => '在原文下方顯示已有譯名。';
+
+  @override
+  String get promptReading_completion => '輸入時補全標籤';
+
+  @override
+  String get promptReading_completionHint => '支援中英文搜尋標籤、角色和作品。';
+
+  @override
+  String get promptReading_fillMissing => '補齊可見標籤的缺失譯名';
+
+  @override
+  String get modelSettings_promptReadingHint => '全文翻譯僅供閱讀，不修改提示詞。';
+
+  @override
+  String get promptCompletion_works => '作品';
+
+  @override
+  String get promptCompletion_expand => '完整列表與 Wiki 預覽（右鍵候選可直接預覽）';
 }

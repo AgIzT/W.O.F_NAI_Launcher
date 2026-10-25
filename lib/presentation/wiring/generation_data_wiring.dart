@@ -8,13 +8,11 @@ import '../../core/constants/model_spec.dart';
 import '../../core/shortcuts/default_shortcuts.dart';
 import '../providers/shortcuts_provider.dart';
 import '../../data/models/character/character_prompt.dart';
-import '../../data/models/prompt_block/pill_document.dart';
 import '../../core/services/anlas_calculator.dart';
 import '../../core/services/prompt_token_counter_service.dart';
 import '../../data/models/user/user_subscription.dart';
 import '../../data/services/alias_resolver_service.dart';
 import '../../l10n/app_localizations.dart';
-import '../prompt_assistant/providers/prompt_assistant_config_provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/canvas_settings_provider.dart';
 import '../providers/canvas_channel_provider.dart';
@@ -36,7 +34,7 @@ import '../providers/layout_state_provider.dart';
 import '../providers/local_gallery_provider.dart';
 import '../providers/prompt_block_library_provider.dart';
 import '../providers/prompt_token_counter_provider.dart';
-import '../providers/prompt_translation_provider.dart';
+import '../providers/prompt_reading_preferences_provider.dart';
 import '../providers/quality_preset_provider.dart';
 import '../providers/subscription_provider.dart';
 import '../providers/uc_preset_provider.dart';
@@ -53,10 +51,6 @@ import 'generation_settings.dart';
 import 'generation_view_mapping.dart';
 import 'tools_generation_wiring.dart';
 
-final generationTranslationRouteLabelProvider = Provider<String?>((ref) {
-  final route = ref.watch(promptAssistantConfigProvider).promptTranslationRoute;
-  return route == null ? null : '${route.provider.name} · ${route.model.name}';
-});
 final generationClockProvider = Provider<DateTime Function()>(
   (ref) => DateTime.now,
 );
@@ -245,10 +239,6 @@ final generationViewDataProvider = Provider.autoDispose
             negativePrompt: draft.fields['characters'][index]['uc'] as String,
           ),
       ];
-      final translationRoute = ref.watch(
-        generationTranslationRouteLabelProvider,
-      );
-      final translating = ref.watch(promptTranslationBusyProvider);
       final resolver = ref.read(aliasResolverServiceProvider.notifier);
       final count = ref.watch(imagesPerRequestProvider);
       final cooldown = ref.watch(generationCooldownProvider).remainingSeconds;
@@ -389,28 +379,6 @@ final generationViewDataProvider = Provider.autoDispose
         ];
       }
 
-      final translationDocuments = [
-        PillDocument.fromJson(
-          Map<String, dynamic>.from(
-            draft.documents[negative ? 'negative_prompt' : 'prompt'] as Map,
-          ),
-        ),
-        for (final role in projectedCharacters)
-          if (role.enabled)
-            PillDocument.fromJson(
-              Map<String, dynamic>.from(
-                draft.documents['characters']['lanes'][role.id][negative
-                        ? 'negative'
-                        : 'positive']
-                    as Map,
-              ),
-            ),
-      ];
-      final translations = [
-        for (final document in translationDocuments)
-          for (final instance in document.instances.values)
-            if (instance.translation != null) instance.translation!,
-      ];
       final feedback = bridge.enabled
           ? ref.watch(bridgeAgentFeedbackProvider)
           : null;
@@ -499,9 +467,7 @@ final generationViewDataProvider = Provider.autoDispose
             related: ref.watch(cooccurrenceSettingsProvider),
           ),
           translate: GenTranslate(
-            busy: translating,
-            showing: translations.any((pill) => !pill.showOriginal),
-            route: translationRoute,
+            showing: ref.watch(promptReadingPreferencesProvider).showReadings,
           ),
           bridge: feedback == null
               ? null

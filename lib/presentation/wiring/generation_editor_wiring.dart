@@ -7,11 +7,13 @@ import '../providers/character_prompt_provider.dart';
 import '../providers/image_generation_provider.dart';
 import '../providers/pill_roll_coordinator.dart';
 import '../providers/pill_workspace_provider.dart';
+import '../providers/prompt_reading_preferences_provider.dart';
 import '../providers/tips_provider.dart';
 import '../ui/gen/gen_contract.dart';
 import '../widgets/prompt/comfyui_import_wrapper.dart';
 import '../widgets/prompt/pills/prompt_pill_editor.dart';
 import '../widgets/prompt/unified/unified_prompt_config.dart';
+import '../widgets/prompt/reading/prompt_reading_layer.dart';
 import 'generation_backend.dart';
 
 ComfyuiImportCommit beginGenerationComfyuiImport(
@@ -113,6 +115,12 @@ class GenerationEditorWiring extends ConsumerWidget {
     final textStyle = DefaultTextStyle.of(
       context,
     ).style.copyWith(fontSize: target.fullscreen ? 14 : 13, height: 1.5);
+    final showReadings = ref
+        .watch(promptReadingPreferencesProvider)
+        .showReadings;
+    final effectiveLineHeight = showReadings
+        ? PromptReadingLayer.lineHeight
+        : textStyle.height!;
     Widget editor(int minLines) => PromptPillEditor(
       key: ValueKey('generation-editor-$scope-${target.fullscreen}'),
       pillScope: scope,
@@ -148,7 +156,7 @@ class GenerationEditorWiring extends ConsumerWidget {
         builder: (context, constraints) {
           final lineHeight =
               MediaQuery.textScalerOf(context).scale(textStyle.fontSize!) *
-              textStyle.height!;
+              effectiveLineHeight;
           final lines = constraints.hasBoundedHeight
               ? (constraints.maxHeight / lineHeight).floor().clamp(8, 80)
               : 8;
@@ -161,12 +169,12 @@ class GenerationEditorWiring extends ConsumerWidget {
       builder: (context, constraints) {
         final lineHeight =
             MediaQuery.textScalerOf(context).scale(textStyle.fontSize!) *
-            textStyle.height!;
+            effectiveLineHeight;
         // 卡片高约 0.72×宽；编辑槽比卡片窄 46px，头尾约 92px，
         // 折算后从槽宽的 0.72 倍扣除约 60px。长正文仍可继续增高。
         final minLines = constraints.hasBoundedWidth
             ? ((constraints.maxWidth * .72 - 60) / lineHeight).round().clamp(
-                4,
+                showReadings ? 3 : 4,
                 16,
               )
             : 4;

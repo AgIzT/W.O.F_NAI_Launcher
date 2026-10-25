@@ -14,10 +14,9 @@ import '../providers/shortcuts_provider.dart';
 import '../../core/storage/local_storage_service.dart';
 import '../../core/utils/localization_extension.dart';
 import '../../data/models/gallery/nai_image_metadata.dart';
-import '../../data/models/prompt_block/pill_document.dart';
 import '../../data/services/image_metadata_service.dart';
 import '../providers/image_generation_provider.dart';
-import '../providers/prompt_translation_provider.dart';
+import '../providers/prompt_text_reading_provider.dart';
 import 'blocks_edit_wiring.dart';
 import '../screens/generation/handlers/vibe_import_handler.dart';
 import '../ui/gen/gen_contract.dart';
@@ -303,14 +302,12 @@ class _GenerationViewerWiringState
         id == current &&
         version == revision &&
         identical(translationRequests[part], pending);
-    late final PillDocument value;
+    late final String value;
     try {
-      value = await ref
-          .read(promptTranslationCoordinatorProvider)
-          .translateDocument(
-            PillDocument(text: partText(id, part), instances: const {}),
-            sessionId: 'generation-viewer-$id',
-          );
+      value = await ref.read(promptTextReadingTranslatorProvider)(
+        partText(id, part),
+        'generation-viewer-$id-$part',
+      );
     } catch (_) {
       if (!valid()) return;
       setState(() {
@@ -321,17 +318,7 @@ class _GenerationViewerWiringState
     }
     if (!valid()) return;
     translationRequests.remove(part);
-    setState(
-      () => translations[part] = ViewerTranslation(
-        text: value.text
-            .split('')
-            .map(
-              (character) =>
-                  value.instances[character]?.translation?.zh ?? character,
-            )
-            .join(),
-      ),
-    );
+    setState(() => translations[part] = ViewerTranslation(text: value));
   }
 
   Future<void> action(String id, ViewerAction action) async {

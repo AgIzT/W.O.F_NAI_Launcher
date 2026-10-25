@@ -88,6 +88,7 @@ class _Tags extends UnifiedTagRepository {
   Future<List<CompletionCandidate>> searchContains(
     String input, {
     int limit = 20,
+    CompletionCategoryFilter categoryFilter = CompletionCategoryFilter.all,
   }) async => [];
   @override
   Future<List<CompletionCandidate>> browse({
@@ -194,6 +195,7 @@ class _Auto extends ChangeNotifier implements AutoTagTranslationController {
     required bool visible,
     String? existingNameZh,
     AutoTagTranslationContext? tagContext,
+    TagReadingIntent intent = TagReadingIntent.details,
   }) {
     final tags = this.visible.putIfAbsent(surface, () => {});
     if (visible) {
@@ -636,7 +638,16 @@ void main() {
       final l10n = AppLocalizations.of(
         tester.element(find.byKey(const Key('host'))),
       )!;
-      await tester.tap(find.byTooltip(l10n.tagExpansion_showRelated).first);
+      await tester.tap(
+        find
+            .byWidgetPredicate(
+              (widget) =>
+                  widget is IconButton &&
+                  widget.tooltip == l10n.tagExpansion_showRelated,
+            )
+            .hitTestable()
+            .first,
+      );
       await tester.pumpAndSettle();
       await mouse.removePointer();
       auto.nameActivities['fate_testarossa'] = const TagTranslationActivity(

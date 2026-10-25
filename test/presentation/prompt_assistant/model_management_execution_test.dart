@@ -42,14 +42,11 @@ class _PendingSecrets extends _Secrets {
 class _CaptureApi extends PromptAssistantApiClient {
   _CaptureApi() : super(dio: Dio());
   final requests = <PromptAssistantRequest>[];
+  String output = '{"tag":"blue_eyes","name_zh":"青い目","wiki_zh":"本文"}';
   @override
   Stream<StreamingChunk> complete({required PromptAssistantRequest request}) {
     requests.add(request);
-    return Stream.value(
-      const StreamingChunk(
-        delta: '{"tag":"blue_eyes","name_zh":"青い目","wiki_zh":"本文"}',
-      ),
-    );
+    return Stream.value(StreamingChunk(delta: output));
   }
 }
 
@@ -79,6 +76,53 @@ Response<dynamic> _response({String text = 'OK', int status = 200}) =>
     );
 
 void main() {
+  test(
+    'whole prompt readings use plain source and a text-only output contract',
+    () async {
+      final api = _CaptureApi()..output = '{"text":"青い目、赤い髪"}';
+      final container = ProviderContainer(
+        overrides: [
+          localStorageServiceProvider.overrideWithValue(_Local()),
+          secureStorageServiceProvider.overrideWithValue(_Secrets()),
+          promptAssistantServiceProvider.overrideWith(
+            (ref) => PromptAssistantService(ref: ref, apiClient: api),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      final config = container.read(promptAssistantConfigProvider.notifier);
+      await config.upsertProvider(_provider);
+      await config.replaceProviderModels(_provider.id, [_model]);
+      await config.saveInterface(
+        LauncherInterface.translate,
+        const InterfaceSlotConfig(
+          providerId: 'service',
+          model: 'model',
+          targetLanguage: 'ja',
+        ),
+      );
+      final service = container.read(promptAssistantServiceProvider);
+      final before = container.read(promptAssistantConfigProvider).encode();
+      const source = 'blue eyes, {red hair}';
+      expect(
+        await service.translatePromptReading(source, sessionId: 'reading'),
+        '青い目、赤い髪',
+      );
+      final request = api.requests.single;
+      expect(
+        jsonDecode((request.userParts.single as PromptAssistantTextPart).text),
+        {'source': source, 'target_language': 'ja'},
+      );
+      expect(request.systemPrompt, contains('{"text":"translated reading"}'));
+      expect(container.read(promptAssistantConfigProvider).encode(), before);
+      api.output = '{"text":""}';
+      await expectLater(
+        service.translatePromptReading(source, sessionId: 'empty'),
+        throwsFormatException,
+      );
+    },
+  );
+
   test('empty services cannot dispatch a hidden preset model', () async {
     final api = _CaptureApi();
     final container = ProviderContainer(
@@ -207,7 +251,7 @@ void main() {
         }),
       );
       expect(
-        config.interfaceFor(LauncherInterface.promptReverse).model,
+        config.interfaceFor(LauncherInterface.tagTranslate).model,
         'model',
       );
       expect(

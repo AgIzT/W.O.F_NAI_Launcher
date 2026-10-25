@@ -3107,7 +3107,7 @@
   "promptBlockLibrary_sourceFile": "소스 파일",
   "promptBlockLibrary_importedAt": "가져온 시간",
   "promptBlockPalette_tooltip": "블록",
-  "promptBlockPalette_emptyHint": "자주 쓰는 프롬프트 블록이나 번역 블록을 여기에 보관하세요. 클릭하면 커서 위치에 삽입되고, 프롬프트 입력란으로 끌어 놓을 수도 있습니다.",
+  "promptBlockPalette_emptyHint": "자주 쓰는 프롬프트 블록을 여기로 드래그하세요. 클릭하여 커서 위치에 넣거나 프롬프트로 드래그할 수 있습니다.",
   "promptBlockPalette_remove": "블록에서 제거",
   "promptBlockPalette_clearAll": "블록 비우기",
   "promptBlockPalette_clearAllArmed": "한 번 더 누르면 모두 비웁니다",
@@ -3248,9 +3248,9 @@
   "@tips_studio_trick_5": {
     "description": "Button count = nSamples x imagesPerRequest; estimatedCost uses both."
   },
-  "tips_studio_trick_6": "번역 블록을 가운데 버튼으로 누르면 원문과 번역문이 번갈아 바뀌어요. AI 번역이 아무리 좋아도 가끔은 원문을 슬쩍 보고 cat ears가 이상한 말로 바뀌지 않았는지 확인해 보세요.",
+  "tips_studio_trick_6": "태그 번역은 프롬프트 아래에 표시됩니다. 언제든 표시를 전환할 수 있으며 원문은 직접 편집할 수 있습니다.",
   "@tips_studio_trick_6": {
-    "description": "promptTranslation_guideMiddleText."
+    "description": "Prompt reading display tip."
   },
   "tips_studio_trick_7": "설정의 생성 빈도 제한을 켜면 생성 사이에 강제로 쉬는 시간을 둘 수 있어요. 간격 무작위 변동까지 더하면 리듬이 덜 기계적이에요. 느긋하게 돌리는 밤에도, 손이 멈추지 않는 나에게도 좋아요.",
   "@tips_studio_trick_7": {
@@ -4214,42 +4214,10 @@
   "toast_titleInfo": "알림",
   "toast_titleProgress": "진행 중",
   "tagExpansion_autoTranslateVisible": "보이는 태그 자동 번역",
-  "translationEditor_title": "번역 블록",
-  "translationEditor_source": "원문",
-  "translationEditor_sourcePrefix": "원",
-  "translationEditor_generation": "이미지 생성용",
-  "translationEditor_editable": "편집 가능",
-  "translationEditor_modified": "수정됨",
-  "translationEditor_edited": "편집됨",
-  "translationEditor_close": "닫기",
-  "translationEditor_save": "저장",
-  "translationEditor_delete": "블록 삭제",
-  "translationEditor_restore": "원문 텍스트로 복원",
-  "translationEditor_configure": "번역 모델 설정",
-  "translationEditor_readingFieldTitle": "{language} 읽기 텍스트",
-  "@translationEditor_readingFieldTitle": {
-    "placeholders": {
-      "language": {}
-    }
-  },
-  "translationEditor_sourceWarning": "원문이 수정되었습니다. {language} 동기화가 필요합니다",
-  "@translationEditor_sourceWarning": {
-    "placeholders": {
-      "language": {}
-    }
-  },
-  "translationEditor_editHint": "번역을 직접 편집했습니다. 원문 검토 상태는 유지됩니다",
-  "translationLanguage_chinese": "중국어",
-  "translationLanguage_english": "영어",
-  "translationLanguage_japanese": "일본어",
-  "translationLanguage_korean": "한국어",
-  "translationLanguage_traditionalChinese": "중국어 번체",
-  "modelTask_translateTitle": "원문 → 읽기 언어",
-  "modelTask_promptReverseTitle": "읽기 언어 → 원문",
+  "modelTask_translateTitle": "전체 읽기 번역",
   "modelTask_tagTranslateTitle": "태그 번역 및 의미 보충",
   "modelTask_wikiTranslateTitle": "백과 문서 번역",
-  "modelTask_translateDescription": "가중치, 그룹, 태그 의미를 유지하며 프롬프트와 블록을 번역합니다.",
-  "modelTask_promptReverseDescription": "번역문에서 추가, 삭제, 수정한 내용을 원문에 반영한 뒤 검토할 수 있도록 돌려줍니다.",
+  "modelTask_translateDescription": "전체 프롬프트를 별도 읽기 번역으로 제공하고 원문을 유지합니다.",
   "modelTask_tagTranslateDescription": "보이는 태그를 번역하고 기존 자료를 재사용하여 중국어 핵심 이름, 동의어, 짧은 설명을 보충합니다.",
   "modelTask_wikiTranslateDescription": "백과 문서를 번역하고 서식을 정리하며, 문맥에 맞춰 클릭할 태그를 고릅니다.",
   "modelTask_connectionTest": "모델 연결 테스트",
@@ -4362,9 +4330,6 @@
   "modelRequest_fieldParameters": "적용된 매개변수",
   "modelRequest_redacted": "[가림 처리됨]",
   "modelRequest_emptyResponse": "모델이 빈 내용을 반환했습니다.",
-  "modelService_testFieldsIncomplete": "테스트 응답에 필드가 빠져 있습니다.",
-  "modelService_testFieldsInvalid": "테스트 응답의 필드가 올바르지 않습니다.",
-  "modelService_testGroupsInvalid": "테스트 응답의 그룹이 올바르지 않습니다.",
   "modelService_testSourceEmpty": "테스트 응답의 원문이 비어 있습니다.",
   "modelService_conversionCancelled": "변환을 취소했습니다",
   "modelService_chooseInterfaceModel": "먼저 설정 → 모델 및 API → 인터페이스에서 서비스와 모델을 선택하세요.",
@@ -4462,9 +4427,6 @@
   "modelSettings_reasoningHelp": "번역에는 보통 사고가 필요하지 않습니다. 이 기능들은 구조화된 출력을 사용하므로 모델이 지원하는 가장 낮은 사고 단계를 권장합니다.",
   "modelSettings_reasoningHelpLabel": "사고 단계 안내",
   "modelSettings_usePreset": "프리셋",
-  "modelSettings_outputLanguage": "출력 언어",
-  "modelSettings_englishPrompt": "영어 생성 프롬프트",
-  "modelSettings_englishPromptHelp": "원문을 기준으로 수정 내용을 반영해 영어 생성 프롬프트를 출력합니다.",
   "modelSettings_targetLanguage": "대상 언어",
   "modelSettings_effective": "적용 중",
   "modelSettings_noModelSelected": "선택한 사용 가능 모델이 없습니다",
@@ -4480,7 +4442,6 @@
       "level": {}
     }
   },
-  "modelSettings_promptBlocksHint": "번역이 필요 없을 때는 프롬프트를 블록으로 나눠 블록 기능으로 자유롭게 배치할 수도 있습니다.",
   "modelSettings_wikiFormatHint": "번역이 필요 없을 때도 서식을 정리하고 관련 태그를 연결할 수 있습니다.",
   "modelSettings_unsavedChanges": "저장하지 않은 변경 사항",
   "modelSettings_testPreset": "프리셋 테스트",
@@ -4745,73 +4706,6 @@
   "modelOverrides_valueTypes": "문자열, 숫자, 불리언, 배열, 객체를 지원합니다",
   "modelOverrides_addBodyField": "본문 필드 추가",
   "modelOverrides_addHeader": "헤더 추가",
-  "promptTranslation_translating": "번역 중",
-  "promptTranslation_needsModel": "번역 · 먼저 모델을 설정하세요",
-  "promptTranslation_withRoute": "번역 · {provider} / {model}",
-  "@promptTranslation_withRoute": {
-    "placeholders": {
-      "provider": {},
-      "model": {}
-    }
-  },
-  "promptTranslation_actions": "번역 작업",
-  "promptTranslation_promptChanged": "프롬프트가 바뀌어 새 편집 내용을 덮어쓰지 않았습니다",
-  "promptTranslation_nothingToTranslate": "번역할 일반 텍스트가 없습니다",
-  "promptTranslation_failed": "번역하지 못했습니다: {error}",
-  "@promptTranslation_failed": {
-    "placeholders": {
-      "error": {}
-    }
-  },
-  "promptTranslation_setupTitle": "먼저 번역 모델을 설정하세요",
-  "promptTranslation_setupBody": "번역하려면 서비스와 모델을 명시적으로 선택해야 합니다. 설정 → 연동 → 모델 및 API에서 서비스를 추가하고 모델 목록을 가져온 뒤, 프롬프트 번역에 쓸 모델을 고르세요.",
-  "promptTranslation_later": "나중에",
-  "promptTranslation_openSettings": "설정 열기",
-  "promptTranslation_toolTitle": "번역",
-  "promptTranslation_noModel": "설정된 모델 없음",
-  "promptTranslation_configureModel": "번역 모델 설정",
-  "promptTranslation_translateNew": "새 내용 번역",
-  "promptTranslation_undoRestore": "복원을 취소하고 번역 블록 되돌리기",
-  "promptTranslation_restoreAll": "모든 번역 블록을 원문 텍스트로 복원",
-  "promptTranslation_tutorial": "사용 방법",
-  "promptTranslation_guideBack": "작업으로 돌아가기",
-  "promptTranslation_guideMiddleTitle": "블록 가운데 버튼 클릭",
-  "promptTranslation_guideMiddleText": "원문과 번역문 전환",
-  "promptTranslation_guideSourceTitle": "원문 왼쪽 클릭",
-  "promptTranslation_guideSourceText": "커서를 놓고 바로 편집",
-  "promptTranslation_guideReadingTitle": "번역문 왼쪽 클릭",
-  "promptTranslation_guideReadingText": "블록 편집기 열기",
-  "promptTranslation_guideCtrlTitle": "Ctrl + 클릭 / 드래그 선택",
-  "promptTranslation_guideCtrlText": "편집기에서 태그 검색 / 관련 태그 찾기",
-  "promptTranslation_guideConvertTitle": "↑ 번역문을 원문으로",
-  "promptTranslation_guideConvertText": "↓ 원문을 번역문으로, 저장 전에 검토",
-  "promptTranslation_guideRestoreTitle": "그룹 전체 표시 전환",
-  "promptTranslation_guideRestoreText": "번역 메뉴에서 원문 / 번역을 모두 전환",
-  "promptTranslation_middleButton": "마우스 가운데 버튼",
-  "promptTranslation_leftButton": "마우스 왼쪽 버튼",
-  "promptTranslation_blockShowingOriginal": "번역 블록, 원문 표시 중",
-  "promptTranslation_blockShowingReading": "번역 블록, 번역문 표시 중",
-  "promptTranslation_blockNeedsReview": "원문 변경됨 · 번역 업데이트 필요",
-  "promptTranslation_badgeTooltip": "원문이 바뀌었습니다. 번역을 동기화해야 합니다",
-  "promptTranslation_sourceChanged": "원문이 바뀌었습니다. 번역 블록을 다시 여세요",
-  "promptTranslation_retranslateFailed": "다시 번역하지 못했습니다: {error}",
-  "@promptTranslation_retranslateFailed": {
-    "placeholders": {
-      "error": {}
-    }
-  },
-  "promptTranslation_draftChanged": "내용이 바뀌었습니다. 다시 변환하세요. 새 초안은 유지됩니다.",
-  "promptTranslation_convertFailed": "변환하지 못했습니다. 초안은 유지됩니다: {error}",
-  "@promptTranslation_convertFailed": {
-    "placeholders": {
-      "error": {}
-    }
-  },
-  "promptTranslation_invalidResultFormat": "변환 결과 형식이 올바르지 않습니다. 초안은 유지됩니다",
-  "promptTranslation_noValidText": "모델이 유효한 텍스트를 반환하지 않았습니다. 초안은 유지됩니다",
-  "promptTranslation_invalidResultContent": "변환 결과에 잘못된 서식이 있습니다. 초안은 유지됩니다",
-  "promptTranslation_incompleteStructure": "변환 결과의 가중치나 그룹이 완전하지 않습니다. 초안은 유지됩니다",
-  "promptTranslation_inputRequired": "먼저 변환할 내용을 입력하세요",
   "wiki_configureTagModel": "먼저 모델 및 API에서 사용할 태그 번역 모델을 설정하세요.",
   "blockOrganizer_replaceMoveBody": "대상에 같은 소스의 사본이 이미 {count}개 있습니다. 교체하면 소스는 라이브러리에서 숨겨지며, 프롬프트에 이미 삽입된 인스턴스는 원래 블록을 계속 참조할 수 있습니다.",
   "@blockOrganizer_replaceMoveBody": {
@@ -4829,7 +4723,6 @@
   "blockAppearance_dots": "물방울",
   "blockAppearance_solid": "단색",
   "blockAppearance_gradient": "그라데이션",
-  "blockAppearance_translation": "번역",
   "opusUsage_regularRemaining": "기본 무료 할당량: {percent}%",
   "@opusUsage_regularRemaining": {
     "description": "Separate Opus quota pool; backup means already activated usage boosts, not inventory.",
@@ -5167,7 +5060,6 @@
   "imageMenu_editAndDerive": "편집 및 파생",
   "imageMenu_more": "추가 작업",
   "imageMenu_fileActions": "파일 작업",
-  "imageMenu_saveToBlock": "블록에 저장",
   "settings_highAnlasCostEstimate": "예상 사용량",
   "settings_highAnlasCostThresholdLabel": "알림 기준",
   "settings_highAnlasCostQuestion": "이번 생성을 계속할까요?",
@@ -6889,7 +6781,6 @@
     }
   },
   "blocks_title": "블록 라이브러리",
-  "blocks_translationMark": "번",
   "blocks_add": "추가",
   "blocks_cancel": "취소",
   "blocks_close": "닫기",
@@ -6964,7 +6855,6 @@
   "blocks_lookDots": "도트",
   "blocks_lookSolid": "단색",
   "blocks_lookGradient": "그라데이션",
-  "blocks_lookTranslation": "번역",
   "blocks_hasParams": "설정 포함",
   "blocks_hasNegative": "부정 포함",
   "blocks_hintClick": "클릭해 삽입",
@@ -7222,8 +7112,6 @@
   "blocks_details": "세부 정보",
   "blocks_noSelection": "카드를 클릭해 세부 정보 보기. 더블클릭으로 편집, Enter로 프롬프트에 삽입.",
   "blocks_changeThumb": "변경 / 조정",
-  "blocks_reading": "번역 읽기",
-  "blocks_needsReview": "검토 필요",
   "blocks_applyToCurrent": "지금 적용",
   "blocks_noParams": "없음. 넣어도 현재 설정은 바뀌지 않습니다.",
   "blocks_paramModel": "모델",
@@ -8122,19 +8010,6 @@
   "gen_sdConvertSub": "(tag:1.2) 붙여넣기를 NAI 가중치로 변환",
   "gen_related": "연관 태그 추천",
   "gen_relatedSub": "자주 함께 쓰는 태그 추천",
-  "gen_translating": "번역 중…",
-  "gen_translateNeedsModel": "번역 모델이 없습니다. 클릭하여 설정",
-  "gen_translateRestore": "원문 보기",
-  "gen_translateWith": "번역 ({route})",
-  "@gen_translateWith": {
-    "placeholders": {
-      "route": {}
-    }
-  },
-  "gen_translateNew": "새 내용 번역",
-  "gen_translateShowOriginal": "모두 원문 보기",
-  "gen_translateShowTranslated": "모두 번역문 보기",
-  "gen_translateSettings": "번역 모델 설정",
   "gen_qualityPreset": "품질 태그",
   "gen_ucPreset": "제외 프리셋",
   "gen_presetNone": "없음",
@@ -9927,7 +9802,6 @@
   },
   "set_mdDeleteBody": "사용하던 기능은 다른 공급자로 전환됩니다.",
   "set_mdTaskPrompt": "프롬프트 번역",
-  "set_mdTaskReverse": "프롬프트 역추론",
   "set_mdTaskTag": "태그 번역 및 의미 보충",
   "set_mdTaskWiki": "위키 번역",
   "set_mdFeature": "기능",
@@ -11276,5 +11150,18 @@
         "type": "String"
       }
     }
-  }
+  },
+  "promptCompletion_all": "전체",
+  "promptCompletion_tags": "태그",
+  "promptCompletion_summary": "사전 요약",
+  "promptCompletion_synonyms": "중국어 동의어",
+  "promptReading_showReadings": "태그 번역 표시",
+  "promptReading_hideReadings": "태그 번역 숨기기",
+  "promptReading_displayHint": "원문 아래에 사용 가능한 번역을 표시합니다.",
+  "promptReading_completion": "입력 중 태그 자동 완성",
+  "promptReading_completionHint": "중국어와 영어로 태그, 캐릭터, 작품을 검색합니다.",
+  "promptReading_fillMissing": "표시된 태그의 누락된 번역 채우기",
+  "modelSettings_promptReadingHint": "전체 번역은 읽기용이며 프롬프트를 변경하지 않습니다.",
+  "promptCompletion_works": "작품",
+  "promptCompletion_expand": "전체 목록 및 Wiki 미리보기 (후보를 우클릭하면 바로 미리보기)"
 }

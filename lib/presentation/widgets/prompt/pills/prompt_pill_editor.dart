@@ -5,14 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/localization_extension.dart';
-import '../../../../core/utils/prompt_input_normalization.dart';
-import '../../../prompt_assistant/providers/prompt_assistant_config_provider.dart';
-import '../../../prompt_assistant/services/prompt_assistant_service.dart';
-import '../../../screens/settings/sections/prompt_assistant_settings_section.dart';
 import '../../../../data/models/character/character_prompt.dart';
 import '../../../../data/models/prompt_block/pill_document.dart';
 import '../../../providers/pill_workspace_provider.dart';
-import '../../../providers/prompt_translation_provider.dart';
 import '../../../providers/prompt_block_library_provider.dart';
 import '../blocks/prompt_block_colors.dart';
 import '../blocks/prompt_block_drag_data.dart';
@@ -24,7 +19,6 @@ import '../../../wiring/blocks_instance_wiring.dart';
 import '../../../wiring/blocks_mapping.dart';
 import '../../../wiring/blocks_actions.dart';
 import 'prompt_pill.dart';
-import 'translation_pill_view.dart';
 
 /// 药丸块编辑器：单个完整输入框 + 内联药丸。
 ///
@@ -103,7 +97,6 @@ class _PromptPillEditorState extends ConsumerState<PromptPillEditor> {
   /// L1 实例卡浮层（P2.5）：同屏只开一张，编辑器卸载时必须带走。
   UiPopoverAnchor? _instanceCardAnchor;
   String? _instanceCardMarker;
-  TranslationPillEditHandle? _translationEditor;
 
   @override
   void initState() {
@@ -129,8 +122,6 @@ class _PromptPillEditorState extends ConsumerState<PromptPillEditor> {
     // scope 切换（角色编辑面板 State 复用、切换编辑目标）：重绑文档
     if (oldWidget.pillScope != widget.pillScope) {
       _dismissInstanceCard(refresh: false);
-      _translationEditor?.dismiss();
-      _translationEditor = null;
       final workspace = ref.read(_workspace);
       _applyingExternal = true;
       _controller.value = TextEditingValue(
@@ -176,7 +167,6 @@ class _PromptPillEditorState extends ConsumerState<PromptPillEditor> {
   @override
   void dispose() {
     _dismissInstanceCard(refresh: false);
-    _translationEditor?.dismiss();
     _controller
       ..removeListener(_handleControllerChanged)
       ..dispose();
@@ -319,7 +309,6 @@ class _PromptPillEditorState extends ConsumerState<PromptPillEditor> {
           block?.color ?? '',
           block?.iconName ?? '',
           block?.appearance ?? '',
-          instance.translation,
           block == null,
         ),
       );
@@ -352,78 +341,6 @@ class _PromptPillEditorState extends ConsumerState<PromptPillEditor> {
             ),
           ),
         ),
-      );
-    }
-
-    if (instance.translation case final translation?) {
-      Widget draggable(Widget child) => Draggable<PromptBlockDragData>(
-        data: PromptBlockDragData(
-          blockId: '',
-          translation: translation,
-          instanceMarker: PillInstanceDragRef(
-            marker: marker,
-            occurrence: occurrence,
-            scope: widget.pillScope,
-          ),
-        ),
-        rootOverlay: true,
-        dragAnchorStrategy: pointerDragAnchorStrategy,
-        feedback: Material(
-          color: Colors.transparent,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 300),
-            child: TranslationPillView(
-              pill: translation,
-              highlightEnabled: widget.config.enableSyntaxHighlight,
-              numericEmphasisEnabled: widget.config.numericEmphasisEnabled,
-              autoFormat: widget.config.enableAutoFormat,
-              onToggle: () {},
-              onEdit: (_) {},
-            ),
-          ),
-        ),
-        childWhenDragging: Opacity(opacity: .35, child: child),
-        child: child,
-      );
-      final pill = TranslationPillView(
-        key: ValueKey('translation-pill-$marker-$occurrence'),
-        pill: translation,
-        highlightEnabled: widget.config.enableSyntaxHighlight,
-        numericEmphasisEnabled: widget.config.numericEmphasisEnabled,
-        autoFormat: widget.config.enableAutoFormat,
-        onToggle: () => ref
-            .read(_workspace.notifier)
-            .updateTranslation(
-              marker,
-              translation.copyWith(showOriginal: !translation.showOriginal),
-            ),
-        onEdit: (position) => _editTranslation(marker, translation, position),
-        onSourceChanged: (source) {
-          final current = ref
-              .read(_workspace)
-              .document
-              .instances[marker]
-              ?.translation;
-          if (current == null || current.source == source) return;
-          ref
-              .read(_workspace.notifier)
-              .updateTranslation(
-                marker,
-                current.copyWith(
-                  source: source,
-                  marks: const [],
-                  needsReview: true,
-                ),
-              );
-        },
-        sourceHandleBuilder: (handle) => MouseRegion(
-          cursor: SystemMouseCursors.grab,
-          child: draggable(handle),
-        ),
-      );
-      return WidgetSpan(
-        alignment: PlaceholderAlignment.middle,
-        child: _withPillGap(translation.showOriginal ? pill : draggable(pill)),
       );
     }
 
@@ -532,84 +449,6 @@ class _PromptPillEditorState extends ConsumerState<PromptPillEditor> {
   Widget _withPillGap(Widget child) =>
       Padding(padding: const EdgeInsets.symmetric(horizontal: 1), child: child);
 
-  Future<void> _editTranslation(
-    String marker,
-    TranslationPill initial,
-    Offset position,
-  ) async {
-    _dismissInstanceCard();
-    _translationEditor?.dismiss();
-    final coordinator = ref.read(promptTranslationCoordinatorProvider);
-    final service = ref.read(promptAssistantServiceProvider);
-    final editor = showTranslationPillEditor(
-      context: context,
-      initial: widget.config.enableAutoFormat
-          ? initial.copyWith(
-              source: PromptInputNormalization.normalize(
-                initial.source,
-                autoFormat: true,
-                sdAutoConvert: false,
-              ).text,
-            )
-          : initial,
-      globalPosition: position,
-      enableTagExpansion: true,
-      highlightEnabled: widget.config.enableSyntaxHighlight,
-      numericEmphasisEnabled: widget.config.numericEmphasisEnabled,
-      annotations: ref.read(promptTranslationAnnotationProvider),
-      converter: (request, sessionId) =>
-          coordinator.convertDraft(request, sessionId: sessionId),
-      cancelConversion: (sessionId) {
-        coordinator.cancelDraft(sessionId);
-        service.cancelCurrentTask(sessionId: sessionId);
-      },
-      isModelConfigured: () =>
-          ref.read(promptAssistantConfigProvider).promptTranslationRoute !=
-          null,
-      onConfigure: () => showModelManagementDialog(context),
-    );
-    _translationEditor = editor;
-    final result = await editor.result;
-    if (identical(_translationEditor, editor)) _translationEditor = null;
-    if (!mounted ||
-        ref.read(_workspace).document.instances[marker]?.translation !=
-            initial) {
-      return;
-    }
-    if (result == 'delete') {
-      ref.read(_workspace.notifier).removeMarker(marker);
-    } else if (result is TranslationPillPlainText) {
-      ref
-          .read(_workspace.notifier)
-          .unwrapTranslation(marker, source: result.source);
-    } else if (result == 'retranslate') {
-      try {
-        final updated = await ref
-            .read(promptTranslationCoordinatorProvider)
-            .retranslateSingle(widget.pillScope, marker);
-        if (mounted && !updated) {
-          ScaffoldMessenger.maybeOf(context)?.showSnackBar(
-            SnackBar(
-              content: Text(context.l10n.promptTranslation_sourceChanged),
-            ),
-          );
-        }
-      } catch (error) {
-        if (mounted) {
-          ScaffoldMessenger.maybeOf(context)?.showSnackBar(
-            SnackBar(
-              content: Text(
-                context.l10n.promptTranslation_retranslateFailed('$error'),
-              ),
-            ),
-          );
-        }
-      }
-    } else if (result is TranslationPill) {
-      ref.read(_workspace.notifier).updateTranslation(marker, result);
-    }
-  }
-
   // ==================== 拖放 ====================
 
   void _handleDrop(PromptBlockDragData data, Offset globalPosition) {
@@ -618,31 +457,6 @@ class _PromptPillEditorState extends ConsumerState<PromptPillEditor> {
     final sameLane =
         dragRef != null &&
         (dragRef.scope == null || dragRef.scope == widget.pillScope);
-    if (data.translation case final translation?) {
-      if (sameLane &&
-          ref.read(_workspace).document.instances.containsKey(dragRef.marker)) {
-        ref
-            .read(_workspace.notifier)
-            .moveMarker(
-              marker: dragRef.marker,
-              occurrence: dragRef.occurrence,
-              newOffset: offset,
-            );
-      } else {
-        ref
-            .read(_workspace.notifier)
-            .insertTranslationAt(
-              offset: offset,
-              source: translation.source,
-              zh: translation.zh,
-              marks: translation.marks,
-              needsReview: translation.needsReview,
-              languageCode: translation.languageCode,
-              translationEdited: translation.translationEdited,
-            );
-      }
-      return;
-    }
     if (!sameLane) {
       final scope = widget.pillScope;
       BlocksActions(

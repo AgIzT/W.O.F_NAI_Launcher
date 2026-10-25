@@ -13,7 +13,6 @@ import '../../core/utils/app_logger.dart';
 import '../../core/utils/localization_extension.dart';
 import '../../core/utils/nai_resolution_adapter.dart';
 import '../../core/utils/window_focus_tracker.dart';
-import '../../data/models/prompt_block/pill_document.dart';
 import '../../data/services/thumbnail_service.dart';
 import '../providers/collection_provider.dart';
 import '../providers/image_generation_provider.dart';
@@ -26,7 +25,7 @@ import '../router/app_router.dart';
 import '../ui/viewer/viewer_contract.dart';
 import '../ui/viewer/viewer_page.dart';
 import '../widgets/common/app_toast.dart';
-import '../widgets/common/image_detail/components/detail_prompt_translation.dart';
+import '../providers/prompt_text_reading_provider.dart';
 import '../widgets/common/image_detail/file_image_detail_data.dart';
 import '../widgets/common/image_detail/image_detail_data.dart';
 import '../widgets/common/save_vibe_dialog.dart';
@@ -381,18 +380,14 @@ class _ImageViewerWiringState extends ConsumerState<ImageViewerWiring> {
     _translationTokens[part] = token;
     setState(() => _translations[part] = const ViewerTranslation(busy: true));
     try {
-      final result = await ref.read(detailPromptTranslatorProvider)(
-        PillDocument(text: text, instances: const {}),
+      final result = await ref.read(promptTextReadingTranslatorProvider)(
+        text,
         'viewer-$key-$part-${identityHashCode(token)}',
       );
       if (mounted &&
           key == backend.currentKey &&
           identical(_translationTokens[part], token)) {
-        setState(
-          () => _translations[part] = ViewerTranslation(
-            text: viewerTranslationText(result),
-          ),
-        );
+        setState(() => _translations[part] = ViewerTranslation(text: result));
       }
     } catch (error) {
       if (mounted &&

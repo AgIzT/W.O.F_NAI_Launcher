@@ -84,7 +84,7 @@ WebP 初始 quality 82（method 6），必要时逐级降低质量；硬检查 h
 | `agent-card-images` | `AgentImagesBlock` + `AgentTurnSummary`；4 张互异素材、80 Anlas、42 秒示范小结；没有调用生成 |
 | `agent-card-thinking` | 折叠的 `AgentThinkingBlock` + 3 步 `AgentStepsBlock`；点击展开真实过程组，思考正文仍收起，读取草稿→查百科→改写提示词 |
 | `agent-card-promptset` | `AgentPromptSetBlock` → `AgentPromptSetCard`；6 幕有序「雨夜咖啡馆」分镜，v2 仅第 5 幕改动；真实按钮切到第 3 幕（2 张互异缩略图），第 1 幕另有图片绿点；展开提示词，保留共同／本幕高亮、`…` 窗口及「展开全部」，生成按钮单价 20；不导入、不生成 |
-| `translation` | 自建宿主 + 真实 `BlockPill`／`TranslationPillView`；中英标题有独立断言 |
+| `translation` | 自建宿主 + 提示词示例槽；中英标题有独立断言。旧翻译块场景已退役；当前译名实绘使用 `test/presentation/widgets/prompt/unified_prompt_readings_integration_test.dart` |
 | `tag-expansion` | 自建 `ExpansionHost` + 真实 `TagExpansionWrapper`，Ctrl+单击打开后查询；中英标题有断言 |
 | `wiki` | 真实 `TagWikiScreen`，搜索并打开安全词条，断言语义徽标 |
 | `stats` | `StatisticsPage` + 安全化统计数据，Top10 仅 `sample_*` |

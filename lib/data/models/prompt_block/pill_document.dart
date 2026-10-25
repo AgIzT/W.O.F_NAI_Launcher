@@ -5,8 +5,6 @@
 /// 手写不可变类（不走 freezed/build_runner），原型期减少再生成链路。
 library;
 
-import '../../../core/utils/prompt_translation_language.dart';
-
 /// 实例随机模式（P2.5）：固定 = 投影恒为块内容；随机抽取 = 投影为物化的
 /// `currentRoll`（未锁定实例可在参数变更/手动骰子/生成入队后重抽）；
 /// 顺序 = 同样物化 `currentRoll`，但从池头起按池序逐批推进（游标见
@@ -195,7 +193,6 @@ class PillInstanceSettings {
 class PillInstance {
   const PillInstance({
     required this.blockId,
-    this.translation,
     this.enabled = true,
     this.locked = false,
     this.evolutionEnabled = false,
@@ -209,10 +206,6 @@ class PillInstance {
   });
 
   final String blockId;
-
-  /// Inline bilingual text. When present this instance is independent of the
-  /// block library and always projects [TranslationPill.source].
-  final TranslationPill? translation;
 
   /// 同一块的负面部分。旧存档缺键时仍解析原有正文。
   final bool useNegativeContent;
@@ -251,7 +244,6 @@ class PillInstance {
 
   PillInstance copyWith({
     String? blockId,
-    TranslationPill? translation,
     bool? enabled,
     bool? locked,
     bool? evolutionEnabled,
@@ -265,7 +257,6 @@ class PillInstance {
   }) {
     return PillInstance(
       blockId: blockId ?? this.blockId,
-      translation: translation ?? this.translation,
       enabled: enabled ?? this.enabled,
       locked: locked ?? this.locked,
       evolutionEnabled: evolutionEnabled ?? this.evolutionEnabled,
@@ -281,7 +272,6 @@ class PillInstance {
 
   Map<String, dynamic> toJson() => {
     'blockId': blockId,
-    if (translation != null) 'translation': translation!.toJson(),
     if (useNegativeContent) 'useNegativeContent': true,
     if (bundleId != null) 'bundleId': bundleId,
     if (bundleId != null) 'rollScopeMask': rollScopeMask,
@@ -295,15 +285,16 @@ class PillInstance {
   };
 
   factory PillInstance.fromJson(Map<String, dynamic> json) {
+    final blockId = json['blockId'];
+    if (blockId is! String || blockId.trim().isEmpty) {
+      throw const FormatException(
+        'A block instance requires a library block ID',
+      );
+    }
     final rawSettings = json['settings'];
     final rawCursor = json['sequenceCursor'];
     return PillInstance(
-      blockId: json['blockId'] as String? ?? '',
-      translation: json['translation'] is Map
-          ? TranslationPill.fromJson(
-              Map<String, dynamic>.from(json['translation'] as Map),
-            )
-          : null,
+      blockId: blockId,
       useNegativeContent: json['useNegativeContent'] as bool? ?? false,
       bundleId: json['bundleId'] as String?,
       rollScopeMask:
@@ -336,7 +327,6 @@ class PillInstance {
   bool operator ==(Object other) =>
       other is PillInstance &&
       other.blockId == blockId &&
-      other.translation == translation &&
       other.useNegativeContent == useNegativeContent &&
       other.bundleId == bundleId &&
       other.rollScopeMask == rollScopeMask &&
@@ -351,7 +341,6 @@ class PillInstance {
   @override
   int get hashCode => Object.hash(
     blockId,
-    translation,
     useNegativeContent,
     bundleId,
     rollScopeMask,
@@ -365,175 +354,7 @@ class PillInstance {
   );
 }
 
-/// Presentation metadata for a verified tag phrase inside a Chinese reading.
-class TranslationTagMark {
-  const TranslationTagMark({
-    required this.start,
-    required this.end,
-    required this.tag,
-    required this.iconId,
-  });
-
-  /// UTF-16 offsets into [TranslationPill.zh], never into generation text.
-  final int start;
-  final int end;
-  final String tag;
-  final String iconId;
-
-  Map<String, dynamic> toJson() => {
-    'start': start,
-    'end': end,
-    'tag': tag,
-    'icon_id': iconId,
-  };
-
-  static TranslationTagMark? fromJson(Map<String, dynamic> json, int length) {
-    final start = json['start'];
-    final end = json['end'];
-    final tag = json['tag'];
-    final iconId = json['icon_id'];
-    if (start is! int ||
-        end is! int ||
-        start < 0 ||
-        end <= start ||
-        end > length ||
-        tag is! String ||
-        tag.isEmpty ||
-        iconId is! String ||
-        iconId.isEmpty) {
-      return null;
-    }
-    return TranslationTagMark(start: start, end: end, tag: tag, iconId: iconId);
-  }
-
-  @override
-  bool operator ==(Object other) =>
-      other is TranslationTagMark &&
-      other.start == start &&
-      other.end == end &&
-      other.tag == tag &&
-      other.iconId == iconId;
-
-  @override
-  int get hashCode => Object.hash(start, end, tag, iconId);
-}
-
-/// A reading aid; only [source] participates in image generation.
-class TranslationPill {
-  const TranslationPill({
-    required this.source,
-    required this.zh,
-    this.marks = const [],
-    this.showOriginal = false,
-    this.needsReview = false,
-    this.languageCode = 'zh',
-    this.translationEdited = false,
-  });
-
-  final String source;
-  final String zh;
-  final List<TranslationTagMark> marks;
-  final bool showOriginal;
-  final bool needsReview;
-
-  /// Legacy blocks without metadata contain Chinese readings.
-  final String languageCode;
-
-  /// A quiet edit record; it does not request source review.
-  final bool translationEdited;
-
-  TranslationPill copyWith({
-    String? source,
-    String? zh,
-    List<TranslationTagMark>? marks,
-    bool? showOriginal,
-    bool? needsReview,
-    String? languageCode,
-    bool? translationEdited,
-  }) => TranslationPill(
-    source: source ?? this.source,
-    zh: zh ?? this.zh,
-    marks: marks ?? this.marks,
-    showOriginal: showOriginal ?? this.showOriginal,
-    needsReview: needsReview ?? this.needsReview,
-    languageCode: languageCode ?? this.languageCode,
-    translationEdited: translationEdited ?? this.translationEdited,
-  );
-
-  Map<String, dynamic> toJson() => {
-    'source': source,
-    'zh': zh,
-    if (marks.isNotEmpty) 'marks': marks.map((mark) => mark.toJson()).toList(),
-    if (showOriginal) 'showOriginal': true,
-    if (needsReview) 'needsReview': true,
-    if (languageCode != 'zh') 'languageCode': languageCode,
-    if (translationEdited) 'translationEdited': true,
-  };
-
-  factory TranslationPill.fromJson(Map<String, dynamic> json) {
-    final zh = json['zh'] as String? ?? '';
-    final marks = <TranslationTagMark>[];
-    if (json['marks'] case final List rawMarks) {
-      for (final raw in rawMarks) {
-        if (raw is! Map) continue;
-        final mark = TranslationTagMark.fromJson(
-          Map<String, dynamic>.from(raw),
-          zh.length,
-        );
-        if (mark == null || (marks.isNotEmpty && mark.start < marks.last.end)) {
-          continue;
-        }
-        marks.add(mark);
-      }
-    }
-    return TranslationPill(
-      source: json['source'] as String? ?? '',
-      zh: zh,
-      marks: List.unmodifiable(marks),
-      showOriginal: json['showOriginal'] as bool? ?? false,
-      needsReview: json['needsReview'] as bool? ?? false,
-      languageCode: PromptTranslationLanguage.isCode(json['languageCode'])
-          ? json['languageCode'] as String
-          : 'zh',
-      translationEdited: json['translationEdited'] == true,
-    );
-  }
-
-  @override
-  bool operator ==(Object other) =>
-      other is TranslationPill &&
-      other.source == source &&
-      other.zh == zh &&
-      _sameMarks(other.marks, marks) &&
-      other.showOriginal == showOriginal &&
-      other.needsReview == needsReview &&
-      other.languageCode == languageCode &&
-      other.translationEdited == translationEdited;
-
-  @override
-  int get hashCode => Object.hash(
-    source,
-    zh,
-    Object.hashAll(marks),
-    showOriginal,
-    needsReview,
-    languageCode,
-    translationEdited,
-  );
-
-  static bool _sameMarks(
-    List<TranslationTagMark> a,
-    List<TranslationTagMark> b,
-  ) {
-    if (a.length != b.length) return false;
-    for (var i = 0; i < a.length; i++) {
-      if (a[i] != b[i]) return false;
-    }
-    return true;
-  }
-}
-
-/// 药丸工作区文档：文本（含标记字符）+ 实例表。
+/// Text and explicitly inserted library block instances.
 class PillDocument {
   const PillDocument({required this.text, required this.instances});
 

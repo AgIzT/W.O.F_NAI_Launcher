@@ -73,6 +73,7 @@ class Tags extends UnifiedTagRepository implements CompletionSource {
   Future<List<CompletionCandidate>> searchContains(
     String input, {
     int limit = 20,
+    CompletionCategoryFilter categoryFilter = CompletionCategoryFilter.all,
   }) async =>
       genericTags.where((t) => t.contains(input)).map(tag).take(limit).toList();
   @override

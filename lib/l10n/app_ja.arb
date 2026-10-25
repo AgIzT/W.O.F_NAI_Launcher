@@ -3107,7 +3107,7 @@
   "promptBlockLibrary_sourceFile": "ソースファイル",
   "promptBlockLibrary_importedAt": "インポート日時",
   "promptBlockPalette_tooltip": "ブロック",
-  "promptBlockPalette_emptyHint": "よく使うプロンプトブロックや翻訳ブロックをここに収納。クリックでカーソル位置に挿入するか、プロンプト欄へドラッグできます。",
+  "promptBlockPalette_emptyHint": "よく使うプロンプトブロックをここにドラッグして保存します。クリックしてカーソル位置に挿入するか、入力欄にドラッグできます。",
   "promptBlockPalette_remove": "ブロックから削除",
   "promptBlockPalette_clearAll": "ブロックをすべて削除",
   "promptBlockPalette_clearAllArmed": "もう一度押してすべて削除",
@@ -3248,9 +3248,9 @@
   "@tips_studio_trick_5": {
     "description": "Button count = nSamples x imagesPerRequest; estimatedCost uses both."
   },
-  "tips_studio_trick_6": "翻訳ブロックを中クリックすると、原文と訳文を切り替えられます。AI の翻訳がどれだけ優秀でも、たまには原文をのぞいて cat ears が変なものになっていないか確かめましょう。",
+  "tips_studio_trick_6": "タグの訳名はプロンプトの下に表示されます。いつでも切り替えられ、原文は直接編集できます。",
   "@tips_studio_trick_6": {
-    "description": "promptTranslation_guideMiddleText."
+    "description": "Prompt reading display tip."
   },
   "tips_studio_trick_7": "設定の「画像生成の頻度を制限」を使うと、生成と生成のあいだに強制クールダウンを入れられます。少しランダムな揺らぎも足せば、リズムが機械っぽくなりません。のんびり回す夜にも、手が止まらない自分にも。",
   "@tips_studio_trick_7": {
@@ -4214,42 +4214,10 @@
   "toast_titleInfo": "お知らせ",
   "toast_titleProgress": "処理中",
   "tagExpansion_autoTranslateVisible": "表示中のタグを自動翻訳",
-  "translationEditor_title": "翻訳ブロック",
-  "translationEditor_source": "原文",
-  "translationEditor_sourcePrefix": "原",
-  "translationEditor_generation": "画像生成用",
-  "translationEditor_editable": "編集可能",
-  "translationEditor_modified": "変更済み",
-  "translationEditor_edited": "編集済み",
-  "translationEditor_close": "閉じる",
-  "translationEditor_save": "保存",
-  "translationEditor_delete": "ブロックを削除",
-  "translationEditor_restore": "原文テキストに戻す",
-  "translationEditor_configure": "翻訳モデルを設定",
-  "translationEditor_readingFieldTitle": "{language}の表示テキスト",
-  "@translationEditor_readingFieldTitle": {
-    "placeholders": {
-      "language": {}
-    }
-  },
-  "translationEditor_sourceWarning": "原文が変更されました。{language}との同期が必要です",
-  "@translationEditor_sourceWarning": {
-    "placeholders": {
-      "language": {}
-    }
-  },
-  "translationEditor_editHint": "訳文の手動編集履歴です。原文の確認状態は変わりません",
-  "translationLanguage_chinese": "中国語",
-  "translationLanguage_english": "英語",
-  "translationLanguage_japanese": "日本語",
-  "translationLanguage_korean": "韓国語",
-  "translationLanguage_traditionalChinese": "繁体字中国語",
-  "modelTask_translateTitle": "原文 → 表示言語",
-  "modelTask_promptReverseTitle": "表示言語 → 原文",
+  "modelTask_translateTitle": "全文の閲覧用翻訳",
   "modelTask_tagTranslateTitle": "タグ翻訳・意味情報",
   "modelTask_wikiTranslateTitle": "百科本文の翻訳",
-  "modelTask_translateDescription": "プロンプトとブロックを翻訳し、重み・グループ・タグの意味を保ちます。",
-  "modelTask_promptReverseDescription": "訳文での追加・削除・変更を原文に反映し、確認用に原文へ戻します。",
+  "modelTask_translateDescription": "プロンプト全文を独立した閲覧用訳文に翻訳し、原文を保持します。",
   "modelTask_tagTranslateDescription": "表示中のタグを翻訳し、既存資料を再利用して中国語の基本名・同義語・短い説明を補います。",
   "modelTask_wikiTranslateDescription": "百科本文を翻訳してレイアウトを整え、文脈に応じてクリックできるタグを選びます。",
   "modelTask_connectionTest": "モデル接続テスト",
@@ -4362,9 +4330,6 @@
   "modelRequest_fieldParameters": "適用パラメーター",
   "modelRequest_redacted": "[マスク済み]",
   "modelRequest_emptyResponse": "モデルが空の内容を返しました。",
-  "modelService_testFieldsIncomplete": "テストの応答にフィールドが不足しています。",
-  "modelService_testFieldsInvalid": "テストの応答のフィールドが正しくありません。",
-  "modelService_testGroupsInvalid": "テストの応答のグループが正しくありません。",
   "modelService_testSourceEmpty": "テストの応答の原文が空です。",
   "modelService_conversionCancelled": "変換をキャンセルしました",
   "modelService_chooseInterfaceModel": "先に「設定 → モデルとAPI → 機能インターフェース」でサービスとモデルを選択してください。",
@@ -4462,9 +4427,6 @@
   "modelSettings_reasoningHelp": "翻訳では通常、思考は不要です。これらの機能は構造化出力を使うため、モデルが対応する最も低い思考レベルをおすすめします。",
   "modelSettings_reasoningHelpLabel": "思考レベルのヒント",
   "modelSettings_usePreset": "使用するプリセット",
-  "modelSettings_outputLanguage": "出力言語",
-  "modelSettings_englishPrompt": "英語の生成プロンプト",
-  "modelSettings_englishPromptHelp": "原文に変更を反映し、英語の生成プロンプトを出力します。",
   "modelSettings_targetLanguage": "翻訳先の言語",
   "modelSettings_effective": "現在の設定",
   "modelSettings_noModelSelected": "利用できるモデルが選択されていません",
@@ -4480,7 +4442,6 @@
       "level": {}
     }
   },
-  "modelSettings_promptBlocksHint": "翻訳が不要なときは、プロンプトをモジュールに分け、ブロック機能で自由に組み立てることもできます。",
   "modelSettings_wikiFormatHint": "翻訳が不要なときも、レイアウトを整えて関連タグにリンクを付けられます。",
   "modelSettings_unsavedChanges": "未保存の変更があります",
   "modelSettings_testPreset": "プリセットをテスト",
@@ -4745,73 +4706,6 @@
   "modelOverrides_valueTypes": "文字列・数値・真偽値・配列・オブジェクトに対応",
   "modelOverrides_addBodyField": "ボディのフィールドを追加",
   "modelOverrides_addHeader": "ヘッダーを追加",
-  "promptTranslation_translating": "翻訳中",
-  "promptTranslation_needsModel": "翻訳 · 先にモデルを設定",
-  "promptTranslation_withRoute": "翻訳 · {provider} / {model}",
-  "@promptTranslation_withRoute": {
-    "placeholders": {
-      "provider": {},
-      "model": {}
-    }
-  },
-  "promptTranslation_actions": "翻訳の操作",
-  "promptTranslation_promptChanged": "プロンプトが変更されたため、新しい編集は上書きしませんでした",
-  "promptTranslation_nothingToTranslate": "翻訳する通常のテキストはありません",
-  "promptTranslation_failed": "翻訳に失敗しました：{error}",
-  "@promptTranslation_failed": {
-    "placeholders": {
-      "error": {}
-    }
-  },
-  "promptTranslation_setupTitle": "先に翻訳モデルを設定してください",
-  "promptTranslation_setupBody": "翻訳にはサービスとモデルを明示的に選ぶ必要があります。「設定 → 連携 → モデルとAPI」でサービスを追加してモデル一覧を取得し、プロンプト翻訳のモデルを選択してください。",
-  "promptTranslation_later": "後で",
-  "promptTranslation_openSettings": "設定を開く",
-  "promptTranslation_toolTitle": "翻訳",
-  "promptTranslation_noModel": "モデル未設定",
-  "promptTranslation_configureModel": "翻訳モデルを設定",
-  "promptTranslation_translateNew": "追加した内容を翻訳",
-  "promptTranslation_undoRestore": "原文への復元を取り消し、翻訳ブロックに戻す",
-  "promptTranslation_restoreAll": "すべての翻訳ブロックを原文テキストに戻す",
-  "promptTranslation_tutorial": "使い方",
-  "promptTranslation_guideBack": "操作に戻る",
-  "promptTranslation_guideMiddleTitle": "ブロックを中クリック",
-  "promptTranslation_guideMiddleText": "原文と訳文を切り替え",
-  "promptTranslation_guideSourceTitle": "原文を左クリック",
-  "promptTranslation_guideSourceText": "カーソルを置いて直接編集",
-  "promptTranslation_guideReadingTitle": "訳文を左クリック",
-  "promptTranslation_guideReadingText": "ブロック編集を開く",
-  "promptTranslation_guideCtrlTitle": "Ctrl + クリック / ドラッグ選択",
-  "promptTranslation_guideCtrlText": "編集画面でタグ検索 / 関連タグ",
-  "promptTranslation_guideConvertTitle": "↑ 訳文から原文へ",
-  "promptTranslation_guideConvertText": "↓ 原文から訳文へ。確認してから保存",
-  "promptTranslation_guideRestoreTitle": "グループ全体の表示切替",
-  "promptTranslation_guideRestoreText": "翻訳メニューで原文 / 訳文をまとめて切り替え",
-  "promptTranslation_middleButton": "マウス中ボタン",
-  "promptTranslation_leftButton": "マウス左ボタン",
-  "promptTranslation_blockShowingOriginal": "翻訳ブロック（原文を表示）",
-  "promptTranslation_blockShowingReading": "翻訳ブロック（訳文を表示）",
-  "promptTranslation_blockNeedsReview": "原文が変更されました · 訳文の更新が必要です",
-  "promptTranslation_badgeTooltip": "原文が変更されました。訳文の同期が必要です",
-  "promptTranslation_sourceChanged": "原文が変更されました。翻訳ブロックを開き直してください",
-  "promptTranslation_retranslateFailed": "再翻訳に失敗しました：{error}",
-  "@promptTranslation_retranslateFailed": {
-    "placeholders": {
-      "error": {}
-    }
-  },
-  "promptTranslation_draftChanged": "内容が変更されました。もう一度変換してください。新しい下書きは保持されています",
-  "promptTranslation_convertFailed": "変換に失敗しました。下書きは保持されています：{error}",
-  "@promptTranslation_convertFailed": {
-    "placeholders": {
-      "error": {}
-    }
-  },
-  "promptTranslation_invalidResultFormat": "変換結果の形式が正しくありません。下書きは保持されています",
-  "promptTranslation_noValidText": "モデルが有効なテキストを返しませんでした。下書きは保持されています",
-  "promptTranslation_invalidResultContent": "変換結果に無効な書式が含まれています。下書きは保持されています",
-  "promptTranslation_incompleteStructure": "変換結果の重みまたはグループが不完全です。下書きは保持されています",
-  "promptTranslation_inputRequired": "先に変換する内容を入力してください",
   "wiki_configureTagModel": "先に「モデルとAPI」で利用できるタグ翻訳モデルを設定してください。",
   "blockOrganizer_replaceMoveBody": "移動先に同じ元のコピーが {count} 件あります。置き換えると元のブロックはライブラリで非表示になりますが、プロンプトに挿入済みのインスタンスは引き続き元のブロックを参照できます。",
   "@blockOrganizer_replaceMoveBody": {
@@ -4829,7 +4723,6 @@
   "blockAppearance_dots": "ドット",
   "blockAppearance_solid": "ベタ塗り",
   "blockAppearance_gradient": "グラデーション",
-  "blockAppearance_translation": "翻訳",
   "opusUsage_regularRemaining": "通常の無料枠：{percent}%",
   "@opusUsage_regularRemaining": {
     "description": "Separate Opus quota pool; backup means already activated usage boosts, not inventory.",
@@ -5167,7 +5060,6 @@
   "imageMenu_editAndDerive": "編集・派生",
   "imageMenu_more": "その他の操作",
   "imageMenu_fileActions": "ファイル操作",
-  "imageMenu_saveToBlock": "ブロックに保存",
   "settings_highAnlasCostEstimate": "推定消費量",
   "settings_highAnlasCostThresholdLabel": "通知のしきい値",
   "settings_highAnlasCostQuestion": "このまま生成しますか？",
@@ -6889,7 +6781,6 @@
     }
   },
   "blocks_title": "ブロックライブラリ",
-  "blocks_translationMark": "訳",
   "blocks_add": "追加",
   "blocks_cancel": "キャンセル",
   "blocks_close": "閉じる",
@@ -6964,7 +6855,6 @@
   "blocks_lookDots": "ドット",
   "blocks_lookSolid": "ソリッド",
   "blocks_lookGradient": "グラデーション",
-  "blocks_lookTranslation": "翻訳",
   "blocks_hasParams": "パラメーター付き",
   "blocks_hasNegative": "ネガ含む",
   "blocks_hintClick": "クリックで挿入",
@@ -7222,8 +7112,6 @@
   "blocks_details": "詳細",
   "blocks_noSelection": "カードをクリックで詳細。ダブルクリックで編集、Enter でプロンプトに挿入。",
   "blocks_changeThumb": "変更 / 調整",
-  "blocks_reading": "翻訳（読み）",
-  "blocks_needsReview": "要確認",
   "blocks_applyToCurrent": "現在に適用",
   "blocks_noParams": "なし。挿入しても現在のパラメーターは変わりません。",
   "blocks_paramModel": "モデル",
@@ -8122,19 +8010,6 @@
   "gen_sdConvertSub": "(tag:1.2) を貼り付けると NAI の重みに変換",
   "gen_related": "共起タグの提案",
   "gen_relatedSub": "一緒に使われやすいタグを提案",
-  "gen_translating": "翻訳中…",
-  "gen_translateNeedsModel": "翻訳モデル未設定。クリックして設定",
-  "gen_translateRestore": "原文を表示",
-  "gen_translateWith": "翻訳（{route}）",
-  "@gen_translateWith": {
-    "placeholders": {
-      "route": {}
-    }
-  },
-  "gen_translateNew": "追加分を翻訳",
-  "gen_translateShowOriginal": "すべて原文に戻す",
-  "gen_translateShowTranslated": "すべて訳文を表示",
-  "gen_translateSettings": "翻訳モデル設定",
   "gen_qualityPreset": "品質タグ",
   "gen_ucPreset": "除外プリセット",
   "gen_presetNone": "なし",
@@ -9927,7 +9802,6 @@
   },
   "set_mdDeleteBody": "使用中の機能は別のプロバイダーに切り替わります。",
   "set_mdTaskPrompt": "プロンプト翻訳",
-  "set_mdTaskReverse": "プロンプト逆推定",
   "set_mdTaskTag": "タグ翻訳・意味情報",
   "set_mdTaskWiki": "百科翻訳",
   "set_mdFeature": "機能",
@@ -11276,5 +11150,18 @@
         "type": "String"
       }
     }
-  }
+  },
+  "promptCompletion_all": "すべて",
+  "promptCompletion_tags": "タグ",
+  "promptCompletion_summary": "辞書の要約",
+  "promptCompletion_synonyms": "中国語の同義語",
+  "promptReading_showReadings": "タグの訳名を表示",
+  "promptReading_hideReadings": "タグの訳名を隠す",
+  "promptReading_displayHint": "原文の下に利用可能な訳名を表示します。",
+  "promptReading_completion": "入力中にタグを補完",
+  "promptReading_completionHint": "中国語・英語でタグ、キャラクター、作品を検索します。",
+  "promptReading_fillMissing": "表示中のタグの未翻訳名を補完",
+  "modelSettings_promptReadingHint": "全文翻訳は閲覧用です。プロンプトは変更しません。",
+  "promptCompletion_works": "作品",
+  "promptCompletion_expand": "候補一覧と Wiki プレビュー（候補を右クリックで直接プレビュー）"
 }

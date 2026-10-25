@@ -986,12 +986,7 @@ class SettingsDictionaryUpdate {
 enum SettingsModelCapability { tools, vision, reasoning }
 
 /// 用到模型的四个功能。
-enum SettingsModelTask {
-  promptTranslate,
-  promptReverse,
-  tagTranslate,
-  wikiTranslate,
-}
+enum SettingsModelTask { promptTranslate, tagTranslate, wikiTranslate }
 
 @immutable
 class SettingsModel {

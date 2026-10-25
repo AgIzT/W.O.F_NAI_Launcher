@@ -5835,7 +5835,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get promptBlockPalette_emptyHint =>
-      'Keep prompt blocks or translation blocks here; click to insert at the caret, or drag them into the prompt box.';
+      'Drag your frequently used prompt blocks here. Click to insert at the caret, or drag into the prompt.';
 
   @override
   String get promptBlockPalette_remove => 'Remove from blocks';
@@ -6026,7 +6026,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tips_studio_trick_6 =>
-      'Middle-click a translation block to flip between the original and the translation. However good the AI is, peek at the original now and then to make sure \"cat ears\" didn\'t become something strange.';
+      'Tag readings appear below your prompt. Toggle them at any time; the original text stays editable.';
 
   @override
   String get tips_studio_trick_7 =>
@@ -7621,75 +7621,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tagExpansion_autoTranslateVisible => 'Auto-translate visible tags';
 
   @override
-  String get translationEditor_title => 'Translation block';
-
-  @override
-  String get translationEditor_source => 'Original';
-
-  @override
-  String get translationEditor_sourcePrefix => 'Src';
-
-  @override
-  String get translationEditor_generation => 'Generation';
-
-  @override
-  String get translationEditor_editable => 'Editable';
-
-  @override
-  String get translationEditor_modified => 'Modified';
-
-  @override
-  String get translationEditor_edited => 'Edited';
-
-  @override
-  String get translationEditor_close => 'Close';
-
-  @override
-  String get translationEditor_save => 'Save';
-
-  @override
-  String get translationEditor_delete => 'Delete block';
-
-  @override
-  String get translationEditor_restore => 'Restore original text';
-
-  @override
-  String get translationEditor_configure => 'Configure translation model';
-
-  @override
-  String translationEditor_readingFieldTitle(Object language) {
-    return '$language reading text';
-  }
-
-  @override
-  String translationEditor_sourceWarning(Object language) {
-    return 'Original modified; $language needs syncing';
-  }
-
-  @override
-  String get translationEditor_editHint =>
-      'Translation edited manually; original review status is unchanged';
-
-  @override
-  String get translationLanguage_chinese => 'Chinese';
-
-  @override
-  String get translationLanguage_english => 'English';
-
-  @override
-  String get translationLanguage_japanese => 'Japanese';
-
-  @override
-  String get translationLanguage_korean => 'Korean';
-
-  @override
-  String get translationLanguage_traditionalChinese => 'Traditional Chinese';
-
-  @override
-  String get modelTask_translateTitle => 'Original → reading language';
-
-  @override
-  String get modelTask_promptReverseTitle => 'Reading language → original';
+  String get modelTask_translateTitle => 'Full-text reading translation';
 
   @override
   String get modelTask_tagTranslateTitle => 'Tag translation & semantics';
@@ -7699,11 +7631,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get modelTask_translateDescription =>
-      'Translate prompts and blocks while preserving weights, groups and tag meaning.';
-
-  @override
-  String get modelTask_promptReverseDescription =>
-      'Apply additions, deletions and edits from the translation to the original, then return it for review.';
+      'Translate a full prompt into a separate reading view, preserving the source.';
 
   @override
   String get modelTask_tagTranslateDescription =>
@@ -8060,18 +7988,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get modelRequest_emptyResponse => 'The model returned empty content.';
 
   @override
-  String get modelService_testFieldsIncomplete =>
-      'The test response is missing fields.';
-
-  @override
-  String get modelService_testFieldsInvalid =>
-      'The test response has invalid fields.';
-
-  @override
-  String get modelService_testGroupsInvalid =>
-      'The test response has invalid groups.';
-
-  @override
   String get modelService_testSourceEmpty =>
       'The test response returned an empty original.';
 
@@ -8283,16 +8199,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get modelSettings_usePreset => 'Preset';
 
   @override
-  String get modelSettings_outputLanguage => 'Output language';
-
-  @override
-  String get modelSettings_englishPrompt => 'English generation prompt';
-
-  @override
-  String get modelSettings_englishPromptHelp =>
-      'Applies the edits against the original and outputs an English generation prompt.';
-
-  @override
   String get modelSettings_targetLanguage => 'Target language';
 
   @override
@@ -8310,10 +8216,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String modelSettings_reasoningSummaryModel(Object level) {
     return 'Thinking: $level (follows model)';
   }
-
-  @override
-  String get modelSettings_promptBlocksHint =>
-      'When translation isn’t needed, you can also split prompts into blocks and arrange them freely with the block feature.';
 
   @override
   String get modelSettings_wikiFormatHint =>
@@ -8884,176 +8786,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get modelOverrides_addHeader => 'Add header';
 
   @override
-  String get promptTranslation_translating => 'Translating';
-
-  @override
-  String get promptTranslation_needsModel =>
-      'Translate · configure a model first';
-
-  @override
-  String promptTranslation_withRoute(Object provider, Object model) {
-    return 'Translate · $provider / $model';
-  }
-
-  @override
-  String get promptTranslation_actions => 'Translation actions';
-
-  @override
-  String get promptTranslation_promptChanged =>
-      'The prompt changed; new edits were not overwritten';
-
-  @override
-  String get promptTranslation_nothingToTranslate =>
-      'There is no plain text to translate';
-
-  @override
-  String promptTranslation_failed(Object error) {
-    return 'Translation failed: $error';
-  }
-
-  @override
-  String get promptTranslation_setupTitle =>
-      'Configure a translation model first';
-
-  @override
-  String get promptTranslation_setupBody =>
-      'Translation needs an explicitly selected service and model. Go to Settings → Integrations → Models & APIs, add a service and fetch its model list, then choose a model for prompt translation.';
-
-  @override
-  String get promptTranslation_later => 'Later';
-
-  @override
-  String get promptTranslation_openSettings => 'Open settings';
-
-  @override
-  String get promptTranslation_toolTitle => 'Translate';
-
-  @override
-  String get promptTranslation_noModel => 'No model configured';
-
-  @override
-  String get promptTranslation_configureModel => 'Configure translation model';
-
-  @override
-  String get promptTranslation_translateNew => 'Translate new content';
-
-  @override
-  String get promptTranslation_undoRestore =>
-      'Undo the restore and bring translation blocks back';
-
-  @override
-  String get promptTranslation_restoreAll =>
-      'Restore all translation blocks to original text';
-
-  @override
-  String get promptTranslation_tutorial => 'How it works';
-
-  @override
-  String get promptTranslation_guideBack => 'Back to actions';
-
-  @override
-  String get promptTranslation_guideMiddleTitle => 'Middle-click a block';
-
-  @override
-  String get promptTranslation_guideMiddleText =>
-      'Switch original and translation';
-
-  @override
-  String get promptTranslation_guideSourceTitle => 'Left-click the original';
-
-  @override
-  String get promptTranslation_guideSourceText =>
-      'Place the cursor and edit directly';
-
-  @override
-  String get promptTranslation_guideReadingTitle =>
-      'Left-click the translation';
-
-  @override
-  String get promptTranslation_guideReadingText => 'Open the block editor';
-
-  @override
-  String get promptTranslation_guideCtrlTitle => 'Ctrl + click / drag-select';
-
-  @override
-  String get promptTranslation_guideCtrlText =>
-      'Search tags / find related tags in the editor';
-
-  @override
-  String get promptTranslation_guideConvertTitle => '↑ Translation to original';
-
-  @override
-  String get promptTranslation_guideConvertText =>
-      '↓ Original to translation; review before saving';
-
-  @override
-  String get promptTranslation_guideRestoreTitle => 'Switch the whole group';
-
-  @override
-  String get promptTranslation_guideRestoreText =>
-      'Use the translation menu to show all source text / translations';
-
-  @override
-  String get promptTranslation_middleButton => 'Middle mouse button';
-
-  @override
-  String get promptTranslation_leftButton => 'Left mouse button';
-
-  @override
-  String get promptTranslation_blockShowingOriginal =>
-      'Translation block, showing original';
-
-  @override
-  String get promptTranslation_blockShowingReading =>
-      'Translation block, showing translation';
-
-  @override
-  String get promptTranslation_blockNeedsReview =>
-      'Original changed · translation needs updating';
-
-  @override
-  String get promptTranslation_badgeTooltip =>
-      'Original changed; translation needs syncing';
-
-  @override
-  String get promptTranslation_sourceChanged =>
-      'The original changed; reopen the translation block';
-
-  @override
-  String promptTranslation_retranslateFailed(Object error) {
-    return 'Retranslation failed: $error';
-  }
-
-  @override
-  String get promptTranslation_draftChanged =>
-      'Content changed; convert again. The new draft is kept.';
-
-  @override
-  String promptTranslation_convertFailed(Object error) {
-    return 'Conversion failed; the draft is kept: $error';
-  }
-
-  @override
-  String get promptTranslation_invalidResultFormat =>
-      'The conversion result format is invalid; the draft is kept';
-
-  @override
-  String get promptTranslation_noValidText =>
-      'The model returned no valid text; the draft is kept';
-
-  @override
-  String get promptTranslation_invalidResultContent =>
-      'The conversion result contains invalid formatting; the draft is kept';
-
-  @override
-  String get promptTranslation_incompleteStructure =>
-      'The conversion result has incomplete weights or groups; the draft is kept';
-
-  @override
-  String get promptTranslation_inputRequired =>
-      'Enter the content to convert first';
-
-  @override
   String get wiki_configureTagModel =>
       'Configure an available tag translation model in Models & APIs first.';
 
@@ -9094,9 +8826,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get blockAppearance_gradient => 'Gradient';
-
-  @override
-  String get blockAppearance_translation => 'Translation';
 
   @override
   String opusUsage_regularRemaining(Object percent) {
@@ -9611,9 +9340,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get imageMenu_fileActions => 'File actions';
-
-  @override
-  String get imageMenu_saveToBlock => 'Save to blocks';
 
   @override
   String get settings_highAnlasCostEstimate => 'Estimated usage';
@@ -12634,9 +12360,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get blocks_title => 'Block library';
 
   @override
-  String get blocks_translationMark => 'Tr';
-
-  @override
   String get blocks_add => 'Add';
 
   @override
@@ -12792,9 +12515,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get blocks_lookGradient => 'Gradient';
-
-  @override
-  String get blocks_lookTranslation => 'Translation';
 
   @override
   String get blocks_hasParams => 'Has settings';
@@ -13351,12 +13071,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get blocks_changeThumb => 'Change / adjust';
-
-  @override
-  String get blocks_reading => 'Reading translation';
-
-  @override
-  String get blocks_needsReview => 'Needs review';
 
   @override
   String get blocks_applyToCurrent => 'Apply now';
@@ -14936,33 +14650,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get gen_relatedSub => 'Suggest tags that often appear together';
-
-  @override
-  String get gen_translating => 'Translating…';
-
-  @override
-  String get gen_translateNeedsModel =>
-      'No translation model yet — click to set one up';
-
-  @override
-  String get gen_translateRestore => 'Show original';
-
-  @override
-  String gen_translateWith(Object route) {
-    return 'Translate ($route)';
-  }
-
-  @override
-  String get gen_translateNew => 'Translate new text';
-
-  @override
-  String get gen_translateShowOriginal => 'Show all original';
-
-  @override
-  String get gen_translateShowTranslated => 'Show all translations';
-
-  @override
-  String get gen_translateSettings => 'Translation model';
 
   @override
   String get gen_qualityPreset => 'Quality tags';
@@ -18724,9 +18411,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get set_mdTaskPrompt => 'Prompt translation';
 
   @override
-  String get set_mdTaskReverse => 'Prompt reverse';
-
-  @override
   String get set_mdTaskTag => 'Tag translation & semantics';
 
   @override
@@ -22101,4 +21785,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String startup_dataActionFailed(String error) {
     return 'Action failed: $error';
   }
+
+  @override
+  String get promptCompletion_all => 'All';
+
+  @override
+  String get promptCompletion_tags => 'Tags';
+
+  @override
+  String get promptCompletion_summary => 'Dictionary summary';
+
+  @override
+  String get promptCompletion_synonyms => 'Chinese synonyms';
+
+  @override
+  String get promptReading_showReadings => 'Show tag readings';
+
+  @override
+  String get promptReading_hideReadings => 'Hide tag readings';
+
+  @override
+  String get promptReading_displayHint =>
+      'Show available translations below the original text.';
+
+  @override
+  String get promptReading_completion => 'Complete tags while typing';
+
+  @override
+  String get promptReading_completionHint =>
+      'Search tags, characters and series in Chinese or English.';
+
+  @override
+  String get promptReading_fillMissing => 'Fill missing visible readings';
+
+  @override
+  String get modelSettings_promptReadingHint =>
+      'Full-text translation is for reading and does not modify prompts.';
+
+  @override
+  String get promptCompletion_works => 'Works';
+
+  @override
+  String get promptCompletion_expand =>
+      'Full list and Wiki preview (right-click a suggestion to preview it)';
 }

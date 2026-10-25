@@ -16,9 +16,6 @@ String encodeRagBlocks(Iterable<PromptBlock> blocks) {
           'positive': block.content,
           'negative': block.negativeContent,
           'tags': block.tags.map((t) => t.name).toList()..sort(),
-          if (!block.readingTranslationNeedsReview &&
-              block.readingTranslationZh?.trim().isNotEmpty == true)
-            'reading': block.readingTranslationZh,
         },
     ],
   });

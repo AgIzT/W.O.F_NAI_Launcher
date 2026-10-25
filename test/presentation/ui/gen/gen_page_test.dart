@@ -240,7 +240,7 @@ void main() {
       expect(find.byKey(const Key('gen-fullscreen-editor')), findsNothing);
     });
 
-    testWidgets('翻译：没配模型时点了去设置', (t) async {
+    testWidgets('译名显示独立于模型配置，点击只切换阅读状态', (t) async {
       final d = GenFixture.view();
       await pump(
         t,
@@ -252,7 +252,8 @@ void main() {
         ),
       );
       await tapKey(t, 'gen-translate-run');
-      expect(r.called('onTranslationSettings'), isTrue);
+      expect(r.called('onToggleTranslation'), isTrue);
+      expect(r.called('onTranslationSettings'), isFalse);
     });
 
     testWidgets('块库侧栏按钮开关 dock', (t) async {

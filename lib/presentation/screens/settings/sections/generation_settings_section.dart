@@ -3,9 +3,11 @@ import 'package:nai_launcher/presentation/widgets/common/studio_material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/localization_extension.dart';
+import '../../../../core/wiki/auto_tag_translation_controller.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../providers/generation/generation_settings_notifiers.dart';
 import '../../../providers/notification_settings_provider.dart';
+import '../../../providers/prompt_reading_preferences_provider.dart';
 import '../widgets/settings_card.dart';
 import '../widgets/settings_tile.dart';
 import '../widgets/settings_section_label.dart';
@@ -122,6 +124,8 @@ class _GenerationSettingsSectionState
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final readingPreferences = ref.watch(promptReadingPreferencesProvider);
+    final translations = ref.watch(autoTagTranslationProvider);
     final promptWeightScrollEnabled = ref.watch(
       promptWeightScrollSettingsProvider,
     );
@@ -139,6 +143,41 @@ class _GenerationSettingsSectionState
           if (!widget.feedbackOnly) ...[
             if (widget.showHeading)
               SettingsSectionLabel(l10n.settings_generationInputSection),
+            SettingsSwitchTile(
+              secondary: const Icon(Icons.translate),
+              title: Text(l10n.promptReading_showReadings),
+              subtitle: Text(l10n.promptReading_displayHint),
+              value: readingPreferences.showReadings,
+              onChanged: (value) async {
+                try {
+                  await ref
+                      .read(promptReadingPreferencesProvider.notifier)
+                      .setShowReadings(value);
+                } catch (error) {
+                  if (context.mounted) {
+                    AppToast.error(
+                      context,
+                      l10n.globalSettings_saveFailed('$error'),
+                    );
+                  }
+                }
+              },
+            ),
+            SettingsSwitchTile(
+              secondary: const Icon(Icons.manage_search),
+              title: Text(l10n.promptReading_completion),
+              subtitle: Text(l10n.promptReading_completionHint),
+              value: readingPreferences.completionEnabled,
+              onChanged: (value) => ref
+                  .read(promptReadingPreferencesProvider.notifier)
+                  .setCompletionEnabled(value),
+            ),
+            SettingsSwitchTile(
+              secondary: const Icon(Icons.auto_awesome_outlined),
+              title: Text(l10n.wiki_autoTranslateTagsArticles),
+              value: translations.enabled,
+              onChanged: translations.setEnabled,
+            ),
             SettingsTile(
               controlWrapWidth: 300 * MediaQuery.textScalerOf(context).scale(1),
               leading: const Icon(Icons.mouse_outlined),

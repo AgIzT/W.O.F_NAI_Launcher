@@ -316,21 +316,15 @@ enum GenPromptTool {
   related,
 }
 
-/// 翻译按钮（`promptTranslationCoordinator`）。
+/// Visibility of the read-only tag annotations.
 @immutable
 class GenTranslate with _GenValue {
-  const GenTranslate({this.busy = false, this.showing = false, this.route});
+  const GenTranslate({this.showing = false});
 
-  /// 正在翻译：图标转圈、按钮不可点。
-  final bool busy;
-
-  /// 当前这一面有译文正在显示（再点一下 = 全部还原）。
+  /// Toggling annotations never changes prompt text.
   final bool showing;
-
-  /// “DeepSeek · deepseek-chat”这类线路名；null = 没配翻译模型（点了先引导去设置）。
-  final String? route;
   @override
-  List<Object?> get _values => [busy, showing, route];
+  List<Object?> get _values => [showing];
 }
 
 @immutable
@@ -1402,7 +1396,6 @@ class GenSlots {
     this.historyDrag,
     this.toolSheet,
     this.emptyCanvas,
-    this.translationGuide,
     this.agentToggle,
     this.historyCaptionInset = true,
     this.preserveHistory = false,
@@ -1412,10 +1405,6 @@ class GenSlots {
 
   /// 品牌欢迎页与随机小贴士由现有组件提供。
   final WidgetBuilder? emptyCanvas;
-
-  /// 教程显示在翻译浮层内；回调返回操作菜单。
-  final Widget Function(BuildContext context, VoidCallback onBack)?
-  translationGuide;
 
   /// 仅应用启用 Agent 集成时提供。
   final Widget? agentToggle;
@@ -1464,9 +1453,7 @@ class GenActions {
     required this.onTransparentChanged,
     required this.onPromptTool,
     required this.onOpenPalette,
-    required this.onTranslate,
     required this.onToggleTranslation,
-    required this.onTranslationSettings,
     required this.onOpenBridge,
     required this.onAddCharacter,
     required this.onClearCharacters,
@@ -1562,9 +1549,7 @@ class GenActions {
     onTransparentChanged: (v) => log('onTransparentChanged($v)'),
     onPromptTool: (tool, value) => log('onPromptTool($tool, $value)'),
     onOpenPalette: (_) => log('onOpenPalette'),
-    onTranslate: () => log('onTranslate'),
     onToggleTranslation: () => log('onToggleTranslation'),
-    onTranslationSettings: () => log('onTranslationSettings'),
     onOpenBridge: (_) => log('onOpenBridge'),
     onAddCharacter: (v) => log('onAddCharacter($v)'),
     onClearCharacters: () => log('onClearCharacters'),
@@ -1663,9 +1648,7 @@ class GenActions {
         onTransparentChanged: onTransparentChanged,
         onPromptTool: onPromptTool,
         onOpenPalette: onOpenPalette,
-        onTranslate: onTranslate,
         onToggleTranslation: onToggleTranslation,
-        onTranslationSettings: onTranslationSettings,
         onOpenBridge: onOpenBridge,
         onAddCharacter: onAddCharacter,
         onClearCharacters: onClearCharacters,
@@ -1773,14 +1756,8 @@ class GenActions {
   /// 积木板按钮（现有 `PromptBlockPalette` 弹层由接线方贴着 [Rect] 弹）。
   final GenAnchorCallback onOpenPalette;
 
-  /// 翻译当前这一面（`coordinator.translate`）。
-  final VoidCallback onTranslate;
-
-  /// 显示原文 / 译文（`coordinator.toggleAll`）。
+  /// Toggle read-only tag annotations without changing the prompt.
   final VoidCallback onToggleTranslation;
-
-  /// 去设置里配翻译模型。
-  final VoidCallback onTranslationSettings;
 
   /// 桥接图标（弹现有桥接面板）。
   final GenAnchorCallback onOpenBridge;

@@ -315,7 +315,7 @@ abstract final class SettingsFixture {
             id: 'deepseek-reasoner',
             detail: 'R1 · 64K',
             capabilities: {SettingsModelCapability.reasoning},
-            usedFor: {SettingsModelTask.promptReverse},
+            usedFor: {SettingsModelTask.promptTranslate},
           ),
           SettingsModel(id: 'deepseek-coder', detail: '已弃用', retired: true),
         ],
@@ -384,12 +384,6 @@ abstract final class SettingsFixture {
         presetId: 'b-tr',
       ),
       SettingsTaskAssignment(
-        task: SettingsModelTask.promptReverse,
-        providerId: 'oa',
-        modelId: 'gpt-4.1',
-        presetId: 'my-rev',
-      ),
-      SettingsTaskAssignment(
         task: SettingsModelTask.tagTranslate,
         providerId: 'ds',
         modelId: 'deepseek-chat',
@@ -407,17 +401,6 @@ abstract final class SettingsFixture {
         name: '内置 · 翻译',
         task: SettingsModelTask.promptTranslate,
         builtin: true,
-      ),
-      SettingsPreset(
-        id: 'b-rev',
-        name: '内置 · 反推',
-        task: SettingsModelTask.promptReverse,
-        builtin: true,
-      ),
-      SettingsPreset(
-        id: 'my-rev',
-        name: '我的反推',
-        task: SettingsModelTask.promptReverse,
       ),
       SettingsPreset(
         id: 'b-tag',

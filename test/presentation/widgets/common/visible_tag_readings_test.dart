@@ -77,6 +77,7 @@ class _Readings extends AutoTagTranslationController {
     required bool visible,
     String? existingNameZh,
     AutoTagTranslationContext? tagContext,
+    TagReadingIntent intent = TagReadingIntent.details,
   }) {
     observed.add(tag);
     final tags = _bySurface.putIfAbsent(surface, () => {});

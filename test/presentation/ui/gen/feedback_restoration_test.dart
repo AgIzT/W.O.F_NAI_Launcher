@@ -12,7 +12,6 @@ import 'package:nai_launcher/presentation/ui/gen/gen_fixture.dart';
 import 'package:nai_launcher/presentation/ui/gen/gen_fixture_editor.dart';
 import 'package:nai_launcher/presentation/ui/gen/gen_parts.dart';
 import 'package:nai_launcher/presentation/widgets/bridge/bridge_link_icon.dart';
-import 'package:nai_launcher/presentation/widgets/common/prompt_translation_guide.dart';
 import 'package:nai_launcher/presentation/widgets/common/studio_animated_icon.dart';
 import 'package:nai_launcher/presentation/widgets/common/studio_icons.dart';
 import 'package:nai_launcher/presentation/themes/presets/geist_theme.dart';
@@ -23,7 +22,6 @@ import 'gen_test_harness.dart';
 GenSlots slots({bool captions = true}) => GenSlots(
   editor: GenFixtureEditor.builder,
   emptyCanvas: (_) => const ProviderScope(child: GenerationWelcome()),
-  translationGuide: (_, back) => PromptTranslationGuide(onBack: back),
   agentToggle: const IconButton(
     key: Key('fixture-agent-toggle'),
     onPressed: _nothing,
@@ -60,7 +58,7 @@ void main() {
   for (final locale in ['zh', 'zh_TW', 'en', 'ja', 'ko']) {
     for (final dark in [false, true]) {
       testWidgets(
-        'restored toolbar and tutorial $locale dark=$dark at narrow width',
+        'toolbar and reading toggle $locale dark=$dark at narrow width',
         (t) async {
           final record = GenRecorder();
           await pumpGen(
@@ -83,21 +81,11 @@ void main() {
           );
           await t.tapAt(const Offset(650, 100));
           await t.pumpAndSettle();
-          await tapKey(t, 'gen-translate-menu');
-          await tapKey(t, 'gen-translation-tutorial');
-          expect(find.byType(MouseGestureIcon), findsNWidgets(3));
-          expect(find.byIcon(Icons.keyboard), findsOneWidget);
-          expect(
-            find.byKey(const Key('gen-translation-guide')),
-            findsOneWidget,
-          );
-          expect(t.takeException(), isNull);
+          await tapKey(t, 'gen-translate-run');
+          expect(record.last('onToggleTranslation'), 'onToggleTranslation');
           if (locale == 'zh') {
-            await capture(t, 'tutorial-${dark ? 'dark' : 'light'}');
+            await capture(t, 'reading-toggle-${dark ? 'dark' : 'light'}');
           }
-          await tapKey(t, 'translation-guide-back');
-          expect(find.byKey(const Key('gen-translate-new')), findsOneWidget);
-          expect(find.byKey(const Key('gen-translation-guide')), findsNothing);
           expect(t.takeException(), isNull);
         },
       );

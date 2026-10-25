@@ -8,6 +8,7 @@ import 'package:nai_launcher/core/constants/storage_keys.dart';
 import 'package:nai_launcher/core/storage/local_storage_service.dart';
 import 'package:nai_launcher/core/storage/pill_workspace_storage.dart';
 import 'package:nai_launcher/data/repositories/character_prompt_repository.dart';
+import 'package:nai_launcher/data/models/prompt_block/prompt_block.dart';
 import 'package:nai_launcher/presentation/providers/character_prompt_provider.dart';
 import 'package:nai_launcher/presentation/providers/image_generation_provider.dart';
 import 'package:nai_launcher/presentation/providers/krita/bridge_draft_snapshot.dart';
@@ -18,6 +19,19 @@ import 'package:nai_launcher/presentation/wiring/nai_agent/agent_diff_undo.dart'
 import 'package:nai_launcher/presentation/wiring/nai_agent/agent_thread_mapper.dart';
 import '../../providers/krita/agent_bridge_draft_test.dart'
     show MemoryCharacters, MemoryDraftSettings, EmptyBlocks;
+
+class _UndoBlocks extends EmptyBlocks {
+  @override
+  Future<PromptBlockLibraryState> build() async => PromptBlockLibraryState(
+    blocks: [
+      PromptBlock.create(id: 'artist', title: 'Artist', content: 'artist tag'),
+    ],
+    folders: [],
+  );
+
+  @override
+  Future<void> incrementUseCount(String blockId) async {}
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -33,7 +47,7 @@ void main() {
       overrides: [
         localStorageServiceProvider.overrideWithValue(MemoryDraftSettings()),
         characterPromptRepositoryProvider.overrideWithValue(MemoryCharacters()),
-        promptBlockLibraryNotifierProvider.overrideWith(EmptyBlocks.new),
+        promptBlockLibraryNotifierProvider.overrideWith(_UndoBlocks.new),
       ],
     );
     await container.read(promptBlockLibraryNotifierProvider.future);
@@ -56,7 +70,7 @@ void main() {
       final lane = container.read(
         pillWorkspaceProvider(PillScopes.main).notifier,
       );
-      lane.insertTranslationAt(offset: 0, source: 'artist tag', zh: '画师');
+      lane.insertBlockAt(offset: 0, blockId: 'artist');
       final before = snapshot();
       final originalDoc = before['documents']['prompt'];
       params.updatePromptImmediately('after');

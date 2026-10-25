@@ -52,6 +52,10 @@ final autoTagTranslationProvider =
 
 enum TagTranslationPhase { queued, translating, failed }
 
+/// Prompt annotations need only a name. Detail surfaces may additionally fill
+/// missing semantic fields and translate a Wiki explicitly opened by the user.
+enum TagReadingIntent { nameOnly, details }
+
 class TagTranslationActivity {
   const TagTranslationActivity(this.phase, {this.wiki = false, this.error});
   final TagTranslationPhase phase;
@@ -60,11 +64,18 @@ class TagTranslationActivity {
 }
 
 class _VisibleTask {
-  const _VisibleTask(this.tag, this.wiki, this.priority, {this.force = false});
+  const _VisibleTask(
+    this.tag,
+    this.wiki,
+    this.priority, {
+    this.force = false,
+    this.nameOnly = false,
+  });
   final String tag;
   final bool wiki;
   final int priority;
   final bool force;
+  final bool nameOnly;
 }
 
 class AutoTagTranslationContext {
@@ -119,6 +130,12 @@ class AutoTagTranslationController extends ChangeNotifier {
   PromptTranslationLanguage get _reading =>
       PromptTranslationLanguage.fromCode(_readingLanguage());
   final Map<String, Set<String>> _visibleBySurface = {};
+  final Map<String, Set<String>> _nameOnlyBySurface = {};
+  final Set<String> _readingPending = {},
+      _readingChecked = {},
+      _readingLoading = {};
+  final Set<String> _forcedNameTags = {};
+  bool _readingFlushScheduled = false;
   final Map<String, String> _wikiBySurface = {};
   final Map<String, _VisibleTask> _pending = {};
   final Set<String> _inFlight = {};
@@ -246,6 +263,12 @@ class AutoTagTranslationController extends ChangeNotifier {
 
   void routeChanged() {
     _routeEpoch++;
+    _pending.clear();
+    _readingChecked.clear();
+    _readingPending.clear();
+    _readingLoading.clear();
+    _readingFlushScheduled = false;
+    _forcedNameTags.clear();
     _route = null;
     _referenceChecked.clear();
     _semanticSettled.clear();
@@ -256,6 +279,7 @@ class AutoTagTranslationController extends ChangeNotifier {
     _nameErrors.clear();
     _wikiErrors.clear();
     notifyListeners();
+    _reloadNameReadings();
     _queueVisible();
   }
 
@@ -263,6 +287,11 @@ class AutoTagTranslationController extends ChangeNotifier {
   Future<void> clearCache() async {
     _routeEpoch++;
     _pending.clear();
+    _readingPending.clear();
+    _readingLoading.clear();
+    _readingFlushScheduled = false;
+    _readingChecked.clear();
+    _forcedNameTags.clear();
     _referenceChecked.clear();
     for (final session in _sessions.values.toList()) {
       unawaited(_assistant.cancelCurrentTask(sessionId: session));
@@ -274,7 +303,12 @@ class AutoTagTranslationController extends ChangeNotifier {
     _nameErrors.clear();
     _wikiErrors.clear();
     await _cache.clear();
-    if (!_disposed) notifyListeners();
+    if (!_disposed) {
+      // Clearing a cache may reload bundled names, but never starts new model
+      // work until the user observes or explicitly requests missing names.
+      _reloadNameReadings(allowRemote: false);
+      notifyListeners();
+    }
   }
 
   Future<void> loadPreference() async {
@@ -306,17 +340,31 @@ class AutoTagTranslationController extends ChangeNotifier {
     required bool visible,
     String? existingNameZh,
     AutoTagTranslationContext? tagContext,
+    TagReadingIntent intent = TagReadingIntent.details,
   }) {
     final canonical = TagNormalizer.normalize(tag);
     if (canonical.isEmpty) return;
     final tags = _visibleBySurface.putIfAbsent(surface, () => <String>{});
+    final nameOnly = _nameOnlyBySurface.putIfAbsent(surface, () => <String>{});
+    if (visible && intent == TagReadingIntent.nameOnly) {
+      nameOnly.add(canonical);
+    } else {
+      nameOnly.remove(canonical);
+    }
     if (tagContext != null) _contexts[canonical] = tagContext;
     // Existing names come from the same translation interface.
-    if (_reading.isChinese && existingNameZh?.trim().isNotEmpty == true) {
+    final acceptsChineseName = intent == TagReadingIntent.nameOnly
+        ? _reading.code == 'zh'
+        : _reading.isChinese;
+    if (acceptsChineseName && existingNameZh?.trim().isNotEmpty == true) {
       _names.putIfAbsent(canonical, () => existingNameZh!.trim());
     }
     if (visible) {
       tags.add(canonical);
+      if (intent == TagReadingIntent.nameOnly) {
+        _scheduleNameReadings([canonical]);
+        return;
+      }
       if (semantics != null && _referenceChecked.add(canonical)) {
         unawaited(_loadReference(canonical));
       }
@@ -329,6 +377,140 @@ class AutoTagTranslationController extends ChangeNotifier {
       tags.remove(canonical);
       if (!_isVisible(canonical)) _pending.remove(canonical);
     }
+  }
+
+  /// Replaces a prompt's currently visible annotation tags. Local reads are
+  /// coalesced across surfaces; no model request is made until they finish.
+  void observeNames({required String surface, required Iterable<String> tags}) {
+    final next = tags
+        .map(TagNormalizer.normalize)
+        .where((tag) => tag.isNotEmpty)
+        .toSet();
+    final previous = _visibleBySurface[surface] ?? const <String>{};
+    _visibleBySurface[surface] = next;
+    _nameOnlyBySurface[surface] = {...next};
+    for (final tag in previous.difference(next)) {
+      if (!_isVisible(tag)) {
+        _pending.remove(tag);
+        _forcedNameTags.remove(tag);
+      }
+    }
+    _scheduleNameReadings(next);
+  }
+
+  /// Explicitly fills only missing names on this surface, even with automatic
+  /// model calls disabled. Existing names are never retranslated by this action.
+  void requestMissingNames({required String surface}) {
+    final tags = _nameOnlyBySurface[surface] ?? const <String>{};
+    for (final tag in tags) {
+      if (!_names.containsKey(tag)) {
+        _forcedNameTags.add(tag);
+        _nameErrors.remove(tag);
+      }
+    }
+    _scheduleNameReadings(tags);
+    notifyListeners();
+  }
+
+  void _reloadNameReadings({bool allowRemote = true}) => _scheduleNameReadings(
+    _nameOnlyBySurface.values.expand((tags) => tags),
+    allowRemote: allowRemote,
+  );
+
+  void _scheduleNameReadings(Iterable<String> tags, {bool allowRemote = true}) {
+    for (final tag in tags) {
+      if (_readingChecked.add(tag)) {
+        _readingPending.add(tag);
+      } else if (allowRemote && !_readingPending.contains(tag)) {
+        _queueMissingName(tag);
+      }
+    }
+    if (_readingFlushScheduled ||
+        _readingPending.difference(_readingLoading).isEmpty) {
+      return;
+    }
+    _readingFlushScheduled = true;
+    final epoch = _routeEpoch;
+    scheduleMicrotask(() {
+      if (_disposed || epoch != _routeEpoch) return;
+      _readingFlushScheduled = false;
+      final batch = _readingPending.difference(_readingLoading).toList();
+      if (batch.isEmpty) return;
+      _readingLoading.addAll(batch);
+      unawaited(_loadNameReadings(batch, allowRemote: allowRemote));
+    });
+  }
+
+  Future<void> _loadNameReadings(
+    List<String> tags, {
+    required bool allowRemote,
+  }) async {
+    final epoch = _routeEpoch;
+    final generation = _cache.generation;
+    final language = _reading.code;
+    final route = _assistant.translateRouteFingerprint();
+    Future<Map<String, String>> cachedNames() async {
+      try {
+        return await _cache.namesFor(
+          tags: tags,
+          language: language,
+          route: route.isEmpty ? null : route,
+          maxPromptVersion:
+              PromptAssistantService.visibleTagTranslationPromptVersion,
+        );
+      } catch (_) {
+        return const {};
+      }
+    }
+
+    Future<Map<String, TagSemanticProfile>> localNames() async {
+      if (language != 'zh') return const {};
+      try {
+        return await semantics?.findAll(tags) ?? const {};
+      } catch (_) {
+        return const {};
+      }
+    }
+
+    final cachedFuture = cachedNames();
+    final profiles = await localNames();
+    final cached = await cachedFuture;
+    if (_disposed ||
+        epoch != _routeEpoch ||
+        generation != _cache.generation ||
+        language != _reading.code ||
+        route != _assistant.translateRouteFingerprint()) {
+      return;
+    }
+    for (final tag in tags) {
+      _readingPending.remove(tag);
+      _readingLoading.remove(tag);
+      final name = cached[tag] ?? profiles[tag]?.coreZh;
+      if (name?.trim().isNotEmpty == true) {
+        _names[tag] = name!;
+        _nameErrors.remove(tag);
+        _forcedNameTags.remove(tag);
+      }
+      if (allowRemote) _queueMissingName(tag);
+    }
+    notifyListeners();
+  }
+
+  void _queueMissingName(String tag) {
+    if (!_isVisible(tag) || _readingPending.contains(tag)) return;
+    if (_names.containsKey(tag)) {
+      _forcedNameTags.remove(tag);
+      return;
+    }
+    final force = _forcedNameTags.contains(tag);
+    if (!_enabled && !force) return;
+    if (_assistant.translateRouteFingerprint().isEmpty) {
+      // An unconfigured automatic reader remains a useful offline reader.
+      if (force) _nameErrors[tag] = currentL10n.wiki_configureTagModel;
+      _forcedNameTags.remove(tag);
+      return;
+    }
+    _enqueue(tag, wiki: false, nameOnly: true, force: force);
   }
 
   Future<void> _loadReference(String tag) async {
@@ -368,6 +550,8 @@ class AutoTagTranslationController extends ChangeNotifier {
   }
 
   void clearSurface(String surface) {
+    _nameOnlyBySurface.remove(surface);
+    final removed = _visibleBySurface.remove(surface);
     final oldWiki = _wikiBySurface.remove(surface);
     if (oldWiki != null && !_wikiBySurface.values.contains(oldWiki)) {
       final pending = _pending[oldWiki];
@@ -375,19 +559,47 @@ class AutoTagTranslationController extends ChangeNotifier {
         if (_names.containsKey(oldWiki)) {
           _pending.remove(oldWiki);
         } else {
-          _pending[oldWiki] = _VisibleTask(oldWiki, false, pending!.priority);
+          _pending[oldWiki] = _VisibleTask(
+            oldWiki,
+            false,
+            pending!.priority,
+            nameOnly: !_needsDetails(oldWiki),
+          );
         }
       }
     }
-    final removed = _visibleBySurface.remove(surface);
     if (removed == null) return;
     for (final tag in removed) {
-      if (!_isVisible(tag)) _pending.remove(tag);
+      if (!_isVisible(tag)) {
+        _pending.remove(tag);
+        _forcedNameTags.remove(tag);
+      } else if (!_needsDetails(tag)) {
+        final pending = _pending[tag];
+        if (pending != null && !pending.wiki) {
+          if (_names.containsKey(tag)) {
+            _pending.remove(tag);
+          } else {
+            _pending[tag] = _VisibleTask(
+              tag,
+              false,
+              pending.priority,
+              force: pending.force,
+              nameOnly: true,
+            );
+          }
+        }
+      }
     }
   }
 
   bool _isVisible(String tag) =>
       _visibleBySurface.values.any((tags) => tags.contains(tag));
+
+  bool _needsDetails(String tag) => _visibleBySurface.entries.any(
+    (entry) =>
+        entry.value.contains(tag) &&
+        !(_nameOnlyBySurface[entry.key]?.contains(tag) ?? false),
+  );
 
   void _queueVisible() {
     if (!_enabled) return;
@@ -396,6 +608,10 @@ class AutoTagTranslationController extends ChangeNotifier {
     }
     for (final tags in _visibleBySurface.values) {
       for (final tag in tags) {
+        if (!_needsDetails(tag)) {
+          _queueMissingName(tag);
+          continue;
+        }
         if (!_names.containsKey(tag) ||
             semantics != null && !_semanticSettled.contains(tag)) {
           _enqueue(tag, wiki: false);
@@ -404,8 +620,13 @@ class AutoTagTranslationController extends ChangeNotifier {
     }
   }
 
-  void _enqueue(String tag, {required bool wiki}) {
-    if (!_enabled ||
+  void _enqueue(
+    String tag, {
+    required bool wiki,
+    bool nameOnly = false,
+    bool force = false,
+  }) {
+    if ((!_enabled && !force) ||
         (wiki ? _wikiErrors : _nameErrors).containsKey(tag) ||
         (_inFlightEpoch[tag] == _routeEpoch &&
             _inFlight.contains(tag) &&
@@ -420,7 +641,10 @@ class AutoTagTranslationController extends ChangeNotifier {
       ++_priority,
       // A forced name retry must not turn an automatic Wiki request into a
       // cache-bypassing one.
-      force: previous != null && previous.wiki == merged && previous.force,
+      force:
+          force && !merged ||
+          previous != null && previous.wiki == merged && previous.force,
+      nameOnly: !merged && nameOnly && (previous?.nameOnly ?? true),
     );
     notifyListeners();
     _pump();
@@ -447,6 +671,7 @@ class AutoTagTranslationController extends ChangeNotifier {
             });
       if (eligible.isEmpty) return;
       final task = eligible.first;
+      final taskEpoch = _routeEpoch;
       _pending.remove(task.tag);
       _inFlight.add(task.tag);
       _inFlightEpoch[task.tag] = _routeEpoch;
@@ -461,6 +686,12 @@ class AutoTagTranslationController extends ChangeNotifier {
           _wikiInFlight.remove(task.tag);
           if (!_disposed) {
             notifyListeners();
+            if (task.nameOnly &&
+                taskEpoch == _routeEpoch &&
+                _needsDetails(task.tag) &&
+                _enabled) {
+              _enqueue(task.tag, wiki: false);
+            }
             _pump();
           }
         }),
@@ -469,6 +700,7 @@ class AutoTagTranslationController extends ChangeNotifier {
   }
 
   Future<void> _run(_VisibleTask task) async {
+    if (task.nameOnly) return _runNameOnly(task);
     final epoch = _routeEpoch;
     final cacheGeneration = _cache.generation;
     try {
@@ -826,6 +1058,76 @@ class AutoTagTranslationController extends ChangeNotifier {
       if (_pending[task.tag]?.wiki == task.wiki) _pending.remove(task.tag);
       if (!_disposed) notifyListeners();
     } finally {
+      _sessions.remove(task.tag);
+    }
+  }
+
+  Future<void> _runNameOnly(_VisibleTask task) async {
+    final epoch = _routeEpoch;
+    final generation = _cache.generation;
+    final language = _reading.code;
+    final route = _assistant.translateRouteFingerprint();
+    bool current() =>
+        !_disposed &&
+        epoch == _routeEpoch &&
+        generation == _cache.generation &&
+        language == _reading.code &&
+        route == _assistant.translateRouteFingerprint();
+    try {
+      // Local batching has already read the current route's cache. A name can
+      // also arrive from another visible detail surface while this task waits.
+      if (_names.containsKey(task.tag) || route.isEmpty) return;
+      final entry = await _wiki.find(task.tag);
+      if (!current() ||
+          (!_enabled && !task.force) ||
+          !_isVisible(task.tag) ||
+          _names.containsKey(task.tag)) {
+        return;
+      }
+      final body = entry?.body ?? '';
+      final context = _contexts[task.tag];
+      final session =
+          'tag-reading-${DateTime.now().microsecondsSinceEpoch}-${task.tag}';
+      _sessions[task.tag] = session;
+      notifyListeners();
+      final result = await _assistant.translateVisibleTag(
+        tag: task.tag,
+        wikiBody: body,
+        includeWikiTranslation: false,
+        category: context?.category,
+        aliases: context?.aliases ?? const [],
+        postCount: context?.postCount,
+        relatedTo: context?.relatedTo,
+        sessionId: session,
+      );
+      if (!current() || (!_enabled && !task.force)) return;
+      await _cache.put(
+        expectedGeneration: generation,
+        tag: task.tag,
+        route: route,
+        promptVersion:
+            PromptAssistantService.visibleTagTranslationPromptVersion,
+        wikiHash: sha256.convert(utf8.encode(body)).toString(),
+        nameZh: result.nameZh,
+        definition: result.definition,
+        nameLanguage: language,
+        definitionLanguage: language,
+      );
+      if (!current()) return;
+      _names[task.tag] = result.nameZh;
+      _nameErrors.remove(task.tag);
+      if (result.definition case final definition?) {
+        _definitions[task.tag] = definition;
+      }
+      notifyListeners();
+    } catch (error) {
+      if (!current() || (!_enabled && !task.force)) return;
+      _nameErrors[task.tag] = FatalDiagnostics.redactSensitiveText(
+        '$error'.replaceAll(RegExp(r'https?://[^\s]+'), '[URL]'),
+      );
+      notifyListeners();
+    } finally {
+      if (epoch == _routeEpoch) _forcedNameTags.remove(task.tag);
       _sessions.remove(task.tag);
     }
   }

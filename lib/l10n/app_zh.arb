@@ -3107,7 +3107,7 @@
   "promptBlockLibrary_sourceFile": "来源文件",
   "promptBlockLibrary_importedAt": "导入时间",
   "promptBlockPalette_tooltip": "积木",
-  "promptBlockPalette_emptyHint": "把常用的提示词块或翻译块拖进来收纳；用时点一下插到光标处，或直接拖进提示词框。",
+  "promptBlockPalette_emptyHint": "把常用提示词块拖进来收纳；用时点击插到光标处，或直接拖进提示词框。",
   "promptBlockPalette_remove": "从积木移除",
   "promptBlockPalette_clearAll": "清空积木",
   "promptBlockPalette_clearAllArmed": "再点一次确认清空",
@@ -3248,9 +3248,9 @@
   "@tips_studio_trick_5": {
     "description": "Button count = nSamples x imagesPerRequest; estimatedCost uses both."
   },
-  "tips_studio_trick_6": "在翻译块上按一下鼠标中键，原文和译文来回切换。AI 翻得再好，偶尔也值得偷看一眼原文，确认它没把 cat ears 翻成什么奇怪的东西。",
+  "tips_studio_trick_6": "标签译名显示在提示词下方，可随时开关；原文始终可以直接编辑。",
   "@tips_studio_trick_6": {
-    "description": "promptTranslation_guideMiddleText."
+    "description": "Prompt reading display tip."
   },
   "tips_studio_trick_7": "设置里的「限制生图频率」可以让两次生图之间强制冷却，再加一点随机抖动，节奏就没那么机械。适合挂着慢慢抽的夜晚，也适合管不住手的自己。",
   "@tips_studio_trick_7": {
@@ -4214,42 +4214,10 @@
   "toast_titleInfo": "提示",
   "toast_titleProgress": "正在处理",
   "tagExpansion_autoTranslateVisible": "自动翻译可见标签",
-  "translationEditor_title": "翻译块",
-  "translationEditor_source": "原文",
-  "translationEditor_sourcePrefix": "原",
-  "translationEditor_generation": "生图使用",
-  "translationEditor_editable": "可改写",
-  "translationEditor_modified": "被修改",
-  "translationEditor_edited": "已编辑",
-  "translationEditor_close": "关闭",
-  "translationEditor_save": "保存",
-  "translationEditor_delete": "删除整块",
-  "translationEditor_restore": "还原为原文文本",
-  "translationEditor_configure": "配置翻译模型",
-  "translationEditor_readingFieldTitle": "{language}阅读文本",
-  "@translationEditor_readingFieldTitle": {
-    "placeholders": {
-      "language": {}
-    }
-  },
-  "translationEditor_sourceWarning": "原文已修改，{language}待同步",
-  "@translationEditor_sourceWarning": {
-    "placeholders": {
-      "language": {}
-    }
-  },
-  "translationEditor_editHint": "译文已手工编辑；这是编辑记录，不触发原文修改提醒",
-  "translationLanguage_chinese": "中文",
-  "translationLanguage_english": "英语",
-  "translationLanguage_japanese": "日语",
-  "translationLanguage_korean": "韩语",
-  "translationLanguage_traditionalChinese": "繁体中文",
-  "modelTask_translateTitle": "原文 → 阅读语言",
-  "modelTask_promptReverseTitle": "阅读语言 → 原文",
+  "modelTask_translateTitle": "全文阅读翻译",
   "modelTask_tagTranslateTitle": "标签翻译与语义补充",
   "modelTask_wikiTranslateTitle": "百科正文翻译",
-  "modelTask_translateDescription": "翻译提示词与积木，保留权重、分组和标签语义。",
-  "modelTask_promptReverseDescription": "结合原文落实译文中的增删修改，结果填回原文供确认。",
+  "modelTask_translateDescription": "将完整提示词翻译为独立阅读对照，保留原文。",
   "modelTask_tagTranslateDescription": "翻译可见标签，补齐中文核心词、同义词和简释义；已有资料优先复用。",
   "modelTask_wikiTranslateDescription": "翻译百科正文、整理排版，并按语境选择可点击标签。",
   "modelTask_connectionTest": "模型连接测试",
@@ -4362,9 +4330,6 @@
   "modelRequest_fieldParameters": "生效参数",
   "modelRequest_redacted": "[已脱敏]",
   "modelRequest_emptyResponse": "模型返回了空内容。",
-  "modelService_testFieldsIncomplete": "测试返回的字段不完整。",
-  "modelService_testFieldsInvalid": "测试返回的字段不正确。",
-  "modelService_testGroupsInvalid": "测试返回的分组不正确。",
   "modelService_testSourceEmpty": "测试返回的原文为空。",
   "modelService_conversionCancelled": "转换已取消",
   "modelService_chooseInterfaceModel": "请先在「设置 → 模型与接口 → 功能接口」选择服务商和模型。",
@@ -4462,9 +4427,6 @@
   "modelSettings_reasoningHelp": "翻译通常不需要开启思考；考虑到接口使用结构化输出，建议选择该模型支持的最低思考档位。",
   "modelSettings_reasoningHelpLabel": "思考档位建议",
   "modelSettings_usePreset": "使用预设",
-  "modelSettings_outputLanguage": "输出语言",
-  "modelSettings_englishPrompt": "英文生成提示词",
-  "modelSettings_englishPromptHelp": "结合原文落实修改，输出英文生成提示词。",
   "modelSettings_targetLanguage": "目标语言",
   "modelSettings_effective": "当前生效",
   "modelSettings_noModelSelected": "尚未选择可用模型",
@@ -4480,7 +4442,6 @@
       "level": {}
     }
   },
-  "modelSettings_promptBlocksHint": "无需翻译时，也可将提示词拆分为模块，通过积木功能自由拼装。",
   "modelSettings_wikiFormatHint": "无需翻译时，也可整理排版并为相关标签添加链接。",
   "modelSettings_unsavedChanges": "有未保存的修改",
   "modelSettings_testPreset": "测试预设",
@@ -4745,73 +4706,6 @@
   "modelOverrides_valueTypes": "支持字符串、数字、布尔值、数组和对象",
   "modelOverrides_addBodyField": "添加请求体字段",
   "modelOverrides_addHeader": "添加请求头",
-  "promptTranslation_translating": "正在翻译",
-  "promptTranslation_needsModel": "翻译 · 先配置模型",
-  "promptTranslation_withRoute": "翻译 · {provider} / {model}",
-  "@promptTranslation_withRoute": {
-    "placeholders": {
-      "provider": {},
-      "model": {}
-    }
-  },
-  "promptTranslation_actions": "翻译操作",
-  "promptTranslation_promptChanged": "提示词已变化，未覆盖新编辑",
-  "promptTranslation_nothingToTranslate": "当前没有需要翻译的普通文字",
-  "promptTranslation_failed": "翻译失败：{error}",
-  "@promptTranslation_failed": {
-    "placeholders": {
-      "error": {}
-    }
-  },
-  "promptTranslation_setupTitle": "先配置翻译模型",
-  "promptTranslation_setupBody": "翻译需要明确选择服务商和模型。前往「设置 → 集成 → 模型与接口」，先添加服务商并取得模型列表，再在「提示词翻译」卡片中完成选择。",
-  "promptTranslation_later": "稍后",
-  "promptTranslation_openSettings": "前往设置",
-  "promptTranslation_toolTitle": "翻译",
-  "promptTranslation_noModel": "未配置模型",
-  "promptTranslation_configureModel": "配置翻译模型",
-  "promptTranslation_translateNew": "翻译新增内容",
-  "promptTranslation_undoRestore": "撤销原文还原，恢复翻译块",
-  "promptTranslation_restoreAll": "全部翻译块还原为原文文本",
-  "promptTranslation_tutorial": "操作教程",
-  "promptTranslation_guideBack": "返回操作",
-  "promptTranslation_guideMiddleTitle": "中键点块",
-  "promptTranslation_guideMiddleText": "切换原文与译文",
-  "promptTranslation_guideSourceTitle": "左键点原文",
-  "promptTranslation_guideSourceText": "定位光标，直接修改",
-  "promptTranslation_guideReadingTitle": "左键点译文",
-  "promptTranslation_guideReadingText": "打开块编辑窗",
-  "promptTranslation_guideCtrlTitle": "Ctrl + 点击 / 拖选",
-  "promptTranslation_guideCtrlText": "编辑窗内搜索标签 / 查关联",
-  "promptTranslation_guideConvertTitle": "↑ 中文转原文",
-  "promptTranslation_guideConvertText": "↓ 原文转中文，检查后保存",
-  "promptTranslation_guideRestoreTitle": "切换整组显示",
-  "promptTranslation_guideRestoreText": "在翻译菜单中切换全部原文 / 译文",
-  "promptTranslation_middleButton": "鼠标中键",
-  "promptTranslation_leftButton": "鼠标左键",
-  "promptTranslation_blockShowingOriginal": "翻译块，显示原文",
-  "promptTranslation_blockShowingReading": "翻译块，显示译文",
-  "promptTranslation_blockNeedsReview": "原文已修改 · 译文待更新",
-  "promptTranslation_badgeTooltip": "原文已修改，中文待同步",
-  "promptTranslation_sourceChanged": "原文已变化，请重新打开翻译块",
-  "promptTranslation_retranslateFailed": "重新翻译失败：{error}",
-  "@promptTranslation_retranslateFailed": {
-    "placeholders": {
-      "error": {}
-    }
-  },
-  "promptTranslation_draftChanged": "内容已修改，请重新转换；新草稿已保留",
-  "promptTranslation_convertFailed": "转换失败，草稿已保留：{error}",
-  "@promptTranslation_convertFailed": {
-    "placeholders": {
-      "error": {}
-    }
-  },
-  "promptTranslation_invalidResultFormat": "转换结果格式不正确，草稿已保留",
-  "promptTranslation_noValidText": "模型没有返回有效文字，草稿已保留",
-  "promptTranslation_invalidResultContent": "转换结果包含无效格式，草稿已保留",
-  "promptTranslation_incompleteStructure": "转换结果的权重或分组不完整，草稿已保留",
-  "promptTranslation_inputRequired": "请先输入需要转换的内容",
   "wiki_configureTagModel": "请先在「模型与接口」配置可用的标签翻译模型。",
   "blockOrganizer_replaceMoveBody": "目标中已有 {count} 个同源副本。替换后来源从块库隐藏；已插入提示词的实例仍可引用原块。",
   "@blockOrganizer_replaceMoveBody": {
@@ -4829,7 +4723,6 @@
   "blockAppearance_dots": "圆点",
   "blockAppearance_solid": "实心",
   "blockAppearance_gradient": "渐变",
-  "blockAppearance_translation": "翻译",
   "opusUsage_regularRemaining": "常规免费额度：{percent}%",
   "@opusUsage_regularRemaining": {
     "description": "Separate Opus quota pool; backup means already activated usage boosts, not inventory.",
@@ -5167,7 +5060,6 @@
   "imageMenu_editAndDerive": "编辑与派生",
   "imageMenu_more": "更多操作",
   "imageMenu_fileActions": "文件操作",
-  "imageMenu_saveToBlock": "存入积木",
   "settings_highAnlasCostEstimate": "预计消耗",
   "settings_highAnlasCostThresholdLabel": "提醒阈值",
   "settings_highAnlasCostQuestion": "是否继续本次生成？",
@@ -6889,7 +6781,6 @@
     }
   },
   "blocks_title": "块库",
-  "blocks_translationMark": "译",
   "blocks_add": "添加",
   "blocks_cancel": "取消",
   "blocks_close": "关闭",
@@ -6964,7 +6855,6 @@
   "blocks_lookDots": "圆点",
   "blocks_lookSolid": "实心",
   "blocks_lookGradient": "渐变",
-  "blocks_lookTranslation": "翻译",
   "blocks_hasParams": "附带参数",
   "blocks_hasNegative": "含负面",
   "blocks_hintClick": "点击插入",
@@ -7222,8 +7112,6 @@
   "blocks_details": "详情",
   "blocks_noSelection": "点一张卡片查看详情。双击直接编辑，Enter 插入到提示词。",
   "blocks_changeThumb": "更换 / 调整",
-  "blocks_reading": "翻译阅读",
-  "blocks_needsReview": "需复核",
   "blocks_applyToCurrent": "应用到当前",
   "blocks_noParams": "没有。插入时不会改动当前参数。",
   "blocks_paramModel": "模型",
@@ -8122,19 +8010,6 @@
   "gen_sdConvertSub": "粘贴 (tag:1.2) 时转成 NAI 权重",
   "gen_related": "共现推荐",
   "gen_relatedSub": "补全时推荐常一起出现的标签",
-  "gen_translating": "正在翻译…",
-  "gen_translateNeedsModel": "还没配翻译模型，点一下去设置",
-  "gen_translateRestore": "显示原文",
-  "gen_translateWith": "翻译（{route}）",
-  "@gen_translateWith": {
-    "placeholders": {
-      "route": {}
-    }
-  },
-  "gen_translateNew": "翻译新增内容",
-  "gen_translateShowOriginal": "全部显示原文",
-  "gen_translateShowTranslated": "全部显示译文",
-  "gen_translateSettings": "翻译模型设置",
   "gen_qualityPreset": "质量词预设",
   "gen_ucPreset": "负面预设",
   "gen_presetNone": "无",
@@ -9927,7 +9802,6 @@
   },
   "set_mdDeleteBody": "用到它的功能会回落到其他可用服务商。",
   "set_mdTaskPrompt": "提示词翻译",
-  "set_mdTaskReverse": "提示词反推",
   "set_mdTaskTag": "标签翻译与语义补充",
   "set_mdTaskWiki": "百科翻译",
   "set_mdFeature": "功能",
@@ -11276,5 +11150,18 @@
         "type": "String"
       }
     }
-  }
+  },
+  "promptCompletion_all": "全部",
+  "promptCompletion_tags": "标签",
+  "promptCompletion_summary": "词库简释义",
+  "promptCompletion_synonyms": "中文同义词",
+  "promptReading_showReadings": "显示标签译名",
+  "promptReading_hideReadings": "隐藏标签译名",
+  "promptReading_displayHint": "在原文下方显示已有译名。",
+  "promptReading_completion": "输入时补全标签",
+  "promptReading_completionHint": "支持中英文搜索标签、角色和作品。",
+  "promptReading_fillMissing": "补齐可见标签的缺失译名",
+  "modelSettings_promptReadingHint": "全文翻译仅供阅读，不修改提示词。",
+  "promptCompletion_works": "作品",
+  "promptCompletion_expand": "完整列表与 Wiki 预览（右键候选可直接预览）"
 }

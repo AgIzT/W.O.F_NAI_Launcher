@@ -15,7 +15,7 @@ import '../providers/pill_workspace_provider.dart';
 import '../providers/image_generation_provider.dart';
 import '../providers/image_save_settings_provider.dart';
 import '../providers/krita/krita_bridge_notifier.dart';
-import '../providers/prompt_translation_provider.dart';
+import '../providers/prompt_reading_preferences_provider.dart';
 import '../providers/subscription_provider.dart';
 import '../router/app_router.dart';
 import '../ui/gen/gen_contract.dart';
@@ -35,7 +35,6 @@ import '../providers/simple_output_viewer_provider.dart';
 import '../providers/nai_agent/nai_agent_window_controller.dart';
 import '../providers/nai_agent/nai_agent_workspace_provider.dart';
 import 'nai_agent/agent_toggle_wiring.dart';
-import '../widgets/common/prompt_translation_guide.dart';
 import '../screens/generation/widgets/generation_welcome.dart';
 
 class GenerationRoute extends ConsumerStatefulWidget {
@@ -247,7 +246,6 @@ class _GenerationWiringState extends ConsumerState<GenerationWiring> {
         panelBackdrop: (context, viewport) =>
             GenerationPanelBackdropWiring(canvasViewport: viewport),
         emptyCanvas: (_) => const GenerationWelcome(),
-        translationGuide: (_, onBack) => PromptTranslationGuide(onBack: onBack),
         agentToggle: agentAvailable ? const AgentToggleWiring() : null,
         historyCaptionInset: !agentExpanded,
         preserveHistory: agentExpanded,
@@ -299,16 +297,11 @@ class _GenerationWiringState extends ConsumerState<GenerationWiring> {
         onPromptTool: (tool, value) =>
             run(() => settings.promptTool(tool, value)),
         onOpenPalette: (rect) => run(() => operations.openPalette(rect)),
-        onTranslate: () => run(() async {
-          await ref
-              .read(promptTranslationCoordinatorProvider)
-              .translate(currentData().prompt.negative);
-        }),
-        onToggleTranslation: () => ref
-            .read(promptTranslationCoordinatorProvider)
-            .toggleAll(currentData().prompt.negative),
-        onTranslationSettings: () =>
-            context.go('${AppRoutes.settings}?section=promptAssistant'),
+        onToggleTranslation: () => run(
+          () => ref
+              .read(promptReadingPreferencesProvider.notifier)
+              .toggleReadings(),
+        ),
         onOpenBridge: (rect) => run(
           () => AgentBridgeIndicator.openPanel(context, ref, anchorRect: rect),
         ),

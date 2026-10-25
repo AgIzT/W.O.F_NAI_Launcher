@@ -147,7 +147,7 @@ abstract final class GenFixture {
         positivePreview: positivePreview,
         negativePreview: negativePreview,
         tools: const GenPromptTools(palettePinned: true),
-        translate: const GenTranslate(route: 'DeepSeek · deepseek-chat'),
+        translate: const GenTranslate(showing: true),
       ),
       characters: GenCharactersData(
         list: const [

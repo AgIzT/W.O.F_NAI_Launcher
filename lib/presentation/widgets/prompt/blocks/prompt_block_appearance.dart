@@ -11,36 +11,19 @@ abstract final class PromptBlockAppearance {
   static const dots = 'dots';
   static const solid = 'solid';
   static const gradient = 'gradient';
-  static const translation = 'translation';
 
-  static const selectable = [
-    classic,
-    stripes,
-    dots,
-    solid,
-    gradient,
-    translation,
-  ];
+  static const selectable = [classic, stripes, dots, solid, gradient];
 
   static String label(String value, AppLocalizations l10n) => switch (value) {
     stripes => l10n.blockAppearance_stripes,
     dots => l10n.blockAppearance_dots,
     solid => l10n.blockAppearance_solid,
     gradient => l10n.blockAppearance_gradient,
-    translation => l10n.blockAppearance_translation,
     _ => l10n.blockAppearance_classic,
   };
 
-  static Color fill(
-    String value,
-    Color color, {
-    required bool dark,
-    Color? translationSurface,
-  }) {
+  static Color fill(String value, Color color, {required bool dark}) {
     if (value == solid) return color;
-    if (value == translation && translationSurface != null) {
-      return translationSurface;
-    }
     if (value == stripes || value == gradient) return Colors.transparent;
     if (value == dots) return color.withValues(alpha: .05);
     return color.withValues(alpha: dark ? .15 : .08);
@@ -52,7 +35,6 @@ abstract final class PromptBlockAppearance {
     Color fallback, {
     bool dark = false,
   }) {
-    if (value == translation) return fallback;
     if (value != solid) return Color.lerp(fallback, color, dark ? .62 : .72)!;
     return ThemeData.estimateBrightnessForColor(color) == Brightness.dark
         ? Colors.white
@@ -72,7 +54,6 @@ class PromptBlockPatternPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (appearance == PromptBlockAppearance.classic ||
         appearance == PromptBlockAppearance.solid ||
-        appearance == PromptBlockAppearance.translation ||
         size.isEmpty) {
       return;
     }

@@ -67,13 +67,20 @@ class TagCatalogRepository implements CompletionSource {
   Future<List<CompletionCandidate>> searchContains(
     String input, {
     int limit = 20,
-  }) async => (await _current()).searchContains(input, limit: limit);
+    CompletionCategoryFilter categoryFilter = CompletionCategoryFilter.all,
+  }) async => (await _current()).searchContains(
+    input,
+    limit: limit,
+    categoryFilter: categoryFilter,
+  );
   Future<List<CompletionCandidate>> popular({int limit = 12}) async =>
       (await _current()).popular(limit: limit);
   Future<int?> postCount(String tag) async => (await _current()).postCount(tag);
   Future<Map<String, CompletionCandidate>> exactAliases(
     Iterable<String> terms,
   ) async => (await _current()).exactAliases(terms);
+  Future<Map<String, List<String>>> aliasesFor(Iterable<String> tags) async =>
+      (await _current()).aliasesFor(tags);
   Future<Map<String, TagCatalogRecord>> recordsByCanonicalTag(
     Iterable<String> tags,
   ) async => (await _current()).recordsByCanonicalTag(tags);
@@ -125,6 +132,7 @@ class _TagCatalogQueries implements CompletionSource {
       FROM tag_search f
       JOIN tags t ON t.id = f.tag_id
       WHERE tag_search MATCH ?
+        AND ${query.categoryFilter.sql('t.category')}
       ORDER BY bm25(tag_search), t.post_count DESC, t.name ASC
       LIMIT ?
       ''',
@@ -178,6 +186,7 @@ class _TagCatalogQueries implements CompletionSource {
   Future<List<CompletionCandidate>> searchContains(
     String input, {
     int limit = 20,
+    CompletionCategoryFilter categoryFilter = CompletionCategoryFilter.all,
   }) async {
     final normalized = input.trim().toLowerCase().replaceAll(' ', '_');
     if (normalized.runes.length < 2) return const [];
@@ -191,6 +200,7 @@ class _TagCatalogQueries implements CompletionSource {
       FROM tag_search f
       JOIN tags t ON t.id = f.tag_id
       WHERE f.term LIKE ? ESCAPE '\\'
+        AND ${categoryFilter.sql('t.category')}
       ORDER BY t.post_count DESC, t.name ASC
       LIMIT ?
       ''',
@@ -273,6 +283,26 @@ class _TagCatalogQueries implements CompletionSource {
   Future<int?> postCount(String canonicalTag) async {
     final records = await recordsByCanonicalTag([canonicalTag]);
     return records[canonicalTag.trim().toLowerCase()]?.postCount;
+  }
+
+  Future<Map<String, List<String>>> aliasesFor(Iterable<String> tags) async {
+    final names = tags.toSet().toList();
+    if (names.isEmpty) return const {};
+    await initialize();
+    final result = <String, List<String>>{};
+    for (var offset = 0; offset < names.length; offset += 400) {
+      final chunk = names.skip(offset).take(400).toList();
+      final rows = await _database!.rawQuery(
+        'SELECT t.name, a.alias FROM tags t JOIN aliases a ON a.tag_id=t.id '
+        'WHERE t.name IN (${List.filled(chunk.length, '?').join(',')}) '
+        'ORDER BY a.alias',
+        chunk,
+      );
+      for (final row in rows) {
+        (result[row['name'] as String] ??= []).add(row['alias'] as String);
+      }
+    }
+    return result;
   }
 
   /// Exact alias lookup only; never use a prefix search to create wiki links.

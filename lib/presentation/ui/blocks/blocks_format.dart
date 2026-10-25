@@ -53,7 +53,6 @@ abstract final class BlocksFormat {
       BlockAppearance.dots => l10n.blocks_lookDots,
       BlockAppearance.solid => l10n.blocks_lookSolid,
       BlockAppearance.gradient => l10n.blocks_lookGradient,
-      BlockAppearance.translation => l10n.blocks_lookTranslation,
     };
   }
 

@@ -154,6 +154,41 @@ class VisibleTagTranslationCache {
     );
   }
 
+  /// Reads display names in one batch without requiring Wiki bodies. A saved
+  /// route isolates model/preset changes; without a configured route, the most
+  /// recent name in the requested language remains available for offline use.
+  /// Unknown legacy languages are deliberately excluded.
+  Future<Map<String, String>> namesFor({
+    required Iterable<String> tags,
+    required String language,
+    required String? route,
+    required int maxPromptVersion,
+  }) async {
+    final names = tags.toSet().toList();
+    if (names.isEmpty) return const {};
+    final db = await _open();
+    final result = <String, String>{};
+    for (var start = 0; start < names.length; start += 400) {
+      final chunk = names.skip(start).take(400).toList();
+      final rows = await db.rawQuery(
+        'SELECT tag, name_zh FROM tag_translations '
+        'WHERE tag IN (${List.filled(chunk.length, '?').join(',')}) '
+        'AND name_language = ? AND prompt_version <= ? '
+        "AND LENGTH(TRIM(name_zh)) > 0 "
+        '${route == null ? '' : 'AND route = ? '}'
+        'ORDER BY updated_at DESC, prompt_version DESC',
+        [...chunk, language, maxPromptVersion, if (route != null) route],
+      );
+      for (final row in rows) {
+        result.putIfAbsent(
+          row['tag'] as String,
+          () => row['name_zh'] as String,
+        );
+      }
+    }
+    return result;
+  }
+
   /// Latest Wiki translation of exactly this body in [language], from any
   /// route. Used when the route changed but the article text did not, so an
   /// already translated article is not paid for again. Legacy rows without a

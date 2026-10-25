@@ -71,6 +71,12 @@ void main() {
       testWidgets('golden $name', skip: skip, (t) async {
         await pump(t, dark);
         final masks = <Rect>[];
+        // The retired split translation menu is now a compact reading toggle.
+        // Its reduced width also moves the two adjacent prompt tools.
+        final reading = t.getRect(find.byKey(const Key('gen-translate')));
+        masks.add(
+          Rect.fromLTWH(reading.right - 100, reading.top, 100, reading.height),
+        );
         // 同生图页基准：既有变体价签占位已获准调整，保留原图并排除该工具条。
         final toolbar = find.byKey(const Key('gen-bar-top'));
         if (toolbar.evaluate().isNotEmpty) {
@@ -132,9 +138,19 @@ void main() {
       final name = dark ? '$file-dark' : file;
       testWidgets('golden v2/$name', skip: skip, (t) async {
         await pump(t, dark);
-        await expectLater(
+        final reading = t.getRect(find.byKey(const Key('gen-translate')));
+        await expectOutsideApprovedRegions(
+          t,
           find.byKey(const Key('gen-capture')),
-          matchesGoldenFile('goldens/v2/$name.png'),
+          'test/presentation/ui/channel/goldens/v2/$name.png',
+          [
+            Rect.fromLTWH(
+              reading.right - 100,
+              reading.top,
+              100,
+              reading.height,
+            ),
+          ],
         );
       });
     }

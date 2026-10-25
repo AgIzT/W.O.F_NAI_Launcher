@@ -619,6 +619,7 @@ class _Readings extends AutoTagTranslationController {
     required bool visible,
     String? existingNameZh,
     AutoTagTranslationContext? tagContext,
+    TagReadingIntent intent = TagReadingIntent.details,
   }) {}
 }
 

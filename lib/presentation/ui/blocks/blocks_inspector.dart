@@ -375,19 +375,6 @@ class _SingleState extends State<_Single> {
               ),
             ],
           ),
-          if (b.reading != null)
-            section(
-              l10n.blocks_reading,
-              trailing: b.readingNeedsReview
-                  ? BlockBadge(l10n.blocks_needsReview, color: c.warn)
-                  : null,
-              [
-                Text(
-                  b.reading!,
-                  style: UiText.sans(12, color: c.ink, height: 1.6),
-                ),
-              ],
-            ),
           section(
             key: const Key('blocks-insp-params'),
             l10n.blocks_params,
@@ -738,7 +725,6 @@ class _BatchStyle extends StatelessWidget {
                     color: blockPalette[6],
                     look: look,
                     icon: 'sparkle',
-                    translationMark: l10n.blocks_translationMark,
                   ),
                 ),
             ],

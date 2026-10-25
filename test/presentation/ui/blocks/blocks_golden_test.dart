@@ -244,11 +244,24 @@ void main() {
         // 2026-10-21：块库工具栏加长搜索框、视图分段加“瀑布流”、新增“按文件夹分组”
         // 开关（用户确认）。只排除工具栏这一行；卡片墙仍按原网格逐像素比对。
         final bar = find.byKey(const Key('blocks-toolbar'));
+        final looks = find.byKey(const Key('block-edit-looks'));
+        // The final appearance tile belonged exclusively to translation blocks.
+        // Preserve the baseline and check every pixel outside that removed tile.
+        final looksRect = looks.evaluate().isEmpty ? null : t.getRect(looks);
         await expectOutsideApprovedRegions(
           t,
           find.byKey(const Key('blocks-capture')),
           'test/presentation/ui/blocks/goldens/$file.png',
-          [if (bar.evaluate().isNotEmpty) t.getRect(bar).deflate(1)],
+          [
+            if (bar.evaluate().isNotEmpty) t.getRect(bar).deflate(1),
+            if (looksRect != null)
+              Rect.fromLTWH(
+                looksRect.right - (looksRect.width - 12) / 3,
+                looksRect.top + 52,
+                (looksRect.width - 12) / 3,
+                46,
+              ),
+          ],
         );
         debugDisableShadows = true;
       });

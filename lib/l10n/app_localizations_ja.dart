@@ -5696,7 +5696,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get promptBlockPalette_emptyHint =>
-      'よく使うプロンプトブロックや翻訳ブロックをここに収納。クリックでカーソル位置に挿入するか、プロンプト欄へドラッグできます。';
+      'よく使うプロンプトブロックをここにドラッグして保存します。クリックしてカーソル位置に挿入するか、入力欄にドラッグできます。';
 
   @override
   String get promptBlockPalette_remove => 'ブロックから削除';
@@ -5883,7 +5883,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get tips_studio_trick_6 =>
-      '翻訳ブロックを中クリックすると、原文と訳文を切り替えられます。AI の翻訳がどれだけ優秀でも、たまには原文をのぞいて cat ears が変なものになっていないか確かめましょう。';
+      'タグの訳名はプロンプトの下に表示されます。いつでも切り替えられ、原文は直接編集できます。';
 
   @override
   String get tips_studio_trick_7 =>
@@ -7407,74 +7407,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get tagExpansion_autoTranslateVisible => '表示中のタグを自動翻訳';
 
   @override
-  String get translationEditor_title => '翻訳ブロック';
-
-  @override
-  String get translationEditor_source => '原文';
-
-  @override
-  String get translationEditor_sourcePrefix => '原';
-
-  @override
-  String get translationEditor_generation => '画像生成用';
-
-  @override
-  String get translationEditor_editable => '編集可能';
-
-  @override
-  String get translationEditor_modified => '変更済み';
-
-  @override
-  String get translationEditor_edited => '編集済み';
-
-  @override
-  String get translationEditor_close => '閉じる';
-
-  @override
-  String get translationEditor_save => '保存';
-
-  @override
-  String get translationEditor_delete => 'ブロックを削除';
-
-  @override
-  String get translationEditor_restore => '原文テキストに戻す';
-
-  @override
-  String get translationEditor_configure => '翻訳モデルを設定';
-
-  @override
-  String translationEditor_readingFieldTitle(Object language) {
-    return '$languageの表示テキスト';
-  }
-
-  @override
-  String translationEditor_sourceWarning(Object language) {
-    return '原文が変更されました。$languageとの同期が必要です';
-  }
-
-  @override
-  String get translationEditor_editHint => '訳文の手動編集履歴です。原文の確認状態は変わりません';
-
-  @override
-  String get translationLanguage_chinese => '中国語';
-
-  @override
-  String get translationLanguage_english => '英語';
-
-  @override
-  String get translationLanguage_japanese => '日本語';
-
-  @override
-  String get translationLanguage_korean => '韓国語';
-
-  @override
-  String get translationLanguage_traditionalChinese => '繁体字中国語';
-
-  @override
-  String get modelTask_translateTitle => '原文 → 表示言語';
-
-  @override
-  String get modelTask_promptReverseTitle => '表示言語 → 原文';
+  String get modelTask_translateTitle => '全文の閲覧用翻訳';
 
   @override
   String get modelTask_tagTranslateTitle => 'タグ翻訳・意味情報';
@@ -7484,11 +7417,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get modelTask_translateDescription =>
-      'プロンプトとブロックを翻訳し、重み・グループ・タグの意味を保ちます。';
-
-  @override
-  String get modelTask_promptReverseDescription =>
-      '訳文での追加・削除・変更を原文に反映し、確認用に原文へ戻します。';
+      'プロンプト全文を独立した閲覧用訳文に翻訳し、原文を保持します。';
 
   @override
   String get modelTask_tagTranslateDescription =>
@@ -7822,15 +7751,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get modelRequest_emptyResponse => 'モデルが空の内容を返しました。';
 
   @override
-  String get modelService_testFieldsIncomplete => 'テストの応答にフィールドが不足しています。';
-
-  @override
-  String get modelService_testFieldsInvalid => 'テストの応答のフィールドが正しくありません。';
-
-  @override
-  String get modelService_testGroupsInvalid => 'テストの応答のグループが正しくありません。';
-
-  @override
   String get modelService_testSourceEmpty => 'テストの応答の原文が空です。';
 
   @override
@@ -8033,15 +7953,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get modelSettings_usePreset => '使用するプリセット';
 
   @override
-  String get modelSettings_outputLanguage => '出力言語';
-
-  @override
-  String get modelSettings_englishPrompt => '英語の生成プロンプト';
-
-  @override
-  String get modelSettings_englishPromptHelp => '原文に変更を反映し、英語の生成プロンプトを出力します。';
-
-  @override
   String get modelSettings_targetLanguage => '翻訳先の言語';
 
   @override
@@ -8059,10 +7970,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String modelSettings_reasoningSummaryModel(Object level) {
     return '思考：$level（モデルに従う）';
   }
-
-  @override
-  String get modelSettings_promptBlocksHint =>
-      '翻訳が不要なときは、プロンプトをモジュールに分け、ブロック機能で自由に組み立てることもできます。';
 
   @override
   String get modelSettings_wikiFormatHint =>
@@ -8612,159 +8519,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get modelOverrides_addHeader => 'ヘッダーを追加';
 
   @override
-  String get promptTranslation_translating => '翻訳中';
-
-  @override
-  String get promptTranslation_needsModel => '翻訳 · 先にモデルを設定';
-
-  @override
-  String promptTranslation_withRoute(Object provider, Object model) {
-    return '翻訳 · $provider / $model';
-  }
-
-  @override
-  String get promptTranslation_actions => '翻訳の操作';
-
-  @override
-  String get promptTranslation_promptChanged =>
-      'プロンプトが変更されたため、新しい編集は上書きしませんでした';
-
-  @override
-  String get promptTranslation_nothingToTranslate => '翻訳する通常のテキストはありません';
-
-  @override
-  String promptTranslation_failed(Object error) {
-    return '翻訳に失敗しました：$error';
-  }
-
-  @override
-  String get promptTranslation_setupTitle => '先に翻訳モデルを設定してください';
-
-  @override
-  String get promptTranslation_setupBody =>
-      '翻訳にはサービスとモデルを明示的に選ぶ必要があります。「設定 → 連携 → モデルとAPI」でサービスを追加してモデル一覧を取得し、プロンプト翻訳のモデルを選択してください。';
-
-  @override
-  String get promptTranslation_later => '後で';
-
-  @override
-  String get promptTranslation_openSettings => '設定を開く';
-
-  @override
-  String get promptTranslation_toolTitle => '翻訳';
-
-  @override
-  String get promptTranslation_noModel => 'モデル未設定';
-
-  @override
-  String get promptTranslation_configureModel => '翻訳モデルを設定';
-
-  @override
-  String get promptTranslation_translateNew => '追加した内容を翻訳';
-
-  @override
-  String get promptTranslation_undoRestore => '原文への復元を取り消し、翻訳ブロックに戻す';
-
-  @override
-  String get promptTranslation_restoreAll => 'すべての翻訳ブロックを原文テキストに戻す';
-
-  @override
-  String get promptTranslation_tutorial => '使い方';
-
-  @override
-  String get promptTranslation_guideBack => '操作に戻る';
-
-  @override
-  String get promptTranslation_guideMiddleTitle => 'ブロックを中クリック';
-
-  @override
-  String get promptTranslation_guideMiddleText => '原文と訳文を切り替え';
-
-  @override
-  String get promptTranslation_guideSourceTitle => '原文を左クリック';
-
-  @override
-  String get promptTranslation_guideSourceText => 'カーソルを置いて直接編集';
-
-  @override
-  String get promptTranslation_guideReadingTitle => '訳文を左クリック';
-
-  @override
-  String get promptTranslation_guideReadingText => 'ブロック編集を開く';
-
-  @override
-  String get promptTranslation_guideCtrlTitle => 'Ctrl + クリック / ドラッグ選択';
-
-  @override
-  String get promptTranslation_guideCtrlText => '編集画面でタグ検索 / 関連タグ';
-
-  @override
-  String get promptTranslation_guideConvertTitle => '↑ 訳文から原文へ';
-
-  @override
-  String get promptTranslation_guideConvertText => '↓ 原文から訳文へ。確認してから保存';
-
-  @override
-  String get promptTranslation_guideRestoreTitle => 'グループ全体の表示切替';
-
-  @override
-  String get promptTranslation_guideRestoreText => '翻訳メニューで原文 / 訳文をまとめて切り替え';
-
-  @override
-  String get promptTranslation_middleButton => 'マウス中ボタン';
-
-  @override
-  String get promptTranslation_leftButton => 'マウス左ボタン';
-
-  @override
-  String get promptTranslation_blockShowingOriginal => '翻訳ブロック（原文を表示）';
-
-  @override
-  String get promptTranslation_blockShowingReading => '翻訳ブロック（訳文を表示）';
-
-  @override
-  String get promptTranslation_blockNeedsReview => '原文が変更されました · 訳文の更新が必要です';
-
-  @override
-  String get promptTranslation_badgeTooltip => '原文が変更されました。訳文の同期が必要です';
-
-  @override
-  String get promptTranslation_sourceChanged => '原文が変更されました。翻訳ブロックを開き直してください';
-
-  @override
-  String promptTranslation_retranslateFailed(Object error) {
-    return '再翻訳に失敗しました：$error';
-  }
-
-  @override
-  String get promptTranslation_draftChanged =>
-      '内容が変更されました。もう一度変換してください。新しい下書きは保持されています';
-
-  @override
-  String promptTranslation_convertFailed(Object error) {
-    return '変換に失敗しました。下書きは保持されています：$error';
-  }
-
-  @override
-  String get promptTranslation_invalidResultFormat =>
-      '変換結果の形式が正しくありません。下書きは保持されています';
-
-  @override
-  String get promptTranslation_noValidText =>
-      'モデルが有効なテキストを返しませんでした。下書きは保持されています';
-
-  @override
-  String get promptTranslation_invalidResultContent =>
-      '変換結果に無効な書式が含まれています。下書きは保持されています';
-
-  @override
-  String get promptTranslation_incompleteStructure =>
-      '変換結果の重みまたはグループが不完全です。下書きは保持されています';
-
-  @override
-  String get promptTranslation_inputRequired => '先に変換する内容を入力してください';
-
-  @override
   String get wiki_configureTagModel => '先に「モデルとAPI」で利用できるタグ翻訳モデルを設定してください。';
 
   @override
@@ -8803,9 +8557,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get blockAppearance_gradient => 'グラデーション';
-
-  @override
-  String get blockAppearance_translation => '翻訳';
 
   @override
   String opusUsage_regularRemaining(Object percent) {
@@ -9289,9 +9040,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get imageMenu_fileActions => 'ファイル操作';
-
-  @override
-  String get imageMenu_saveToBlock => 'ブロックに保存';
 
   @override
   String get settings_highAnlasCostEstimate => '推定消費量';
@@ -12252,9 +12000,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get blocks_title => 'ブロックライブラリ';
 
   @override
-  String get blocks_translationMark => '訳';
-
-  @override
   String get blocks_add => '追加';
 
   @override
@@ -12410,9 +12155,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get blocks_lookGradient => 'グラデーション';
-
-  @override
-  String get blocks_lookTranslation => '翻訳';
 
   @override
   String get blocks_hasParams => 'パラメーター付き';
@@ -12960,12 +12702,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get blocks_changeThumb => '変更 / 調整';
-
-  @override
-  String get blocks_reading => '翻訳（読み）';
-
-  @override
-  String get blocks_needsReview => '要確認';
 
   @override
   String get blocks_applyToCurrent => '現在に適用';
@@ -14513,32 +14249,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get gen_relatedSub => '一緒に使われやすいタグを提案';
-
-  @override
-  String get gen_translating => '翻訳中…';
-
-  @override
-  String get gen_translateNeedsModel => '翻訳モデル未設定。クリックして設定';
-
-  @override
-  String get gen_translateRestore => '原文を表示';
-
-  @override
-  String gen_translateWith(Object route) {
-    return '翻訳（$route）';
-  }
-
-  @override
-  String get gen_translateNew => '追加分を翻訳';
-
-  @override
-  String get gen_translateShowOriginal => 'すべて原文に戻す';
-
-  @override
-  String get gen_translateShowTranslated => 'すべて訳文を表示';
-
-  @override
-  String get gen_translateSettings => '翻訳モデル設定';
 
   @override
   String get gen_qualityPreset => '品質タグ';
@@ -18179,9 +17889,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get set_mdTaskPrompt => 'プロンプト翻訳';
 
   @override
-  String get set_mdTaskReverse => 'プロンプト逆推定';
-
-  @override
   String get set_mdTaskTag => 'タグ翻訳・意味情報';
 
   @override
@@ -21348,4 +21055,43 @@ class AppLocalizationsJa extends AppLocalizations {
   String startup_dataActionFailed(String error) {
     return '操作に失敗しました：$error';
   }
+
+  @override
+  String get promptCompletion_all => 'すべて';
+
+  @override
+  String get promptCompletion_tags => 'タグ';
+
+  @override
+  String get promptCompletion_summary => '辞書の要約';
+
+  @override
+  String get promptCompletion_synonyms => '中国語の同義語';
+
+  @override
+  String get promptReading_showReadings => 'タグの訳名を表示';
+
+  @override
+  String get promptReading_hideReadings => 'タグの訳名を隠す';
+
+  @override
+  String get promptReading_displayHint => '原文の下に利用可能な訳名を表示します。';
+
+  @override
+  String get promptReading_completion => '入力中にタグを補完';
+
+  @override
+  String get promptReading_completionHint => '中国語・英語でタグ、キャラクター、作品を検索します。';
+
+  @override
+  String get promptReading_fillMissing => '表示中のタグの未翻訳名を補完';
+
+  @override
+  String get modelSettings_promptReadingHint => '全文翻訳は閲覧用です。プロンプトは変更しません。';
+
+  @override
+  String get promptCompletion_works => '作品';
+
+  @override
+  String get promptCompletion_expand => '候補一覧と Wiki プレビュー（候補を右クリックで直接プレビュー）';
 }

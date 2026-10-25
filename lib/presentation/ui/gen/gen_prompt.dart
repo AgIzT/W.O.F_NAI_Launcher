@@ -295,7 +295,7 @@ class _Bridge extends StatelessWidget {
   }
 }
 
-/// 翻译钮（原型 `.ibx`）：26 高、1px 描边、圆角 6；左半翻译 / 显示原文，右半箭头弹菜单。
+/// 译名显示开关：26 高、1px 描边、圆角 6；不修改提示词。
 class _Translate extends StatelessWidget {
   const _Translate();
 
@@ -303,129 +303,32 @@ class _Translate extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.ui;
     final scope = GenScope.of(context, GenAspect.prompt);
-    final t = scope.data.prompt.translate;
+    final showing = scope.data.prompt.translate.showing;
     final l = context.l10n;
-    final open = scope.controller.popoverTag == #translate;
-    final tip = t.busy
-        ? l.gen_translating
-        : t.route == null
-        ? l.gen_translateNeedsModel
-        : t.showing
-        ? l.gen_translateRestore
-        : l.gen_translateWith(t.route!);
-    return Builder(
-      builder: (context) => Container(
-        key: const Key('gen-translate'),
-        height: 26,
-        margin: const EdgeInsets.symmetric(horizontal: 2),
-        decoration: BoxDecoration(
-          border: Border.all(color: c.line),
-          borderRadius: BorderRadius.circular(6),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Tooltip(
-              message: tip,
-              child: UiPressable(
-                key: const Key('gen-translate-run'),
-                onTap: t.busy
-                    ? null
-                    : () {
-                        if (t.route == null) {
-                          scope.actions.onTranslationSettings();
-                        } else if (t.showing) {
-                          scope.actions.onToggleTranslation();
-                        } else {
-                          scope.actions.onTranslate();
-                        }
-                      },
-                builder: (context, hover) => Container(
-                  height: 24,
-                  padding: const EdgeInsets.only(left: 5, right: 1),
-                  color: hover ? c.control : null,
-                  alignment: Alignment.center,
-                  child: TranslationIcon(
-                    size: 17,
-                    busy: t.busy,
-                    color: t.busy || t.showing
-                        ? c.accent
-                        : (hover ? c.ink : c.muted),
-                  ),
-                ),
-              ),
-            ),
-            UiPressable(
-              key: const Key('gen-translate-menu'),
-              onTap: () =>
-                  _openMenu(context, genBelow(context, dy: 4, right: true)),
-              builder: (context, hover) => Container(
-                height: 24,
-                padding: const EdgeInsets.only(left: 1, right: 3),
-                color: hover || open ? c.control : null,
-                alignment: Alignment.center,
-                child: UiGlyph(UiGlyphs.chevronDown, size: 12, color: c.muted),
-              ),
-            ),
-          ],
+    return Tooltip(
+      key: const Key('gen-translate'),
+      message: showing
+          ? l.promptReading_hideReadings
+          : l.promptReading_showReadings,
+      child: UiPressable(
+        key: const Key('gen-translate-run'),
+        onTap: scope.actions.onToggleTranslation,
+        builder: (context, hover) => Container(
+          height: 26,
+          margin: const EdgeInsets.symmetric(horizontal: 2),
+          padding: const EdgeInsets.symmetric(horizontal: 5),
+          decoration: BoxDecoration(
+            color: hover ? c.control : null,
+            border: Border.all(color: c.line),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          alignment: Alignment.center,
+          child: TranslationIcon(
+            size: 17,
+            color: showing ? c.accent : (hover ? c.ink : c.muted),
+          ),
         ),
       ),
-    );
-  }
-
-  static void _openMenu(BuildContext context, UiPopoverAnchor anchor) {
-    final scope = GenScope.of(context, GenAspect.prompt);
-    final t = scope.data.prompt.translate;
-    final l = context.l10n;
-    scope.controller.openMenu(
-      anchor,
-      [
-        UiMenuItem(
-          key: const Key('gen-translate-new'),
-          label: l.gen_translateNew,
-          glyph: UiGlyphs.retry,
-          enabled: !t.busy && t.route != null,
-          onTap: scope.actions.onTranslate,
-        ),
-        UiMenuItem(
-          label: t.showing
-              ? l.gen_translateShowOriginal
-              : l.gen_translateShowTranslated,
-          glyph: UiGlyphs.swap,
-          enabled: !t.busy && t.route != null,
-          onTap: scope.actions.onToggleTranslation,
-        ),
-        UiMenuItem(
-          label: l.gen_translateSettings,
-          glyph: UiGlyphs.external,
-          divider: true,
-          trailing: t.route,
-          onTap: scope.actions.onTranslationSettings,
-        ),
-        if (scope.slots.translationGuide != null)
-          UiMenuItem(
-            key: const Key('gen-translation-tutorial'),
-            label: l.promptTranslation_tutorial,
-            glyph: UiGlyphs.infoCircle,
-            divider: true,
-            onTap: () => scope.controller.openPopover(
-              anchor,
-              (guideContext) => UiPopoverSurface(
-                key: const Key('gen-translation-guide'),
-                width: 300,
-                padding: const EdgeInsets.all(10),
-                child: scope.slots.translationGuide!(
-                  guideContext,
-                  () => _openMenu(context, anchor),
-                ),
-              ),
-              tag: #translate,
-            ),
-          ),
-      ],
-      tag: #translate,
-      width: 240,
     );
   }
 }

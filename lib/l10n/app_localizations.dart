@@ -10249,7 +10249,7 @@ abstract class AppLocalizations {
   /// No description provided for @promptBlockPalette_emptyHint.
   ///
   /// In en, this message translates to:
-  /// **'Keep prompt blocks or translation blocks here; click to insert at the caret, or drag them into the prompt box.'**
+  /// **'Drag your frequently used prompt blocks here. Click to insert at the caret, or drag into the prompt.'**
   String get promptBlockPalette_emptyHint;
 
   /// No description provided for @promptBlockPalette_remove.
@@ -10558,10 +10558,10 @@ abstract class AppLocalizations {
   /// **'Requests per click and images per request are two different numbers. The button shows the total, and Anlas is charged on the total too. Check before you click. Don\'t ask how I know.'**
   String get tips_studio_trick_5;
 
-  /// promptTranslation_guideMiddleText.
+  /// Prompt reading display tip.
   ///
   /// In en, this message translates to:
-  /// **'Middle-click a translation block to flip between the original and the translation. However good the AI is, peek at the original now and then to make sure \"cat ears\" didn\'t become something strange.'**
+  /// **'Tag readings appear below your prompt. Toggle them at any time; the original text stays editable.'**
   String get tips_studio_trick_6;
 
   /// settings_limitGenerationIntervalTitle / settings_setGenerationIntervalJitterTitle.
@@ -13294,137 +13294,11 @@ abstract class AppLocalizations {
   /// **'Auto-translate visible tags'**
   String get tagExpansion_autoTranslateVisible;
 
-  /// No description provided for @translationEditor_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Translation block'**
-  String get translationEditor_title;
-
-  /// No description provided for @translationEditor_source.
-  ///
-  /// In en, this message translates to:
-  /// **'Original'**
-  String get translationEditor_source;
-
-  /// No description provided for @translationEditor_sourcePrefix.
-  ///
-  /// In en, this message translates to:
-  /// **'Src'**
-  String get translationEditor_sourcePrefix;
-
-  /// No description provided for @translationEditor_generation.
-  ///
-  /// In en, this message translates to:
-  /// **'Generation'**
-  String get translationEditor_generation;
-
-  /// No description provided for @translationEditor_editable.
-  ///
-  /// In en, this message translates to:
-  /// **'Editable'**
-  String get translationEditor_editable;
-
-  /// No description provided for @translationEditor_modified.
-  ///
-  /// In en, this message translates to:
-  /// **'Modified'**
-  String get translationEditor_modified;
-
-  /// No description provided for @translationEditor_edited.
-  ///
-  /// In en, this message translates to:
-  /// **'Edited'**
-  String get translationEditor_edited;
-
-  /// No description provided for @translationEditor_close.
-  ///
-  /// In en, this message translates to:
-  /// **'Close'**
-  String get translationEditor_close;
-
-  /// No description provided for @translationEditor_save.
-  ///
-  /// In en, this message translates to:
-  /// **'Save'**
-  String get translationEditor_save;
-
-  /// No description provided for @translationEditor_delete.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete block'**
-  String get translationEditor_delete;
-
-  /// No description provided for @translationEditor_restore.
-  ///
-  /// In en, this message translates to:
-  /// **'Restore original text'**
-  String get translationEditor_restore;
-
-  /// No description provided for @translationEditor_configure.
-  ///
-  /// In en, this message translates to:
-  /// **'Configure translation model'**
-  String get translationEditor_configure;
-
-  /// No description provided for @translationEditor_readingFieldTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'{language} reading text'**
-  String translationEditor_readingFieldTitle(Object language);
-
-  /// No description provided for @translationEditor_sourceWarning.
-  ///
-  /// In en, this message translates to:
-  /// **'Original modified; {language} needs syncing'**
-  String translationEditor_sourceWarning(Object language);
-
-  /// No description provided for @translationEditor_editHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Translation edited manually; original review status is unchanged'**
-  String get translationEditor_editHint;
-
-  /// No description provided for @translationLanguage_chinese.
-  ///
-  /// In en, this message translates to:
-  /// **'Chinese'**
-  String get translationLanguage_chinese;
-
-  /// No description provided for @translationLanguage_english.
-  ///
-  /// In en, this message translates to:
-  /// **'English'**
-  String get translationLanguage_english;
-
-  /// No description provided for @translationLanguage_japanese.
-  ///
-  /// In en, this message translates to:
-  /// **'Japanese'**
-  String get translationLanguage_japanese;
-
-  /// No description provided for @translationLanguage_korean.
-  ///
-  /// In en, this message translates to:
-  /// **'Korean'**
-  String get translationLanguage_korean;
-
-  /// No description provided for @translationLanguage_traditionalChinese.
-  ///
-  /// In en, this message translates to:
-  /// **'Traditional Chinese'**
-  String get translationLanguage_traditionalChinese;
-
   /// No description provided for @modelTask_translateTitle.
   ///
   /// In en, this message translates to:
-  /// **'Original → reading language'**
+  /// **'Full-text reading translation'**
   String get modelTask_translateTitle;
-
-  /// No description provided for @modelTask_promptReverseTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Reading language → original'**
-  String get modelTask_promptReverseTitle;
 
   /// No description provided for @modelTask_tagTranslateTitle.
   ///
@@ -13441,14 +13315,8 @@ abstract class AppLocalizations {
   /// No description provided for @modelTask_translateDescription.
   ///
   /// In en, this message translates to:
-  /// **'Translate prompts and blocks while preserving weights, groups and tag meaning.'**
+  /// **'Translate a full prompt into a separate reading view, preserving the source.'**
   String get modelTask_translateDescription;
-
-  /// No description provided for @modelTask_promptReverseDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Apply additions, deletions and edits from the translation to the original, then return it for review.'**
-  String get modelTask_promptReverseDescription;
 
   /// No description provided for @modelTask_tagTranslateDescription.
   ///
@@ -14062,24 +13930,6 @@ abstract class AppLocalizations {
   /// **'The model returned empty content.'**
   String get modelRequest_emptyResponse;
 
-  /// No description provided for @modelService_testFieldsIncomplete.
-  ///
-  /// In en, this message translates to:
-  /// **'The test response is missing fields.'**
-  String get modelService_testFieldsIncomplete;
-
-  /// No description provided for @modelService_testFieldsInvalid.
-  ///
-  /// In en, this message translates to:
-  /// **'The test response has invalid fields.'**
-  String get modelService_testFieldsInvalid;
-
-  /// No description provided for @modelService_testGroupsInvalid.
-  ///
-  /// In en, this message translates to:
-  /// **'The test response has invalid groups.'**
-  String get modelService_testGroupsInvalid;
-
   /// No description provided for @modelService_testSourceEmpty.
   ///
   /// In en, this message translates to:
@@ -14438,24 +14288,6 @@ abstract class AppLocalizations {
   /// **'Preset'**
   String get modelSettings_usePreset;
 
-  /// No description provided for @modelSettings_outputLanguage.
-  ///
-  /// In en, this message translates to:
-  /// **'Output language'**
-  String get modelSettings_outputLanguage;
-
-  /// No description provided for @modelSettings_englishPrompt.
-  ///
-  /// In en, this message translates to:
-  /// **'English generation prompt'**
-  String get modelSettings_englishPrompt;
-
-  /// No description provided for @modelSettings_englishPromptHelp.
-  ///
-  /// In en, this message translates to:
-  /// **'Applies the edits against the original and outputs an English generation prompt.'**
-  String get modelSettings_englishPromptHelp;
-
   /// No description provided for @modelSettings_targetLanguage.
   ///
   /// In en, this message translates to:
@@ -14485,12 +14317,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Thinking: {level} (follows model)'**
   String modelSettings_reasoningSummaryModel(Object level);
-
-  /// No description provided for @modelSettings_promptBlocksHint.
-  ///
-  /// In en, this message translates to:
-  /// **'When translation isn’t needed, you can also split prompts into blocks and arrange them freely with the block feature.'**
-  String get modelSettings_promptBlocksHint;
 
   /// No description provided for @modelSettings_wikiFormatHint.
   ///
@@ -15482,282 +15308,6 @@ abstract class AppLocalizations {
   /// **'Add header'**
   String get modelOverrides_addHeader;
 
-  /// No description provided for @promptTranslation_translating.
-  ///
-  /// In en, this message translates to:
-  /// **'Translating'**
-  String get promptTranslation_translating;
-
-  /// No description provided for @promptTranslation_needsModel.
-  ///
-  /// In en, this message translates to:
-  /// **'Translate · configure a model first'**
-  String get promptTranslation_needsModel;
-
-  /// No description provided for @promptTranslation_withRoute.
-  ///
-  /// In en, this message translates to:
-  /// **'Translate · {provider} / {model}'**
-  String promptTranslation_withRoute(Object provider, Object model);
-
-  /// No description provided for @promptTranslation_actions.
-  ///
-  /// In en, this message translates to:
-  /// **'Translation actions'**
-  String get promptTranslation_actions;
-
-  /// No description provided for @promptTranslation_promptChanged.
-  ///
-  /// In en, this message translates to:
-  /// **'The prompt changed; new edits were not overwritten'**
-  String get promptTranslation_promptChanged;
-
-  /// No description provided for @promptTranslation_nothingToTranslate.
-  ///
-  /// In en, this message translates to:
-  /// **'There is no plain text to translate'**
-  String get promptTranslation_nothingToTranslate;
-
-  /// No description provided for @promptTranslation_failed.
-  ///
-  /// In en, this message translates to:
-  /// **'Translation failed: {error}'**
-  String promptTranslation_failed(Object error);
-
-  /// No description provided for @promptTranslation_setupTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Configure a translation model first'**
-  String get promptTranslation_setupTitle;
-
-  /// No description provided for @promptTranslation_setupBody.
-  ///
-  /// In en, this message translates to:
-  /// **'Translation needs an explicitly selected service and model. Go to Settings → Integrations → Models & APIs, add a service and fetch its model list, then choose a model for prompt translation.'**
-  String get promptTranslation_setupBody;
-
-  /// No description provided for @promptTranslation_later.
-  ///
-  /// In en, this message translates to:
-  /// **'Later'**
-  String get promptTranslation_later;
-
-  /// No description provided for @promptTranslation_openSettings.
-  ///
-  /// In en, this message translates to:
-  /// **'Open settings'**
-  String get promptTranslation_openSettings;
-
-  /// No description provided for @promptTranslation_toolTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Translate'**
-  String get promptTranslation_toolTitle;
-
-  /// No description provided for @promptTranslation_noModel.
-  ///
-  /// In en, this message translates to:
-  /// **'No model configured'**
-  String get promptTranslation_noModel;
-
-  /// No description provided for @promptTranslation_configureModel.
-  ///
-  /// In en, this message translates to:
-  /// **'Configure translation model'**
-  String get promptTranslation_configureModel;
-
-  /// No description provided for @promptTranslation_translateNew.
-  ///
-  /// In en, this message translates to:
-  /// **'Translate new content'**
-  String get promptTranslation_translateNew;
-
-  /// No description provided for @promptTranslation_undoRestore.
-  ///
-  /// In en, this message translates to:
-  /// **'Undo the restore and bring translation blocks back'**
-  String get promptTranslation_undoRestore;
-
-  /// No description provided for @promptTranslation_restoreAll.
-  ///
-  /// In en, this message translates to:
-  /// **'Restore all translation blocks to original text'**
-  String get promptTranslation_restoreAll;
-
-  /// No description provided for @promptTranslation_tutorial.
-  ///
-  /// In en, this message translates to:
-  /// **'How it works'**
-  String get promptTranslation_tutorial;
-
-  /// No description provided for @promptTranslation_guideBack.
-  ///
-  /// In en, this message translates to:
-  /// **'Back to actions'**
-  String get promptTranslation_guideBack;
-
-  /// No description provided for @promptTranslation_guideMiddleTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Middle-click a block'**
-  String get promptTranslation_guideMiddleTitle;
-
-  /// No description provided for @promptTranslation_guideMiddleText.
-  ///
-  /// In en, this message translates to:
-  /// **'Switch original and translation'**
-  String get promptTranslation_guideMiddleText;
-
-  /// No description provided for @promptTranslation_guideSourceTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Left-click the original'**
-  String get promptTranslation_guideSourceTitle;
-
-  /// No description provided for @promptTranslation_guideSourceText.
-  ///
-  /// In en, this message translates to:
-  /// **'Place the cursor and edit directly'**
-  String get promptTranslation_guideSourceText;
-
-  /// No description provided for @promptTranslation_guideReadingTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Left-click the translation'**
-  String get promptTranslation_guideReadingTitle;
-
-  /// No description provided for @promptTranslation_guideReadingText.
-  ///
-  /// In en, this message translates to:
-  /// **'Open the block editor'**
-  String get promptTranslation_guideReadingText;
-
-  /// No description provided for @promptTranslation_guideCtrlTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Ctrl + click / drag-select'**
-  String get promptTranslation_guideCtrlTitle;
-
-  /// No description provided for @promptTranslation_guideCtrlText.
-  ///
-  /// In en, this message translates to:
-  /// **'Search tags / find related tags in the editor'**
-  String get promptTranslation_guideCtrlText;
-
-  /// No description provided for @promptTranslation_guideConvertTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'↑ Translation to original'**
-  String get promptTranslation_guideConvertTitle;
-
-  /// No description provided for @promptTranslation_guideConvertText.
-  ///
-  /// In en, this message translates to:
-  /// **'↓ Original to translation; review before saving'**
-  String get promptTranslation_guideConvertText;
-
-  /// No description provided for @promptTranslation_guideRestoreTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Switch the whole group'**
-  String get promptTranslation_guideRestoreTitle;
-
-  /// No description provided for @promptTranslation_guideRestoreText.
-  ///
-  /// In en, this message translates to:
-  /// **'Use the translation menu to show all source text / translations'**
-  String get promptTranslation_guideRestoreText;
-
-  /// No description provided for @promptTranslation_middleButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Middle mouse button'**
-  String get promptTranslation_middleButton;
-
-  /// No description provided for @promptTranslation_leftButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Left mouse button'**
-  String get promptTranslation_leftButton;
-
-  /// No description provided for @promptTranslation_blockShowingOriginal.
-  ///
-  /// In en, this message translates to:
-  /// **'Translation block, showing original'**
-  String get promptTranslation_blockShowingOriginal;
-
-  /// No description provided for @promptTranslation_blockShowingReading.
-  ///
-  /// In en, this message translates to:
-  /// **'Translation block, showing translation'**
-  String get promptTranslation_blockShowingReading;
-
-  /// No description provided for @promptTranslation_blockNeedsReview.
-  ///
-  /// In en, this message translates to:
-  /// **'Original changed · translation needs updating'**
-  String get promptTranslation_blockNeedsReview;
-
-  /// No description provided for @promptTranslation_badgeTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Original changed; translation needs syncing'**
-  String get promptTranslation_badgeTooltip;
-
-  /// No description provided for @promptTranslation_sourceChanged.
-  ///
-  /// In en, this message translates to:
-  /// **'The original changed; reopen the translation block'**
-  String get promptTranslation_sourceChanged;
-
-  /// No description provided for @promptTranslation_retranslateFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Retranslation failed: {error}'**
-  String promptTranslation_retranslateFailed(Object error);
-
-  /// No description provided for @promptTranslation_draftChanged.
-  ///
-  /// In en, this message translates to:
-  /// **'Content changed; convert again. The new draft is kept.'**
-  String get promptTranslation_draftChanged;
-
-  /// No description provided for @promptTranslation_convertFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Conversion failed; the draft is kept: {error}'**
-  String promptTranslation_convertFailed(Object error);
-
-  /// No description provided for @promptTranslation_invalidResultFormat.
-  ///
-  /// In en, this message translates to:
-  /// **'The conversion result format is invalid; the draft is kept'**
-  String get promptTranslation_invalidResultFormat;
-
-  /// No description provided for @promptTranslation_noValidText.
-  ///
-  /// In en, this message translates to:
-  /// **'The model returned no valid text; the draft is kept'**
-  String get promptTranslation_noValidText;
-
-  /// No description provided for @promptTranslation_invalidResultContent.
-  ///
-  /// In en, this message translates to:
-  /// **'The conversion result contains invalid formatting; the draft is kept'**
-  String get promptTranslation_invalidResultContent;
-
-  /// No description provided for @promptTranslation_incompleteStructure.
-  ///
-  /// In en, this message translates to:
-  /// **'The conversion result has incomplete weights or groups; the draft is kept'**
-  String get promptTranslation_incompleteStructure;
-
-  /// No description provided for @promptTranslation_inputRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter the content to convert first'**
-  String get promptTranslation_inputRequired;
-
   /// No description provided for @wiki_configureTagModel.
   ///
   /// In en, this message translates to:
@@ -15829,12 +15379,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Gradient'**
   String get blockAppearance_gradient;
-
-  /// No description provided for @blockAppearance_translation.
-  ///
-  /// In en, this message translates to:
-  /// **'Translation'**
-  String get blockAppearance_translation;
 
   /// Separate Opus quota pool; backup means already activated usage boosts, not inventory.
   ///
@@ -16627,12 +16171,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'File actions'**
   String get imageMenu_fileActions;
-
-  /// No description provided for @imageMenu_saveToBlock.
-  ///
-  /// In en, this message translates to:
-  /// **'Save to blocks'**
-  String get imageMenu_saveToBlock;
 
   /// No description provided for @settings_highAnlasCostEstimate.
   ///
@@ -21865,12 +21403,6 @@ abstract class AppLocalizations {
   /// **'Block library'**
   String get blocks_title;
 
-  /// No description provided for @blocks_translationMark.
-  ///
-  /// In en, this message translates to:
-  /// **'Tr'**
-  String get blocks_translationMark;
-
   /// No description provided for @blocks_add.
   ///
   /// In en, this message translates to:
@@ -22164,12 +21696,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Gradient'**
   String get blocks_lookGradient;
-
-  /// No description provided for @blocks_lookTranslation.
-  ///
-  /// In en, this message translates to:
-  /// **'Translation'**
-  String get blocks_lookTranslation;
 
   /// No description provided for @blocks_hasParams.
   ///
@@ -23190,18 +22716,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Change / adjust'**
   String get blocks_changeThumb;
-
-  /// No description provided for @blocks_reading.
-  ///
-  /// In en, this message translates to:
-  /// **'Reading translation'**
-  String get blocks_reading;
-
-  /// No description provided for @blocks_needsReview.
-  ///
-  /// In en, this message translates to:
-  /// **'Needs review'**
-  String get blocks_needsReview;
 
   /// No description provided for @blocks_applyToCurrent.
   ///
@@ -25924,54 +25438,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Suggest tags that often appear together'**
   String get gen_relatedSub;
-
-  /// No description provided for @gen_translating.
-  ///
-  /// In en, this message translates to:
-  /// **'Translating…'**
-  String get gen_translating;
-
-  /// No description provided for @gen_translateNeedsModel.
-  ///
-  /// In en, this message translates to:
-  /// **'No translation model yet — click to set one up'**
-  String get gen_translateNeedsModel;
-
-  /// No description provided for @gen_translateRestore.
-  ///
-  /// In en, this message translates to:
-  /// **'Show original'**
-  String get gen_translateRestore;
-
-  /// No description provided for @gen_translateWith.
-  ///
-  /// In en, this message translates to:
-  /// **'Translate ({route})'**
-  String gen_translateWith(Object route);
-
-  /// No description provided for @gen_translateNew.
-  ///
-  /// In en, this message translates to:
-  /// **'Translate new text'**
-  String get gen_translateNew;
-
-  /// No description provided for @gen_translateShowOriginal.
-  ///
-  /// In en, this message translates to:
-  /// **'Show all original'**
-  String get gen_translateShowOriginal;
-
-  /// No description provided for @gen_translateShowTranslated.
-  ///
-  /// In en, this message translates to:
-  /// **'Show all translations'**
-  String get gen_translateShowTranslated;
-
-  /// No description provided for @gen_translateSettings.
-  ///
-  /// In en, this message translates to:
-  /// **'Translation model'**
-  String get gen_translateSettings;
 
   /// No description provided for @gen_qualityPreset.
   ///
@@ -32650,12 +32116,6 @@ abstract class AppLocalizations {
   /// **'Prompt translation'**
   String get set_mdTaskPrompt;
 
-  /// No description provided for @set_mdTaskReverse.
-  ///
-  /// In en, this message translates to:
-  /// **'Prompt reverse'**
-  String get set_mdTaskReverse;
-
   /// No description provided for @set_mdTaskTag.
   ///
   /// In en, this message translates to:
@@ -38403,6 +37863,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Action failed: {error}'**
   String startup_dataActionFailed(String error);
+
+  /// No description provided for @promptCompletion_all.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get promptCompletion_all;
+
+  /// No description provided for @promptCompletion_tags.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags'**
+  String get promptCompletion_tags;
+
+  /// No description provided for @promptCompletion_summary.
+  ///
+  /// In en, this message translates to:
+  /// **'Dictionary summary'**
+  String get promptCompletion_summary;
+
+  /// No description provided for @promptCompletion_synonyms.
+  ///
+  /// In en, this message translates to:
+  /// **'Chinese synonyms'**
+  String get promptCompletion_synonyms;
+
+  /// No description provided for @promptReading_showReadings.
+  ///
+  /// In en, this message translates to:
+  /// **'Show tag readings'**
+  String get promptReading_showReadings;
+
+  /// No description provided for @promptReading_hideReadings.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide tag readings'**
+  String get promptReading_hideReadings;
+
+  /// No description provided for @promptReading_displayHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Show available translations below the original text.'**
+  String get promptReading_displayHint;
+
+  /// No description provided for @promptReading_completion.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete tags while typing'**
+  String get promptReading_completion;
+
+  /// No description provided for @promptReading_completionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search tags, characters and series in Chinese or English.'**
+  String get promptReading_completionHint;
+
+  /// No description provided for @promptReading_fillMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill missing visible readings'**
+  String get promptReading_fillMissing;
+
+  /// No description provided for @modelSettings_promptReadingHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Full-text translation is for reading and does not modify prompts.'**
+  String get modelSettings_promptReadingHint;
+
+  /// No description provided for @promptCompletion_works.
+  ///
+  /// In en, this message translates to:
+  /// **'Works'**
+  String get promptCompletion_works;
+
+  /// No description provided for @promptCompletion_expand.
+  ///
+  /// In en, this message translates to:
+  /// **'Full list and Wiki preview (right-click a suggestion to preview it)'**
+  String get promptCompletion_expand;
 }
 
 class _AppLocalizationsDelegate

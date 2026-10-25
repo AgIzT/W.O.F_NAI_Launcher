@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:nai_launcher/data/models/prompt_block/pill_document.dart';
 import 'package:nai_launcher/l10n/app_localizations.dart';
 import 'package:nai_launcher/presentation/themes/presets/geist_theme.dart';
 import 'package:nai_launcher/presentation/ui/agent/agent_fixture.dart';
@@ -41,7 +40,7 @@ import 'package:nai_launcher/presentation/ui/tools/tools_fixture.dart';
 import 'package:nai_launcher/presentation/ui/tools/tools_sheets.dart';
 import 'package:nai_launcher/presentation/ui/viewer/viewer_page.dart';
 import 'package:nai_launcher/presentation/widgets/navigation/window_chrome_layout.dart';
-import 'package:nai_launcher/presentation/widgets/prompt/pills/translation_pill_view.dart';
+import 'package:nai_launcher/presentation/widgets/prompt/reading/prompt_reading_text.dart';
 
 import '../../test/helpers/studio_capture_fonts.dart';
 import '../../test/presentation/ui/blocks/blocks_test_harness.dart'
@@ -130,17 +129,9 @@ Widget promptEditor(ReadmeData d, GenEditorTarget target) {
         'starry sky, glowing flowers, night,\ncinematic lighting, depth of field,',
         style: TextStyle(fontSize: 13, height: 1.7),
       ),
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: TranslationPillView(
-          pill: TranslationPill(
-            source: 'soft lighting, blue theme',
-            zh: d.tr('柔和光影，蓝色调', 'soft lighting, blue theme'),
-            languageCode: d.locale,
-          ),
-          onToggle: () {},
-          onEdit: (_) {},
-        ),
+      const Padding(
+        padding: EdgeInsets.symmetric(vertical: 8),
+        child: PromptReadingText(text: 'soft lighting, blue theme'),
       ),
       const Text(
         'very aesthetic, masterpiece, no text',

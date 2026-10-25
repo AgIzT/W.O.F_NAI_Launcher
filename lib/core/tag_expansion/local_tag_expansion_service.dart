@@ -1,4 +1,5 @@
 import '../autocomplete/completion_models.dart';
+import '../autocomplete/chinese_tag_completion_source.dart';
 import '../utils/tag_normalizer.dart';
 
 typedef SubstringTagSearch =
@@ -6,7 +7,14 @@ typedef SubstringTagSearch =
 typedef PopularTagSearch =
     Future<List<CompletionCandidate>> Function({int limit});
 
-/// The explicit tag picker only reads the bundled English tag databases.
+typedef FilteredTagSearch =
+    Future<List<CompletionCandidate>> Function(
+      String input, {
+      int limit,
+      CompletionCategoryFilter categoryFilter,
+    });
+
+/// Prompt pickers read the local tag catalog and structured Chinese names.
 /// It deliberately does not depend on the autocomplete orchestrator, whose
 /// optional Danbooru and AI branches can make network requests. Readings come
 /// from the visible-tag translation queue, not from this service.
@@ -17,6 +25,8 @@ class LocalTagExpansionService {
     required this.substringSearch,
     required this.popularSearch,
     this.semanticNames,
+    this.filteredSubstringSearch,
+    this.filteredSemanticNames,
   });
 
   final CompletionSource catalog;
@@ -24,6 +34,7 @@ class LocalTagExpansionService {
   final SubstringTagSearch substringSearch;
   final PopularTagSearch popularSearch;
   final SubstringTagSearch? semanticNames;
+  final FilteredTagSearch? filteredSubstringSearch, filteredSemanticNames;
 
   Future<List<CompletionCandidate>> popular({
     required String locale,
@@ -47,6 +58,7 @@ class LocalTagExpansionService {
     required String locale,
     Set<String> existingTags = const {},
     int limit = 40,
+    CompletionCategoryFilter categoryFilter = CompletionCategoryFilter.all,
   }) async {
     final token = TagNormalizer.normalize(input);
     if (token.isEmpty) return const [];
@@ -55,18 +67,34 @@ class LocalTagExpansionService {
       locale: locale,
       existingTags: existingTags,
       limit: limit,
-    );
-    final prefix = await catalog.search(
-      query.copyWith(limit: limit.clamp(1, 100)),
-    );
-    final contains = token.runes.length < 2
-        ? const <CompletionCandidate>[]
-        : await substringSearch(token, limit: limit);
-    final chinese =
-        await semanticNames?.call(input, limit: limit) ??
-        const <CompletionCandidate>[];
-    final candidates = [...prefix, ...chinese, ...contains]
-      ..sort((a, b) => a.matchKind.index.compareTo(b.matchKind.index));
+    ).copyWith(categoryFilter: categoryFilter);
+    // Chinese names have a separate data source. Avoid scanning the English
+    // substring index on every committed Chinese keystroke.
+    final batches = await Future.wait([
+      if (!query.isChinese) catalog.search(query),
+      if (!query.isChinese && token.runes.length >= 2)
+        filteredSubstringSearch != null
+            ? filteredSubstringSearch!(
+                token,
+                limit: limit,
+                categoryFilter: categoryFilter,
+              )
+            : substringSearch(token, limit: limit),
+      if (query.isChinese && semanticNames != null)
+        filteredSemanticNames != null
+            ? filteredSemanticNames!(
+                input,
+                limit: limit,
+                categoryFilter: categoryFilter,
+              )
+            : semanticNames!(input, limit: limit),
+    ]);
+    final candidates =
+        batches
+            .expand((batch) => batch)
+            .where((candidate) => categoryFilter.accepts(candidate.category))
+            .toList()
+          ..sort(ChineseTagCompletionSource.compare);
     return _decorate(_unique(candidates, limit), existingTags);
   }
 

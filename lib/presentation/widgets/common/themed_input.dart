@@ -84,6 +84,9 @@ class ThemedInput extends StatefulWidget {
   /// line height so EditableText reserves their actual rendered height.
   final StrutStyle? strutStyle;
 
+  /// Caret height; null keeps the full line height.
+  final double? cursorHeight;
+
   /// 提示文字样式
   final TextStyle? hintStyle;
 
@@ -164,6 +167,7 @@ class ThemedInput extends StatefulWidget {
     this.maxLength,
     this.style,
     this.strutStyle,
+    this.cursorHeight,
     this.hintStyle,
     this.autofocus = false,
     this.onTap,
@@ -209,6 +213,7 @@ class ThemedInput extends StatefulWidget {
     this.maxLength,
     this.style,
     this.strutStyle,
+    this.cursorHeight,
     this.hintStyle,
     this.autofocus = false,
     this.onTap,
@@ -386,6 +391,7 @@ class _ThemedInputState extends State<ThemedInput> {
       maxLength: widget.maxLength,
       style: widget.style ?? theme.textTheme.bodyLarge,
       strutStyle: widget.strutStyle,
+      cursorHeight: widget.cursorHeight,
       autofocus: widget.autofocus,
       textAlign: widget.textAlign,
       textAlignVertical: widget.textAlignVertical,

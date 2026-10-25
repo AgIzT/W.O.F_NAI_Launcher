@@ -39,11 +39,6 @@ const _models = SettingsModelsData(
       reasoningEffort: 'low',
     ),
     SettingsTaskAssignment(
-      task: SettingsModelTask.promptReverse,
-      providerId: 'p',
-      modelId: 'supported',
-    ),
-    SettingsTaskAssignment(
       task: SettingsModelTask.tagTranslate,
       providerId: 'p',
       modelId: 'unsupported',
@@ -62,13 +57,28 @@ Future<SettingsRecorder> _pump(
   double width = 1600,
   bool dark = false,
   double scale = 1,
+  bool inheritPrompt = false,
 }) async {
   t.platformDispatcher.textScaleFactorTestValue = 1;
   addTearDown(t.platformDispatcher.clearTextScaleFactorTestValue);
   final d = SettingsFixture.view(page: SettingsPageId.models);
   final rec = await pumpSettings(
     t,
-    data: d.copyWith(models: _models),
+    data: d.copyWith(
+      models: inheritPrompt
+          ? SettingsModelsData(
+              providers: _models.providers,
+              assignments: [
+                const SettingsTaskAssignment(
+                  task: SettingsModelTask.promptTranslate,
+                  providerId: 'p',
+                  modelId: 'supported',
+                ),
+                ..._models.assignments.skip(1),
+              ],
+            )
+          : _models,
+    ),
     locale: locale,
     window: width,
     height: 1400,
@@ -123,8 +133,10 @@ void main() {
       find.byKey(const Key('assign-reasoning-wikiTranslate')),
     );
     expect(unknown.options.map((o) => o.value), ['inherit']);
+    await t.pumpWidget(const SizedBox.shrink());
+    await _pump(t, inheritPrompt: true);
     final inherited = t.widget<SettingsSelect>(
-      find.byKey(const Key('assign-reasoning-promptReverse')),
+      find.byKey(const Key('assign-reasoning-promptTranslate')),
     );
     expect(inherited.selected, 'inherit');
     final l = AppLocalizations.of(t.element(find.byType(SettingsHost)))!;

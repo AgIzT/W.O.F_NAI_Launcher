@@ -3107,7 +3107,7 @@
   "promptBlockLibrary_sourceFile": "Source file",
   "promptBlockLibrary_importedAt": "Imported at",
   "promptBlockPalette_tooltip": "Blocks",
-  "promptBlockPalette_emptyHint": "Keep prompt blocks or translation blocks here; click to insert at the caret, or drag them into the prompt box.",
+  "promptBlockPalette_emptyHint": "Drag your frequently used prompt blocks here. Click to insert at the caret, or drag into the prompt.",
   "promptBlockPalette_remove": "Remove from blocks",
   "promptBlockPalette_clearAll": "Clear blocks",
   "promptBlockPalette_clearAllArmed": "Tap again to clear all",
@@ -3248,9 +3248,9 @@
   "@tips_studio_trick_5": {
     "description": "Button count = nSamples x imagesPerRequest; estimatedCost uses both."
   },
-  "tips_studio_trick_6": "Middle-click a translation block to flip between the original and the translation. However good the AI is, peek at the original now and then to make sure \"cat ears\" didn't become something strange.",
+  "tips_studio_trick_6": "Tag readings appear below your prompt. Toggle them at any time; the original text stays editable.",
   "@tips_studio_trick_6": {
-    "description": "promptTranslation_guideMiddleText."
+    "description": "Prompt reading display tip."
   },
   "tips_studio_trick_7": "Limit generation frequency in Settings forces a cooldown between runs, and a little random jitter keeps the rhythm from feeling mechanical. Good for slow late-night sessions — and for anyone whose finger won't leave the button.",
   "@tips_studio_trick_7": {
@@ -4214,42 +4214,10 @@
   "toast_titleInfo": "Notice",
   "toast_titleProgress": "In progress",
   "tagExpansion_autoTranslateVisible": "Auto-translate visible tags",
-  "translationEditor_title": "Translation block",
-  "translationEditor_source": "Original",
-  "translationEditor_sourcePrefix": "Src",
-  "translationEditor_generation": "Generation",
-  "translationEditor_editable": "Editable",
-  "translationEditor_modified": "Modified",
-  "translationEditor_edited": "Edited",
-  "translationEditor_close": "Close",
-  "translationEditor_save": "Save",
-  "translationEditor_delete": "Delete block",
-  "translationEditor_restore": "Restore original text",
-  "translationEditor_configure": "Configure translation model",
-  "translationEditor_readingFieldTitle": "{language} reading text",
-  "@translationEditor_readingFieldTitle": {
-    "placeholders": {
-      "language": {}
-    }
-  },
-  "translationEditor_sourceWarning": "Original modified; {language} needs syncing",
-  "@translationEditor_sourceWarning": {
-    "placeholders": {
-      "language": {}
-    }
-  },
-  "translationEditor_editHint": "Translation edited manually; original review status is unchanged",
-  "translationLanguage_chinese": "Chinese",
-  "translationLanguage_english": "English",
-  "translationLanguage_japanese": "Japanese",
-  "translationLanguage_korean": "Korean",
-  "translationLanguage_traditionalChinese": "Traditional Chinese",
-  "modelTask_translateTitle": "Original → reading language",
-  "modelTask_promptReverseTitle": "Reading language → original",
+  "modelTask_translateTitle": "Full-text reading translation",
   "modelTask_tagTranslateTitle": "Tag translation & semantics",
   "modelTask_wikiTranslateTitle": "Wiki article translation",
-  "modelTask_translateDescription": "Translate prompts and blocks while preserving weights, groups and tag meaning.",
-  "modelTask_promptReverseDescription": "Apply additions, deletions and edits from the translation to the original, then return it for review.",
+  "modelTask_translateDescription": "Translate a full prompt into a separate reading view, preserving the source.",
   "modelTask_tagTranslateDescription": "Translate visible tags and fill missing Chinese core names, synonyms and short meanings. Reuse existing reference data.",
   "modelTask_wikiTranslateDescription": "Translate wiki articles, tidy the layout and choose clickable tags from context.",
   "modelTask_connectionTest": "Model connection test",
@@ -4362,9 +4330,6 @@
   "modelRequest_fieldParameters": "Effective parameters",
   "modelRequest_redacted": "[redacted]",
   "modelRequest_emptyResponse": "The model returned empty content.",
-  "modelService_testFieldsIncomplete": "The test response is missing fields.",
-  "modelService_testFieldsInvalid": "The test response has invalid fields.",
-  "modelService_testGroupsInvalid": "The test response has invalid groups.",
   "modelService_testSourceEmpty": "The test response returned an empty original.",
   "modelService_conversionCancelled": "Conversion cancelled",
   "modelService_chooseInterfaceModel": "Choose a service and model in Settings → Models & APIs → Interfaces first.",
@@ -4462,9 +4427,6 @@
   "modelSettings_reasoningHelp": "Translation usually needs no thinking. Since these interfaces use structured output, the lowest thinking level supported by the model is recommended.",
   "modelSettings_reasoningHelpLabel": "Thinking level advice",
   "modelSettings_usePreset": "Preset",
-  "modelSettings_outputLanguage": "Output language",
-  "modelSettings_englishPrompt": "English generation prompt",
-  "modelSettings_englishPromptHelp": "Applies the edits against the original and outputs an English generation prompt.",
   "modelSettings_targetLanguage": "Target language",
   "modelSettings_effective": "Effective",
   "modelSettings_noModelSelected": "No available model selected",
@@ -4480,7 +4442,6 @@
       "level": {}
     }
   },
-  "modelSettings_promptBlocksHint": "When translation isn’t needed, you can also split prompts into blocks and arrange them freely with the block feature.",
   "modelSettings_wikiFormatHint": "When translation isn’t needed, it can still tidy the layout and link related tags.",
   "modelSettings_unsavedChanges": "Unsaved changes",
   "modelSettings_testPreset": "Test preset",
@@ -4745,73 +4706,6 @@
   "modelOverrides_valueTypes": "Supports strings, numbers, booleans, arrays and objects",
   "modelOverrides_addBodyField": "Add body field",
   "modelOverrides_addHeader": "Add header",
-  "promptTranslation_translating": "Translating",
-  "promptTranslation_needsModel": "Translate · configure a model first",
-  "promptTranslation_withRoute": "Translate · {provider} / {model}",
-  "@promptTranslation_withRoute": {
-    "placeholders": {
-      "provider": {},
-      "model": {}
-    }
-  },
-  "promptTranslation_actions": "Translation actions",
-  "promptTranslation_promptChanged": "The prompt changed; new edits were not overwritten",
-  "promptTranslation_nothingToTranslate": "There is no plain text to translate",
-  "promptTranslation_failed": "Translation failed: {error}",
-  "@promptTranslation_failed": {
-    "placeholders": {
-      "error": {}
-    }
-  },
-  "promptTranslation_setupTitle": "Configure a translation model first",
-  "promptTranslation_setupBody": "Translation needs an explicitly selected service and model. Go to Settings → Integrations → Models & APIs, add a service and fetch its model list, then choose a model for prompt translation.",
-  "promptTranslation_later": "Later",
-  "promptTranslation_openSettings": "Open settings",
-  "promptTranslation_toolTitle": "Translate",
-  "promptTranslation_noModel": "No model configured",
-  "promptTranslation_configureModel": "Configure translation model",
-  "promptTranslation_translateNew": "Translate new content",
-  "promptTranslation_undoRestore": "Undo the restore and bring translation blocks back",
-  "promptTranslation_restoreAll": "Restore all translation blocks to original text",
-  "promptTranslation_tutorial": "How it works",
-  "promptTranslation_guideBack": "Back to actions",
-  "promptTranslation_guideMiddleTitle": "Middle-click a block",
-  "promptTranslation_guideMiddleText": "Switch original and translation",
-  "promptTranslation_guideSourceTitle": "Left-click the original",
-  "promptTranslation_guideSourceText": "Place the cursor and edit directly",
-  "promptTranslation_guideReadingTitle": "Left-click the translation",
-  "promptTranslation_guideReadingText": "Open the block editor",
-  "promptTranslation_guideCtrlTitle": "Ctrl + click / drag-select",
-  "promptTranslation_guideCtrlText": "Search tags / find related tags in the editor",
-  "promptTranslation_guideConvertTitle": "↑ Translation to original",
-  "promptTranslation_guideConvertText": "↓ Original to translation; review before saving",
-  "promptTranslation_guideRestoreTitle": "Switch the whole group",
-  "promptTranslation_guideRestoreText": "Use the translation menu to show all source text / translations",
-  "promptTranslation_middleButton": "Middle mouse button",
-  "promptTranslation_leftButton": "Left mouse button",
-  "promptTranslation_blockShowingOriginal": "Translation block, showing original",
-  "promptTranslation_blockShowingReading": "Translation block, showing translation",
-  "promptTranslation_blockNeedsReview": "Original changed · translation needs updating",
-  "promptTranslation_badgeTooltip": "Original changed; translation needs syncing",
-  "promptTranslation_sourceChanged": "The original changed; reopen the translation block",
-  "promptTranslation_retranslateFailed": "Retranslation failed: {error}",
-  "@promptTranslation_retranslateFailed": {
-    "placeholders": {
-      "error": {}
-    }
-  },
-  "promptTranslation_draftChanged": "Content changed; convert again. The new draft is kept.",
-  "promptTranslation_convertFailed": "Conversion failed; the draft is kept: {error}",
-  "@promptTranslation_convertFailed": {
-    "placeholders": {
-      "error": {}
-    }
-  },
-  "promptTranslation_invalidResultFormat": "The conversion result format is invalid; the draft is kept",
-  "promptTranslation_noValidText": "The model returned no valid text; the draft is kept",
-  "promptTranslation_invalidResultContent": "The conversion result contains invalid formatting; the draft is kept",
-  "promptTranslation_incompleteStructure": "The conversion result has incomplete weights or groups; the draft is kept",
-  "promptTranslation_inputRequired": "Enter the content to convert first",
   "wiki_configureTagModel": "Configure an available tag translation model in Models & APIs first.",
   "blockOrganizer_replaceMoveBody": "The target already has {count} copies from the same source. After replacing, the source is hidden from the library; instances already inserted in prompts can still reference the original block.",
   "@blockOrganizer_replaceMoveBody": {
@@ -4829,7 +4723,6 @@
   "blockAppearance_dots": "Dots",
   "blockAppearance_solid": "Solid",
   "blockAppearance_gradient": "Gradient",
-  "blockAppearance_translation": "Translation",
   "opusUsage_regularRemaining": "Regular free quota: {percent}%",
   "@opusUsage_regularRemaining": {
     "description": "Separate Opus quota pool; backup means already activated usage boosts, not inventory.",
@@ -5167,7 +5060,6 @@
   "imageMenu_editAndDerive": "Edit & derive",
   "imageMenu_more": "More actions",
   "imageMenu_fileActions": "File actions",
-  "imageMenu_saveToBlock": "Save to blocks",
   "settings_highAnlasCostEstimate": "Estimated usage",
   "settings_highAnlasCostThresholdLabel": "Reminder threshold",
   "settings_highAnlasCostQuestion": "Continue with this generation?",
@@ -6889,7 +6781,6 @@
     }
   },
   "blocks_title": "Block library",
-  "blocks_translationMark": "Tr",
   "blocks_add": "Add",
   "blocks_cancel": "Cancel",
   "blocks_close": "Close",
@@ -6964,7 +6855,6 @@
   "blocks_lookDots": "Dots",
   "blocks_lookSolid": "Solid",
   "blocks_lookGradient": "Gradient",
-  "blocks_lookTranslation": "Translation",
   "blocks_hasParams": "Has settings",
   "blocks_hasNegative": "Has negative",
   "blocks_hintClick": "Click to insert",
@@ -7222,8 +7112,6 @@
   "blocks_details": "Details",
   "blocks_noSelection": "Click a card to see details. Double-click to edit; Enter inserts it into the prompt.",
   "blocks_changeThumb": "Change / adjust",
-  "blocks_reading": "Reading translation",
-  "blocks_needsReview": "Needs review",
   "blocks_applyToCurrent": "Apply now",
   "blocks_noParams": "None. Inserting won’t change current settings.",
   "blocks_paramModel": "Model",
@@ -8122,19 +8010,6 @@
   "gen_sdConvertSub": "Turn pasted (tag:1.2) into NAI weights",
   "gen_related": "Related tags",
   "gen_relatedSub": "Suggest tags that often appear together",
-  "gen_translating": "Translating…",
-  "gen_translateNeedsModel": "No translation model yet — click to set one up",
-  "gen_translateRestore": "Show original",
-  "gen_translateWith": "Translate ({route})",
-  "@gen_translateWith": {
-    "placeholders": {
-      "route": {}
-    }
-  },
-  "gen_translateNew": "Translate new text",
-  "gen_translateShowOriginal": "Show all original",
-  "gen_translateShowTranslated": "Show all translations",
-  "gen_translateSettings": "Translation model",
   "gen_qualityPreset": "Quality tags",
   "gen_ucPreset": "UC preset",
   "gen_presetNone": "None",
@@ -9929,7 +9804,6 @@
   },
   "set_mdDeleteBody": "Features that use it fall back to another provider.",
   "set_mdTaskPrompt": "Prompt translation",
-  "set_mdTaskReverse": "Prompt reverse",
   "set_mdTaskTag": "Tag translation & semantics",
   "set_mdTaskWiki": "Wiki translation",
   "set_mdFeature": "Feature",
@@ -11288,5 +11162,18 @@
         "type": "String"
       }
     }
-  }
+  },
+  "promptCompletion_all": "All",
+  "promptCompletion_tags": "Tags",
+  "promptCompletion_summary": "Dictionary summary",
+  "promptCompletion_synonyms": "Chinese synonyms",
+  "promptReading_showReadings": "Show tag readings",
+  "promptReading_hideReadings": "Hide tag readings",
+  "promptReading_displayHint": "Show available translations below the original text.",
+  "promptReading_completion": "Complete tags while typing",
+  "promptReading_completionHint": "Search tags, characters and series in Chinese or English.",
+  "promptReading_fillMissing": "Fill missing visible readings",
+  "modelSettings_promptReadingHint": "Full-text translation is for reading and does not modify prompts.",
+  "promptCompletion_works": "Works",
+  "promptCompletion_expand": "Full list and Wiki preview (right-click a suggestion to preview it)"
 }

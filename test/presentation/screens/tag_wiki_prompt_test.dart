@@ -77,6 +77,7 @@ class _Tags extends UnifiedTagRepository {
   Future<List<CompletionCandidate>> searchContains(
     String input, {
     int limit = 20,
+    CompletionCategoryFilter categoryFilter = CompletionCategoryFilter.all,
   }) async => const [];
 }
 
@@ -124,11 +125,6 @@ class _Blocks extends PromptBlockLibraryNotifier {
     String? folderId,
     String color = '#FF607D8B',
     String appearance = 'classic',
-    String? readingTranslationZh,
-    List<Map<String, dynamic>>? readingTranslationMarks,
-    bool readingTranslationNeedsReview = false,
-    String readingTranslationLanguageCode = 'zh',
-    bool readingTranslationEdited = false,
     String? iconName,
     String? thumbnail,
     double thumbnailOffsetX = 0.0,

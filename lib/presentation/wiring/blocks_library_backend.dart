@@ -152,10 +152,6 @@ class BlocksLibraryBackend {
                 thumbnailOffsetX: thumb?.offsetX ?? 0,
                 thumbnailOffsetY: thumb?.offsetY ?? 0,
                 thumbnailScale: thumb?.scale ?? 1,
-                readingTranslationNeedsReview:
-                    before.readingTranslationNeedsReview ||
-                    (before.readingTranslationZh != null &&
-                        content != before.content),
               ),
             );
       if (before?.thumbnail != thumbnail && before?.thumbnail != null) {
@@ -212,11 +208,6 @@ class BlocksLibraryBackend {
       appearance: b.appearance,
       iconName: b.iconName,
       isFavorite: b.isFavorite,
-      readingTranslationZh: b.readingTranslationZh,
-      readingTranslationMarks: b.readingTranslationMarks,
-      readingTranslationNeedsReview: b.readingTranslationNeedsReview,
-      readingTranslationLanguageCode: b.readingTranslationLanguageCode,
-      readingTranslationEdited: b.readingTranslationEdited,
       thumbnail: b.hasThumbnail
           ? await savePromptBlockThumbnail(
               await File(b.thumbnail!).readAsBytes(),

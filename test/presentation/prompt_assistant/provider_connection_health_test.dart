@@ -88,6 +88,7 @@ class _OfflineAdapter implements HttpClientAdapter {
 ResponseBody _response([
   int status = 200,
   ProviderProtocol protocol = ProviderProtocol.openaiChatCompletions,
+  String content = 'OK',
 ]) => ResponseBody.fromString(
   jsonEncode(
     status == 200
@@ -97,14 +98,14 @@ ResponseBody _response([
                 {
                   'type': 'message',
                   'content': [
-                    {'type': 'output_text', 'text': 'OK'},
+                    {'type': 'output_text', 'text': content},
                   ],
                 },
               ],
             },
             ProviderProtocol.anthropicMessages => {
               'content': [
-                {'type': 'text', 'text': 'OK'},
+                {'type': 'text', 'text': content},
               ],
             },
             ProviderProtocol.geminiGenerateContent => {
@@ -112,7 +113,7 @@ ResponseBody _response([
                 {
                   'content': {
                     'parts': [
-                      {'text': 'OK'},
+                      {'text': content},
                     ],
                   },
                 },
@@ -121,7 +122,7 @@ ResponseBody _response([
             _ => {
               'choices': [
                 {
-                  'message': {'content': 'OK'},
+                  'message': {'content': content},
                 },
               ],
             },
@@ -294,7 +295,11 @@ void main() {
     () async {
       final storage = _Memory(), secrets = _Secrets();
       final adapter = _OfflineAdapter(
-        (_, call) => _response(call == 2 || call == 3 ? 503 : 200),
+        (_, call) => _response(
+          call == 2 || call == 3 ? 503 : 200,
+          ProviderProtocol.openaiChatCompletions,
+          '{"text":"蓝眼睛"}',
+        ),
       );
       final container = await _container(storage, secrets, adapter);
       final health = container.read(providerConnectionHealthProvider);
@@ -305,14 +310,20 @@ void main() {
         ProviderConnectionStatus.healthy,
       );
       await expectLater(
-        service.translatePromptGroup('{}', sessionId: 'translation'),
+        service.translatePromptReading('blue eyes', sessionId: 'translation'),
         throwsStateError,
       );
       expect(
         health.resultFor(_provider.id).status,
         ProviderConnectionStatus.failed,
       );
-      await service.translatePromptGroup('{}', sessionId: 'recovery');
+      expect(
+        await service.translatePromptReading(
+          'blue eyes',
+          sessionId: 'recovery',
+        ),
+        '蓝眼睛',
+      );
       expect(
         health.resultFor(_provider.id).status,
         ProviderConnectionStatus.healthy,

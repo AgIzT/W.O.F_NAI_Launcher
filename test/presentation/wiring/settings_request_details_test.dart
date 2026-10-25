@@ -199,7 +199,7 @@ void main() {
       expect(body['正文'], {'messages': fullBody});
       expect(copied, content());
       expect(copied!.length, greaterThan(12000));
-      seed('new arriving request', task: LauncherInterface.promptReverse);
+      seed('new arriving request', task: LauncherInterface.wikiTranslate);
       await t.pumpAndSettle();
       expect(content(), contains('full body'));
       await t.tap(find.text('响应').last);

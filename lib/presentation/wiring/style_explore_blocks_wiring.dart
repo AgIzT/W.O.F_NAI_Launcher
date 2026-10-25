@@ -71,8 +71,6 @@ BlockData styleExploreBlockData(
   updatedAt: block.updatedAt,
   sourcePath: block.sourcePath,
   importedAt: block.importedAt,
-  reading: block.readingTranslationZh,
-  readingNeedsReview: block.readingTranslationNeedsReview,
 );
 
 BlockRollSettings styleExploreBlockRules(PillInstanceSettings s) =>
