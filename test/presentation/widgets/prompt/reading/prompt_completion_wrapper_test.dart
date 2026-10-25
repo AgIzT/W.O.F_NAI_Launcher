@@ -158,6 +158,64 @@ Future<void> typeAndSettle(WidgetTester tester, String text) async {
 }
 
 void main() {
+  for (final height in [600.0, 180.0]) {
+    testWidgets(
+      'expanded completion fits ${height}px with empty and failed queries',
+      (tester) async {
+        tester.view.physicalSize = Size(800, height);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        final editor = TextEditingController(), focus = FocusNode();
+        addTearDown(editor.dispose);
+        addTearDown(focus.dispose);
+        var workAttempts = 0;
+        await pumpEditor(
+          tester,
+          editor,
+          focus,
+          (query) async {
+            if (query.categoryFilter == CompletionCategoryFilter.characters) {
+              return [];
+            }
+            if (query.categoryFilter == CompletionCategoryFilter.works) {
+              if (workAttempts++ == 0) throw StateError('offline');
+              return [tag('long_work', category: TagCategory.copyright)];
+            }
+            return [tag('long_hair')];
+          },
+          top: 60,
+          minLines: 20,
+        );
+        await typeAndSettle(tester, 'lo');
+        await tester.tap(find.byKey(const Key('prompt-completion-expand')));
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+        final panel = tester.getRect(find.byKey(_panel));
+        expect(panel.top, greaterThanOrEqualTo(0));
+        expect(panel.bottom, lessThanOrEqualTo(height));
+        if (height == 600) expect(panel.height, greaterThan(100));
+
+        await tester.tap(find.widgetWithText(ChoiceChip, 'Character'));
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+        await tester.tap(find.widgetWithText(ChoiceChip, 'Works'));
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+        final retry = find.widgetWithText(TextButton, 'Retry');
+        await tester.ensureVisible(retry);
+        await tester.pumpAndSettle();
+        await tester.tap(retry);
+        await tester.pumpAndSettle();
+        expect(workAttempts, 2);
+        expect(find.textContaining('long work'), findsOneWidget);
+        expect(editor.text, 'lo');
+        expect(focus.hasFocus, isTrue);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
   for (final expanded in [false, true]) {
     testWidgets(
       'keyboard wrap reveals offscreen candidates in ${expanded ? 'list' : 'strip'}',

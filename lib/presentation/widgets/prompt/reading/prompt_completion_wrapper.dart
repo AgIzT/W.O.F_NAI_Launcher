@@ -429,7 +429,9 @@ class _PromptCompletionWrapperState
     );
     final dx = left - rect.left;
     const strip = PromptCompletionStrip.height;
-    final need = expanded ? 220.0 : strip;
+    final need = expanded
+        ? PromptCompletionPanel.minimumHeight(context)
+        : strip;
     final below = size.height - _margin - visible.bottom - _gap;
     final above = visible.top - _margin - _gap;
     final bottomShown = rect.bottom <= visible.bottom + .5;
@@ -464,11 +466,20 @@ class _PromptCompletionWrapperState
     }
     if (bottomShown && below >= need) return dockBelow();
     if (topShown && above >= need) return dockAbove();
-    if (bottomShown && below >= strip && (!topShown || below >= above)) {
-      return dockBelow();
-    }
-    if (topShown && above >= strip) return dockAbove();
     final room = visible.height - 2 * _gap;
+    // Expanded content needs more than a strip's height. Prefer the editor's
+    // interior over a narrow external slot, then the largest remaining area.
+    if (!expanded || room < need) {
+      if (bottomShown &&
+          below >= strip &&
+          (!topShown || below >= above) &&
+          (!expanded || below >= room)) {
+        return dockBelow();
+      }
+      if (topShown && above >= strip && (!expanded || above >= room)) {
+        return dockAbove();
+      }
+    }
     if (room < strip) return null;
     final selection = widget.controller.selection;
     final caret = selection.isValid

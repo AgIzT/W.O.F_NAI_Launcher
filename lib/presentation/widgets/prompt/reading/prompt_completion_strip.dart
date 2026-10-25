@@ -263,6 +263,10 @@ class PromptCompletionPanel extends StatelessWidget {
   final ValueChanged<CompletionCandidate> onPreview;
   final VoidCallback onClosePreview;
 
+  /// Enough space for the fixed filters and useful results at this text scale.
+  static double minimumHeight(BuildContext context) =>
+      220 * MediaQuery.textScalerOf(context).scale(12) / 12;
+
   @override
   Widget build(BuildContext context) {
     return _surface(
@@ -285,87 +289,103 @@ class PromptCompletionPanel extends StatelessWidget {
   Widget _list(BuildContext context) {
     final c = context.ui;
     final candidates = session.candidates;
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(6, 6, 4, 4),
-          child: Row(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    spacing: 4,
-                    children: [
-                      for (final group in PromptCompletionGroup.values)
-                        ChoiceChip(
-                          label: Text(
-                            promptCompletionGroupLabel(context, group),
-                          ),
-                          selected: session.group == group,
-                          showCheckmark: false,
-                          visualDensity: VisualDensity.compact,
-                          materialTapTargetSize:
-                              MaterialTapTargetSize.shrinkWrap,
-                          labelStyle: UiText.sans(12, height: 1.2),
-                          onSelected: (_) => session.setGroup(group),
-                        ),
-                    ],
-                  ),
+    final header = <Widget>[
+      Padding(
+        padding: const EdgeInsets.fromLTRB(6, 6, 4, 4),
+        child: Row(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  spacing: 4,
+                  children: [
+                    for (final group in PromptCompletionGroup.values)
+                      ChoiceChip(
+                        label: Text(promptCompletionGroupLabel(context, group)),
+                        selected: session.group == group,
+                        showCheckmark: false,
+                        visualDensity: VisualDensity.compact,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        labelStyle: UiText.sans(12, height: 1.2),
+                        onSelected: (_) => session.setGroup(group),
+                      ),
+                  ],
                 ),
               ),
-              IconButton(
-                key: const Key('prompt-completion-collapse'),
-                tooltip: context.l10n.common_collapse,
-                visualDensity: VisualDensity.compact,
-                iconSize: 18,
-                color: c.muted,
-                onPressed: () => session.setExpanded(false),
-                icon: const Icon(Icons.unfold_less_rounded),
-              ),
-            ],
+            ),
+            IconButton(
+              key: const Key('prompt-completion-collapse'),
+              tooltip: context.l10n.common_collapse,
+              visualDensity: VisualDensity.compact,
+              iconSize: 18,
+              color: c.muted,
+              onPressed: () => session.setExpanded(false),
+              icon: const Icon(Icons.unfold_less_rounded),
+            ),
+          ],
+        ),
+      ),
+      Divider(height: 1, thickness: 1, color: c.line),
+      if (session.loading) const LinearProgressIndicator(minHeight: 2),
+      if (session.failed)
+        Align(
+          alignment: Alignment.centerLeft,
+          child: TextButton.icon(
+            onPressed: session.retry,
+            icon: const Icon(Icons.refresh, size: 16),
+            label: Text(context.l10n.common_retry),
           ),
         ),
-        Divider(height: 1, thickness: 1, color: c.line),
-        if (session.loading) const LinearProgressIndicator(minHeight: 2),
-        if (session.failed)
-          Align(
-            alignment: Alignment.centerLeft,
-            child: TextButton.icon(
-              onPressed: session.retry,
-              icon: const Icon(Icons.refresh, size: 16),
-              label: Text(context.l10n.common_retry),
-            ),
-          ),
-        if (!session.loading && !session.failed && candidates.isEmpty)
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Text(
-              context.l10n.tagExpansion_noResults,
-              style: UiText.sans(12, color: c.muted),
-            ),
-          ),
-        Flexible(
-          child: AnimatedOpacity(
-            opacity: session.stale ? .5 : 1,
-            duration: const Duration(milliseconds: 120),
-            child: SingleChildScrollView(
-              controller: scroll,
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  for (var index = 0; index < candidates.length; index++)
-                    _row(context, candidates, index),
-                ],
-              ),
-            ),
+      if (!session.loading && !session.failed && candidates.isEmpty)
+        Padding(
+          padding: const EdgeInsets.all(12),
+          child: Text(
+            context.l10n.tagExpansion_noResults,
+            style: UiText.sans(12, color: c.muted),
           ),
         ),
-      ],
+    ];
+    final rows = AnimatedOpacity(
+      opacity: session.stale ? .5 : 1,
+      duration: const Duration(milliseconds: 120),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (var index = 0; index < candidates.length; index++)
+              _row(context, candidates, index),
+          ],
+        ),
+      ),
+    );
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxHeight < minimumHeight(context)) {
+          // Small windows must allow filters, errors and empty states to
+          // scroll too, rather than overflowing above a zero-height list.
+          return SingleChildScrollView(
+            controller: scroll,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [...header, rows],
+            ),
+          );
+        }
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ...header,
+            Flexible(
+              child: SingleChildScrollView(controller: scroll, child: rows),
+            ),
+          ],
+        );
+      },
     );
   }
 
