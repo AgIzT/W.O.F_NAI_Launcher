@@ -122,8 +122,9 @@ Future<void> _expectLastReadingPainted(
   WidgetTester tester,
   Key capture,
   String reading,
-  TextSelection selection,
-) async {
+  TextSelection selection, {
+  double? maxWidth,
+}) async {
   final boundary = tester.renderObject<RenderRepaintBoundary>(
     find.byKey(capture),
   );
@@ -144,12 +145,19 @@ Future<void> _expectLastReadingPainted(
     editable.getTransformTo(boundary),
     editable.getBoxesForSelection(selection).last.toRect(),
   );
+  // An ellipsized reading fills the viewport from its left edge; source glyph
+  // boxes can have a fractional side bearing (for example the "1" in "1girl").
+  final left = maxWidth == null
+      ? rect.left
+      : editable.localToGlobal(Offset.zero, ancestor: boundary).dx;
   final painter = TextPainter(
     text: TextSpan(text: reading, style: layer.style),
     textDirection: TextDirection.ltr,
     textScaler: editable.textScaler,
     maxLines: 1,
-  )..layout();
+    ellipsis: maxWidth == null ? null : '…',
+  )..layout(maxWidth: maxWidth ?? double.infinity);
+  if (maxWidth != null) expect(painter.didExceedMaxLines, isTrue);
   final top =
       rect.bottom -
       source.computeLineMetrics().first.descent +
@@ -161,17 +169,21 @@ Future<void> _expectLastReadingPainted(
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
     canvas.drawColor(Colors.white, BlendMode.src);
-    painter.paint(canvas, Offset(rect.left, top));
+    painter.paint(canvas, Offset(left, top));
     final picture = recorder.endRecording();
     final reference = await picture.toImage(actual.width, actual.height);
     final actualBytes = (await actual.toByteData())!;
     final referenceBytes = (await reference.toByteData())!;
     var glyphPixels = 0;
     var mismatches = 0;
-    for (var y = top.floor(); y < bottom.ceil(); y++) {
+    for (
+      var y = top.floor().clamp(0, actual.height);
+      y < bottom.ceil().clamp(0, actual.height);
+      y++
+    ) {
       for (
-        var x = rect.left.floor();
-        x < (rect.left + painter.width).ceil();
+        var x = left.floor().clamp(0, actual.width);
+        x < (left + painter.width).ceil().clamp(0, actual.width);
         x++
       ) {
         final i = (y * actual.width + x) * 4;
@@ -685,4 +697,41 @@ void main() {
       const TextSelection(baseOffset: 12, extentOffset: 17),
     );
   });
+
+  for (final width in [160.0, 250.0]) {
+    testWidgets(
+      'over-wide reading keeps its beginning and ellipsis at $width',
+      (tester) async {
+        const name = '开头一个女孩（这是一个非常非常非常非常非常非常非常长的译文末尾）';
+        final readings = _Readings()..names['1girl'] = name;
+        const capture = Key('reading-wide-capture');
+        await tester.pumpWidget(
+          _app(
+            readings,
+            Center(
+              child: RepaintBoundary(
+                key: capture,
+                child: ColoredBox(
+                  color: Colors.white,
+                  child: SizedBox(
+                    width: width,
+                    child: const PromptReadingText(text: '1girl', style: _font),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        await _capture(tester, capture, 'reading-wide-prefix-$width');
+        await _expectLastReadingPainted(
+          tester,
+          capture,
+          name,
+          const TextSelection(baseOffset: 0, extentOffset: 5),
+          maxWidth: width,
+        );
+      },
+    );
+  }
 }

@@ -508,7 +508,7 @@ class _RenderReadings extends RenderProxyBox {
       var x = math.max(rect.left, lineRight + PromptReadingLayer._readingGap);
       if (x + painter.width > viewport.right) {
         x = math.max(
-          viewport.right - painter.width,
+          math.max(viewport.left, viewport.right - painter.width),
           lineRight + PromptReadingLayer._readingGap,
         );
       }
