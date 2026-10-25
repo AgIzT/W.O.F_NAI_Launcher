@@ -102,34 +102,47 @@ class PromptCompletionStrip extends StatelessWidget {
                 : AnimatedOpacity(
                     opacity: session.stale ? .5 : 1,
                     duration: const Duration(milliseconds: 120),
-                    child: ListView.separated(
+                    // Queries are capped at 20 items. Build their geometry
+                    // together so keyboard wrap can reveal any candidate.
+                    child: SingleChildScrollView(
                       controller: scroll,
                       scrollDirection: Axis.horizontal,
                       padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
-                      itemCount: candidates.length,
-                      separatorBuilder: (context, index) =>
-                          PromptCompletionController.groupFor(
-                                candidates[index].category,
-                              ) ==
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          for (
+                            var index = 0;
+                            index < candidates.length;
+                            index++
+                          ) ...[
+                            if (index > 0)
                               PromptCompletionController.groupFor(
-                                candidates[index + 1].category,
-                              )
-                          ? const SizedBox(width: 4)
-                          : Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                                vertical: 7,
-                              ),
-                              child: VerticalDivider(
-                                width: 1,
-                                thickness: 1,
-                                color: c.line,
-                              ),
+                                        candidates[index - 1].category,
+                                      ) ==
+                                      PromptCompletionController.groupFor(
+                                        candidates[index].category,
+                                      )
+                                  ? const SizedBox(width: 4)
+                                  : Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                        vertical: 7,
+                                      ),
+                                      child: VerticalDivider(
+                                        width: 1,
+                                        thickness: 1,
+                                        color: c.line,
+                                      ),
+                                    ),
+                            _chip(
+                              context,
+                              candidates[index],
+                              index == session.selectedIndex,
                             ),
-                      itemBuilder: (context, index) => _chip(
-                        context,
-                        candidates[index],
-                        index == session.selectedIndex,
+                          ],
+                        ],
                       ),
                     ),
                   ),
@@ -338,12 +351,17 @@ class PromptCompletionPanel extends StatelessWidget {
           child: AnimatedOpacity(
             opacity: session.stale ? .5 : 1,
             duration: const Duration(milliseconds: 120),
-            child: ListView.builder(
+            child: SingleChildScrollView(
               controller: scroll,
-              shrinkWrap: true,
               padding: const EdgeInsets.symmetric(vertical: 4),
-              itemCount: candidates.length,
-              itemBuilder: (context, index) => _row(context, candidates, index),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (var index = 0; index < candidates.length; index++)
+                    _row(context, candidates, index),
+                ],
+              ),
             ),
           ),
         ),

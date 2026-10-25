@@ -158,6 +158,70 @@ Future<void> typeAndSettle(WidgetTester tester, String text) async {
 }
 
 void main() {
+  for (final expanded in [false, true]) {
+    testWidgets(
+      'keyboard wrap reveals offscreen candidates in ${expanded ? 'list' : 'strip'}',
+      (tester) async {
+        final editor = TextEditingController(), focus = FocusNode();
+        addTearDown(editor.dispose);
+        addTearDown(focus.dispose);
+        await pumpEditor(
+          tester,
+          editor,
+          focus,
+          (_) async => [
+            for (var i = 0; i < 20; i++)
+              tag(
+                'long_candidate_name_number_$i',
+                category: i < 10 ? TagCategory.general : TagCategory.character,
+              ),
+          ],
+        );
+        await typeAndSettle(tester, 'lo');
+        if (expanded) {
+          await tester.tap(find.byKey(const Key('prompt-completion-expand')));
+          await tester.pumpAndSettle();
+        }
+        Finder candidate(int index) => find
+            .byKey(
+              ValueKey(
+                'prompt-completion-${expanded ? 'info' : 'chip'}-long_candidate_name_number_$index',
+              ),
+            )
+            .hitTestable();
+        final readings =
+            ProviderScope.containerOf(
+                  tester.element(find.byKey(const Key('editor'))),
+                ).read(autoTagTranslationProvider)
+                as _Readings;
+        Set<String> visible() =>
+            readings.surfaces.values.expand((tags) => tags).toSet();
+        expect(candidate(0), findsOneWidget);
+        expect(candidate(19), findsNothing);
+        expect(visible().length, lessThan(20));
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+        await tester.pumpAndSettle();
+        expect(candidate(19), findsOneWidget);
+        expect(candidate(0), findsNothing);
+        expect(visible(), contains('long_candidate_name_number_19'));
+        expect(visible().length, lessThan(20));
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+        await tester.pumpAndSettle();
+        expect(candidate(0), findsOneWidget);
+        expect(candidate(19), findsNothing);
+        await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+        await tester.pumpAndSettle();
+        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+        await tester.pumpAndSettle();
+        expect(editor.text, 'long candidate name number 19, ');
+        expect(focus.hasFocus, isTrue);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
   testWidgets(
     'compact strip docks under the editor without covering any text',
     (tester) async {
