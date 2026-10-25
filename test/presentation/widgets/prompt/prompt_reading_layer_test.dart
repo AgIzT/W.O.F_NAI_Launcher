@@ -65,10 +65,17 @@ Widget _field(
   ScrollController? scroll,
   UndoHistoryController? undo,
   GlobalKey<PromptReadingLayerState>? readingKey,
+  EdgeInsets contentPadding = const EdgeInsets.all(12),
+  InputBorder border = const OutlineInputBorder(),
 }) => PromptReadingLayer(
   key: readingKey,
   controller: controller,
   enabled: enabled,
+  sourceStyle: _font.copyWith(
+    fontSize: size,
+    height: PromptReadingLayer.lineHeight,
+    leadingDistribution: TextLeadingDistribution.even,
+  ),
   style: _font.copyWith(
     fontSize: size * .65,
     height: 1,
@@ -85,10 +92,7 @@ Widget _field(
       height: PromptReadingLayer.lineHeight,
       leadingDistribution: TextLeadingDistribution.even,
     ),
-    decoration: const InputDecoration(
-      border: OutlineInputBorder(),
-      contentPadding: EdgeInsets.all(12),
-    ),
+    decoration: InputDecoration(border: border, contentPadding: contentPadding),
   ),
 );
 
@@ -110,6 +114,85 @@ Future<void> _capture(WidgetTester tester, Key key, String filename) async {
     await file.writeAsBytes(bytes!.buffer.asUint8List());
     image.dispose();
   });
+}
+
+/// Compare every painted glyph pixel with an unclipped reference. Checking
+/// controller text or the source line boxes alone misses cut-off annotations.
+Future<void> _expectLastReadingPainted(
+  WidgetTester tester,
+  Key capture,
+  String reading,
+  TextSelection selection,
+) async {
+  final boundary = tester.renderObject<RenderRepaintBoundary>(
+    find.byKey(capture),
+  );
+  final editable = tester.renderObject<RenderEditable>(
+    find.byWidgetPredicate((w) => w.runtimeType.toString() == '_Editable'),
+  );
+  final layer = tester.widget<PromptReadingLayer>(
+    find.byType(PromptReadingLayer),
+  );
+  final source = TextPainter(
+    text: TextSpan(text: 'Hg', style: editable.text!.style),
+    textDirection: TextDirection.ltr,
+    textScaler: editable.textScaler,
+    textHeightBehavior: editable.textHeightBehavior,
+    maxLines: 1,
+  )..layout();
+  final rect = MatrixUtils.transformRect(
+    editable.getTransformTo(boundary),
+    editable.getBoxesForSelection(selection).last.toRect(),
+  );
+  final painter = TextPainter(
+    text: TextSpan(text: reading, style: layer.style),
+    textDirection: TextDirection.ltr,
+    textScaler: editable.textScaler,
+    maxLines: 1,
+  )..layout();
+  final top =
+      rect.bottom -
+      source.computeLineMetrics().first.descent +
+      editable.textScaler.scale(editable.text!.style!.fontSize!) * .22;
+  final bottom = top + painter.height;
+  expect(boundary.size.height + 1e-6, greaterThanOrEqualTo(bottom));
+  await tester.runAsync(() async {
+    final actual = await boundary.toImage();
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+    canvas.drawColor(Colors.white, BlendMode.src);
+    painter.paint(canvas, Offset(rect.left, top));
+    final picture = recorder.endRecording();
+    final reference = await picture.toImage(actual.width, actual.height);
+    final actualBytes = (await actual.toByteData())!;
+    final referenceBytes = (await reference.toByteData())!;
+    var glyphPixels = 0;
+    var mismatches = 0;
+    for (var y = top.floor(); y < bottom.ceil(); y++) {
+      for (
+        var x = rect.left.floor();
+        x < (rect.left + painter.width).ceil();
+        x++
+      ) {
+        final i = (y * actual.width + x) * 4;
+        final pixel = referenceBytes.getUint32(i);
+        if (pixel == 0xffffffff) continue;
+        glyphPixels++;
+        if (actualBytes.getUint32(i) != pixel) mismatches++;
+      }
+    }
+    expect(glyphPixels, greaterThan(20));
+    expect(
+      mismatches,
+      0,
+      reason: 'The final reading must match the full glyphs',
+    );
+    actual.dispose();
+    reference.dispose();
+    picture.dispose();
+  });
+  source.dispose();
+  painter.dispose();
 }
 
 void main() {
@@ -497,4 +580,109 @@ void main() {
       expect(readings.visible, {'long_hair', 'blue_eyes'});
     },
   );
+
+  for (final readOnly in [false, true]) {
+    for (final scale in [1.0, 1.5]) {
+      testWidgets('final reading is fully painted with zero padding, '
+          'readOnly=$readOnly scale=$scale', (tester) async {
+        final readings = _Readings()
+          ..names.addAll({'1girl': '一个女孩', 'smile': '微笑'});
+        final controller = NaiSyntaxController(text: '1girl\nsmile');
+        addTearDown(controller.dispose);
+        const capture = Key('reading-bottom-capture');
+        final original = controller.value;
+        await tester.pumpWidget(
+          _app(
+            readings,
+            Center(
+              child: MediaQuery(
+                data: MediaQueryData(textScaler: TextScaler.linear(scale)),
+                child: RepaintBoundary(
+                  key: capture,
+                  child: ColoredBox(
+                    color: Colors.white,
+                    child: SizedBox(
+                      width: 250,
+                      child: readOnly
+                          ? const PromptReadingText(
+                              text: '1girl\nsmile',
+                              style: _font,
+                            )
+                          : _field(
+                              controller,
+                              size: 13,
+                              maxLines: null,
+                              contentPadding: EdgeInsets.zero,
+                              border: InputBorder.none,
+                            ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(controller.value, original);
+        await _expectLastReadingPainted(
+          tester,
+          capture,
+          '微笑',
+          const TextSelection(baseOffset: 6, extentOffset: 11),
+        );
+        await _capture(
+          tester,
+          capture,
+          'reading-final-line-${readOnly ? 'detail' : 'editor'}-$scale',
+        );
+      });
+    }
+  }
+
+  testWidgets('a scrolled fixed-line editor keeps its final reading visible', (
+    tester,
+  ) async {
+    final readings = _Readings()
+      ..names.addAll({'1girl': '一个女孩', 'smile': '微笑'});
+    final controller = NaiSyntaxController(text: '1girl\n1girl\nsmile');
+    final scroll = ScrollController();
+    addTearDown(controller.dispose);
+    addTearDown(scroll.dispose);
+    const capture = Key('reading-scrolled-bottom-capture');
+    await tester.pumpWidget(
+      _app(
+        readings,
+        Center(
+          child: RepaintBoundary(
+            key: capture,
+            child: ColoredBox(
+              color: Colors.white,
+              child: SizedBox(
+                width: 250,
+                child: _field(
+                  controller,
+                  scroll: scroll,
+                  maxLines: 2,
+                  contentPadding: EdgeInsets.zero,
+                  border: InputBorder.none,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final original = controller.value;
+    scroll.jumpTo(scroll.position.maxScrollExtent);
+    await tester.pumpAndSettle();
+    expect(controller.value, original);
+    expect(readings.visible, contains('smile'));
+    await _expectLastReadingPainted(
+      tester,
+      capture,
+      '微笑',
+      const TextSelection(baseOffset: 12, extentOffset: 17),
+    );
+  });
 }

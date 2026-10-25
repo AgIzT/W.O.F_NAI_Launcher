@@ -169,6 +169,11 @@ Future<Map<String, Object?>> measure(String root) async {
                   child: PromptReadingLayer(
                     controller: editor,
                     enabled: true,
+                    sourceStyle: const TextStyle(
+                      fontSize: 16,
+                      height: PromptReadingLayer.lineHeight,
+                      leadingDistribution: TextLeadingDistribution.even,
+                    ),
                     style: const TextStyle(fontSize: 10, height: 1),
                     child: ThemedInput(
                       controller: editor,

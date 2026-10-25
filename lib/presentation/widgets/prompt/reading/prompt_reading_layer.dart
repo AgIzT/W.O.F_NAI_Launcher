@@ -23,12 +23,14 @@ class PromptReadingLayer extends ConsumerStatefulWidget {
     super.key,
     required this.controller,
     required this.enabled,
+    required this.sourceStyle,
     required this.style,
     required this.child,
   });
 
   final TextEditingController controller;
   final bool enabled;
+  final TextStyle sourceStyle;
   final TextStyle style;
   final Widget child;
 
@@ -53,6 +55,39 @@ class PromptReadingLayerState extends ConsumerState<PromptReadingLayer> {
   int _visibilityRevision = 0;
   int? _appliedSpacing;
   bool _spacingCheckScheduled = false;
+  (TextStyle, TextStyle, TextScaler)? _insetKey;
+  double _bottomInset = 0;
+
+  /// Intermediate readings can use the next line's upper leading. The final
+  /// reading needs that same room reserved after the editable instead.
+  double _trailingInset(TextScaler scaler) {
+    if (!widget.enabled) return 0;
+    final key = (widget.sourceStyle, widget.style, scaler);
+    if (_insetKey == key) return _bottomInset;
+    final source = TextPainter(
+      text: TextSpan(text: 'Hg', style: widget.sourceStyle),
+      textDirection: TextDirection.ltr,
+      textScaler: scaler,
+      maxLines: 1,
+    )..layout();
+    final reading = TextPainter(
+      text: TextSpan(text: 'Hg', style: widget.style),
+      textDirection: TextDirection.ltr,
+      textScaler: scaler,
+      maxLines: 1,
+    )..layout();
+    final descent = source.computeLineMetrics().first.descent;
+    _bottomInset = math.max(
+      0,
+      scaler.scale(widget.sourceStyle.fontSize ?? 14) * .22 +
+          reading.height -
+          descent,
+    );
+    source.dispose();
+    reading.dispose();
+    _insetKey = key;
+    return _bottomInset;
+  }
 
   void requestMissingNames() =>
       _readings?.requestMissingNames(surface: _surface);
@@ -246,6 +281,8 @@ class PromptReadingLayerState extends ConsumerState<PromptReadingLayer> {
               )
               .toList()
         : const <PromptAnnotationRange>[];
+    final scaler = MediaQuery.textScalerOf(context);
+    final bottomInset = _trailingInset(scaler);
     return _ReadingPaint(
       ranges: ranges,
       names: {
@@ -254,11 +291,15 @@ class PromptReadingLayerState extends ConsumerState<PromptReadingLayer> {
             range.tag: name,
       },
       style: widget.style,
-      scaler: MediaQuery.textScalerOf(context),
+      scaler: scaler,
+      bottomInset: bottomInset,
       direction: Directionality.of(context),
       ancestorOffsets: ancestorOffsets,
       onVisible: _updateVisible,
-      child: widget.child,
+      child: Padding(
+        padding: EdgeInsets.only(bottom: bottomInset),
+        child: widget.child,
+      ),
     );
   }
 }
@@ -269,6 +310,7 @@ class _ReadingPaint extends SingleChildRenderObjectWidget {
     required this.names,
     required this.style,
     required this.scaler,
+    required this.bottomInset,
     required this.direction,
     required this.ancestorOffsets,
     required this.onVisible,
@@ -279,6 +321,7 @@ class _ReadingPaint extends SingleChildRenderObjectWidget {
   final Map<String, String> names;
   final TextStyle style;
   final TextScaler scaler;
+  final double bottomInset;
   final TextDirection direction;
   final List<ViewportOffset> ancestorOffsets;
   final ValueChanged<Set<String>> onVisible;
@@ -380,6 +423,12 @@ class _RenderReadings extends RenderProxyBox {
       transform,
       Offset.zero & editable.size,
     ).intersect(Offset.zero & size);
+    var readingViewport = Rect.fromLTRB(
+      viewport.left,
+      viewport.top,
+      viewport.right,
+      viewport.bottom + config.bottomInset,
+    ).intersect(Offset.zero & size);
     // Auto-growing prompt fields scroll in an outer viewport. Their own
     // RenderEditable is as tall as the entire document, so it cannot define
     // visibility by itself. Intersect every enclosing scrolling viewport.
@@ -393,12 +442,12 @@ class _RenderReadings extends RenderProxyBox {
       }
       final inverse = Matrix4.tryInvert(getTransformTo(ancestor));
       if (inverse == null) continue;
-      viewport = viewport.intersect(
-        MatrixUtils.transformRect(
-          inverse,
-          Offset.zero & (ancestor as RenderBox).size,
-        ),
+      final ancestorViewport = MatrixUtils.transformRect(
+        inverse,
+        Offset.zero & (ancestor as RenderBox).size,
       );
+      viewport = viewport.intersect(ancestorViewport);
+      readingViewport = readingViewport.intersect(ancestorViewport);
     }
     if (viewport.isEmpty) {
       config.onVisible(visible);
@@ -416,15 +465,9 @@ class _RenderReadings extends RenderProxyBox {
     );
     final canvas = context.canvas;
     canvas.save();
-    // Readings may hang a little below the last source line.
-    canvas.clipRect(
-      Rect.fromLTRB(
-        viewport.left,
-        viewport.top,
-        viewport.right,
-        viewport.bottom + sourceSize * .5,
-      ).intersect(Offset.zero & size).shift(offset),
-    );
+    // Include the reserved final-line room, but never extend an ancestor's
+    // scrolling viewport into the next panel.
+    canvas.clipRect(readingViewport.shift(offset));
     var lineTop = double.nan, lineRight = double.negativeInfinity;
     for (final range in config.ranges) {
       if (range.end < math.min(first, last) ||

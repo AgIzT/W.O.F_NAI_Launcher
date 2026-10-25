@@ -1196,6 +1196,7 @@ class _UnifiedPromptInputState extends ConsumerState<UnifiedPromptInput> {
       key: _readingKey,
       controller: _effectiveController,
       enabled: preferences.showReadings,
+      sourceStyle: inputStyle,
       style: baseStyle.copyWith(
         fontSize: (baseStyle.fontSize ?? 14) * 0.65,
         height: 1,

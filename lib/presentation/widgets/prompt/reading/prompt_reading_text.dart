@@ -61,6 +61,10 @@ class _PromptReadingTextState extends State<PromptReadingText> {
     return PromptReadingLayer(
       controller: _controller,
       enabled: true,
+      sourceStyle: style.copyWith(
+        height: PromptReadingLayer.lineHeight,
+        leadingDistribution: TextLeadingDistribution.even,
+      ),
       style: style.copyWith(
         fontSize: (style.fontSize ?? 14) * .65,
         height: 1,
