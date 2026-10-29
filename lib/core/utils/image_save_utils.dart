@@ -327,12 +327,38 @@ class ImageSaveUtils {
     if (hasEmbeddedNovelAiMetadata(imageBytes)) return imageBytes;
     final source = _extractEmbeddedPngMetadata(sourceBytes);
     if (source == null) return imageBytes;
+    return _embedWithResolution(imageBytes, source, width, height);
+  }
+
+  /// Keeps an image's own NovelAI metadata (characters, the prompt NovelAI
+  /// actually used, signatures) and only corrects the recorded size when the
+  /// pixels were resized after generation.
+  static Future<Uint8List> alignEmbeddedResolution({
+    required Uint8List imageBytes,
+    required int width,
+    required int height,
+  }) async {
+    final embedded = _extractEmbeddedPngMetadata(imageBytes);
+    if (embedded == null ||
+        (embedded.commentJson['width'] == width &&
+            embedded.commentJson['height'] == height)) {
+      return imageBytes;
+    }
+    return _embedWithResolution(imageBytes, embedded, width, height);
+  }
+
+  static Future<Uint8List> _embedWithResolution(
+    Uint8List imageBytes,
+    _EmbeddedPngMetadata metadata,
+    int width,
+    int height,
+  ) {
     return _embedNaiAlignedMetadata(
       imageBytes: imageBytes,
-      commentJson: {...source.commentJson, 'width': width, 'height': height},
-      description: source.description,
-      software: source.software,
-      source: source.source,
+      commentJson: {...metadata.commentJson, 'width': width, 'height': height},
+      description: metadata.description,
+      software: metadata.software,
+      source: metadata.source,
       useStealth: false,
     );
   }
