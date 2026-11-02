@@ -72,6 +72,21 @@ class NAIImageGenerationApiService {
       );
       parameters['mask'] = 'mask';
     }
+    // Multipart image arrays refer to uploaded part names.
+    final references = parameters['director_reference_images'] as List<String>?;
+    if (references != null) {
+      final names = <String>[];
+      for (final (index, encoded) in references.indexed) {
+        final name = 'director_reference_$index';
+        fields[name] = MultipartFile.fromBytes(
+          base64Decode(encoded),
+          filename: 'blob',
+          contentType: DioMediaType.parse('image/png'),
+        );
+        names.add(name);
+      }
+      parameters['director_reference_images'] = names;
+    }
     fields['request'] = MultipartFile.fromString(
       jsonEncode({...result.requestData, 'parameters': parameters}),
       filename: 'blob',
