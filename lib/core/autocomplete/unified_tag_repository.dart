@@ -31,6 +31,9 @@ class UnifiedTagRepository implements CompletionSource {
 
   @override
   Future<List<CompletionCandidate>> search(CompletionQuery query) async {
+    if (query.categoryFilter != CompletionCategoryFilter.all) {
+      return _searchFiltered(query.token, query.limit, query.categoryFilter);
+    }
     final bundled = _catalog.search(query);
     final live = _runtimeSearch(query.token, query.limit);
     return _merge(await bundled, await live, query.limit);
@@ -39,10 +42,77 @@ class UnifiedTagRepository implements CompletionSource {
   Future<List<CompletionCandidate>> searchContains(
     String input, {
     int limit = 20,
+    CompletionCategoryFilter categoryFilter = CompletionCategoryFilter.all,
   }) async {
+    if (categoryFilter != CompletionCategoryFilter.all) {
+      return _searchFiltered(input, limit, categoryFilter, contains: true);
+    }
     final bundled = _catalog.searchContains(input, limit: limit);
     final live = _runtimeSearch(input, limit, contains: true);
     return _merge(await bundled, await live, limit);
+  }
+
+  Future<List<CompletionCandidate>> _searchFiltered(
+    String input,
+    int limit,
+    CompletionCategoryFilter filter, {
+    bool contains = false,
+  }) async {
+    final normalized = input.trim().toLowerCase().replaceAll(' ', '_');
+    if (normalized.isEmpty) return const [];
+    final escaped = normalized
+        .replaceAll(r'\', r'\\')
+        .replaceAll('%', r'\%')
+        .replaceAll('_', r'\_');
+    final pattern = '${contains ? '%' : ''}$escaped%';
+    final db = await _openUnion();
+    try {
+      final union = _unionSql(await _hasRuntimeTable(db));
+      // Both aliases and canonical names use the current merged category.
+      // The SQL limit is applied after the category and match predicates.
+      final rows = await db.rawQuery(
+        '''
+        WITH all_tags AS ($union), matches AS (
+          SELECT t.name,t.category,t.post_count,t.name AS term,0 AS kind
+          FROM all_tags t WHERE t.name LIKE ? ESCAPE '\\'
+          AND ${filter.sql('t.category')}
+          UNION ALL
+          SELECT t.name,t.category,t.post_count,a.alias AS term,1 AS kind
+          FROM aliases a JOIN tags original ON original.id=a.tag_id
+          JOIN all_tags t ON t.name=original.name
+          WHERE a.alias LIKE ? ESCAPE '\\' AND ${filter.sql('t.category')}
+        ), ranked AS (
+          SELECT *,CASE WHEN term=? THEN kind*2
+            WHEN term LIKE ? ESCAPE '\\' THEN kind*2+1 ELSE 8 END AS quality
+          FROM matches
+        ), unique_tags AS (
+          SELECT *,ROW_NUMBER() OVER (PARTITION BY name ORDER BY quality,term) AS position FROM ranked
+        ) SELECT * FROM unique_tags WHERE position=1
+        ORDER BY quality,post_count DESC,name LIMIT ?
+      ''',
+        [pattern, pattern, normalized, '$escaped%', limit.clamp(1, 100)],
+      );
+      final aliases = await _catalog.aliasesFor(
+        rows.map((row) => row['name'] as String),
+      );
+      return [
+        for (final row in rows)
+          if (_fromRow(row) case final candidate?)
+            candidate.copyWith(
+              aliases: aliases[candidate.canonicalTag] ?? const [],
+              matchedAlias: row['kind'] == 1 ? row['term'] as String : null,
+              matchKind: switch (row['quality']) {
+                0 => CompletionMatchKind.englishExact,
+                1 => CompletionMatchKind.englishPrefix,
+                2 => CompletionMatchKind.aliasExact,
+                3 => CompletionMatchKind.aliasPrefix,
+                _ => CompletionMatchKind.fullText,
+              },
+            ),
+      ];
+    } finally {
+      await db.close();
+    }
   }
 
   Future<List<CompletionCandidate>> popular({int limit = 12}) async {
@@ -221,9 +291,11 @@ class UnifiedTagRepository implements CompletionSource {
           if (candidate != null) result[candidate.canonicalTag] = candidate;
         }
       }
+      final aliases = await _catalog.aliasesFor(result.keys);
       return [
         for (final name in normalized)
-          if (result[name] case final candidate?) candidate,
+          if (result[name] case final candidate?)
+            candidate.copyWith(aliases: aliases[name] ?? const []),
       ];
     } finally {
       await db.close();
@@ -243,7 +315,20 @@ class UnifiedTagRepository implements CompletionSource {
     final aliases = await _catalog.exactAliases(
       names.difference(result.keys.toSet()),
     );
-    result.addAll(aliases);
+    // Resolve only unambiguous aliases and load authoritative category/count
+    // plus the full alias list for their canonical targets.
+    final targets = {
+      for (final candidate in await byNames(
+        aliases.values.map((candidate) => candidate.canonicalTag),
+      ))
+        candidate.canonicalTag: candidate,
+    };
+    for (final entry in aliases.entries) {
+      final target = targets[entry.value.canonicalTag];
+      if (target != null) {
+        result[entry.key] = target.copyWith(matchedAlias: entry.key);
+      }
+    }
     return result;
   }
 

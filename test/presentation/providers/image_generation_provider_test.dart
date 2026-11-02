@@ -1349,6 +1349,98 @@ void main() {
         },
       );
     }
+    test(
+      'registerExternalImage keeps character prompts of NovelAI results',
+      () async {
+        final notifier = container.read(
+          imageGenerationNotifierProvider.notifier,
+        );
+        final tempDir = await Directory.systemTemp.createTemp(
+          'nai_launcher_external_',
+        );
+        addTearDown(() => tempDir.delete(recursive: true));
+        final generated = await _novelAiResult(width: 640, height: 960);
+
+        await notifier.registerExternalImage(
+          generated,
+          // Request params lack the quality tags NovelAI appended.
+          params: container
+              .read(generationParamsNotifierProvider)
+              .copyWith(prompt: 'scenery', characters: const []),
+          saveToLocal: true,
+          saveDirectoryPath: tempDir.path,
+          syncToGalleryIndex: false,
+        );
+
+        final image = container
+            .read(imageGenerationNotifierProvider)
+            .history
+            .first;
+        expect(image.bytes, equals(generated));
+        final saved = UnifiedMetadataParser.parseFromPng(
+          File(image.filePath!).readAsBytesSync(),
+        ).metadata;
+        expect(saved?.prompt, equals(_novelAiPrompt));
+        expect(saved?.characterPrompts, equals(['1girl, red hair']));
+      },
+    );
+
+    test(
+      'registerExternalImage only corrects the size of resized NovelAI results',
+      () async {
+        final notifier = container.read(
+          imageGenerationNotifierProvider.notifier,
+        );
+
+        await notifier.registerExternalImage(
+          await _novelAiResult(
+            width: 1280,
+            height: 1920,
+            metadataWidth: 640,
+            metadataHeight: 960,
+          ),
+          params: container
+              .read(generationParamsNotifierProvider)
+              .copyWith(prompt: 'scenery', characters: const []),
+          width: 1280,
+          height: 1920,
+        );
+
+        final parsed = UnifiedMetadataParser.parseFromPng(
+          container.read(imageGenerationNotifierProvider).history.first.bytes,
+        ).metadata;
+        expect(parsed?.width, equals(1280));
+        expect(parsed?.height, equals(1920));
+        expect(parsed?.prompt, equals(_novelAiPrompt));
+        expect(parsed?.characterPrompts, equals(['1girl, red hair']));
+      },
+    );
+
+    test(
+      'registerExternalImage embeds request characters into plain images',
+      () async {
+        final notifier = container.read(
+          imageGenerationNotifierProvider.notifier,
+        );
+
+        await notifier.registerExternalImage(
+          _validImageBytes(width: 640, height: 960),
+          params: container
+              .read(generationParamsNotifierProvider)
+              .copyWith(
+                model: 'nai-diffusion-4-5-full',
+                prompt: 'scenery',
+                characters: const [CharacterPrompt(prompt: '1girl, red hair')],
+              ),
+        );
+
+        final parsed = UnifiedMetadataParser.parseFromPng(
+          container.read(imageGenerationNotifierProvider).history.first.bytes,
+        ).metadata;
+        expect(parsed?.prompt, equals('scenery'));
+        expect(parsed?.characterPrompts, equals(['1girl, red hair']));
+      },
+    );
 
     test('generate should保留重绘会话状态并使用流式 inpaint', () async {
       final mockApiService = MockNAIImageGenerationApiService();
@@ -2109,5 +2201,50 @@ Future<Uint8List> _buildImageWithEmbeddedMetadata({
     imageBytes: _validImageBytes(width: imageWidth, height: imageHeight),
     params: params,
     actualSeed: seed,
+  );
+}
+
+const _novelAiPrompt = 'scenery, very aesthetic, masterpiece';
+
+/// A NovelAI response: its Comment records the prompt NovelAI actually used
+/// (quality tags appended) together with the character captions.
+Future<Uint8List> _novelAiResult({
+  required int width,
+  required int height,
+  int? metadataWidth,
+  int? metadataHeight,
+}) {
+  Map<String, dynamic> caption(String base, String character) => {
+    'caption': {
+      'base_caption': base,
+      'char_captions': [
+        {
+          'char_caption': character,
+          'centers': [
+            {'x': 0.5, 'y': 0.5},
+          ],
+        },
+      ],
+    },
+    'use_coords': false,
+    'use_order': true,
+  };
+  return ImageSaveUtils.buildPrebuiltMetadataBytes(
+    imageBytes: _validImageBytes(width: width, height: height),
+    metadata: {
+      'Description': _novelAiPrompt,
+      'Software': 'NovelAI',
+      'Source': 'NovelAI Diffusion V4.5 4BDE2A90',
+      'Comment': jsonEncode({
+        'prompt': _novelAiPrompt,
+        'uc': 'lowres',
+        'seed': 42,
+        'width': metadataWidth ?? width,
+        'height': metadataHeight ?? height,
+        'v4_prompt': caption(_novelAiPrompt, '1girl, red hair'),
+        'v4_negative_prompt': caption('lowres', ''),
+        'signed_hash': 'signature',
+      }),
+    },
   );
 }

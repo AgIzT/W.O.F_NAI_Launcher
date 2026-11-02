@@ -1,0 +1,100 @@
+{
+  "upstream_repository": "z15087716457-stack/W.O.F_NAI_Launcher",
+  "upstream_base": "49e8ed3100fbfa5896fb8467a8b9f72dae522956",
+  "reviewed_through": "49e8ed3100fbfa5896fb8467a8b9f72dae522956",
+  "source_repository": "AgIzT/W.O.F_NAI_Launcher",
+  "source_stable_commit": "fa3bc8ae2649d61ae0a4459890e8b5764a577137",
+  "feature_source_commit": "62f920820bdcbdd6dc5bf2b00f7bd88d1f7d7be8",
+  "migration_branch": "migration/plana",
+  "policy": "Preserve upstream ancestry; review and merge upstream in a development branch, then verify custom editor behavior.",
+  "customizations": [
+    "Chinese/English tag, character and copyright completion",
+    "Wiki and alias preview",
+    "Read-only tag and sentence readings",
+    "Debounced shared translation batches and retry/cancellation policy",
+    "Retire automatic splitting and TranslationPill storage/Agent operations"
+  ],
+  "permanent_exclusions": [
+    "TranslationPill",
+    "automatic translation chunking"
+  ],
+  "local_fix_to_preserve": "Embed character captions before local upscaling plain request images",
+  "validation": {
+    "date": "2026-11-02",
+    "flutter": "3.47.7",
+    "dart": "3.13.5",
+    "full_run": {
+      "skipped": 38,
+      "success": false,
+      "completed": true,
+      "suites": 918,
+      "passed": 9771,
+      "errors": 34,
+      "log": "build/migration/flutter-resume-final.jsonl"
+    },
+    "final_affected_run": {
+      "suites": 8,
+      "passed": 123,
+      "success": true,
+      "log": "build/migration/affected-complete-final.jsonl"
+    },
+    "effective_suite_results": {
+      "suites": 918,
+      "passed": 9804,
+      "skipped": 38,
+      "failed": 0,
+      "method": "Replace the eight affected suites in the completed full run with their final rerun results; this is not a second full run."
+    },
+    "skipped_reasons": [
+      {
+        "count": 1,
+        "reason": "Opt in with --dart-define=LIVE_AI_TAG=true; public reads only"
+      },
+      {
+        "count": 1,
+        "reason": "Opt in with RUN_ADVANCED_UPSCALE_AUDIT=1; requires an RTX GPU and the cached SDK archive"
+      },
+      {
+        "count": 2,
+        "reason": "Opt in with RUN_LOCAL_UPSCALE_AUDIT=1; requires a working Vulkan GPU"
+      },
+      {
+        "count": 1,
+        "reason": "Opt in with RUN_LOCAL_UPSCALE_AUDIT=1; requires Vulkan and the cached official model archive"
+      },
+      {
+        "count": 7,
+        "reason": "Set RAG_TEST_PYTHON or create .dart_tool/rag-runtime/venv for isolated IPC"
+      },
+      {
+        "count": 12,
+        "reason": "Set RAG_TEST_PYTHON or create .dart_tool/rag-runtime/venv for isolated process integration"
+      },
+      {
+        "count": 14,
+        "reason": "Set RAG_TEST_PYTHON or create .dart_tool/rag-runtime/venv to an isolated Python for IPC tests"
+      }
+    ],
+    "node": {
+      "skipped": 0,
+      "failed": 0,
+      "passed": 127,
+      "log": "build/migration/node-final-clean.log"
+    },
+    "analyzer": {
+      "log": "build/migration/analyze-delivery-final.log",
+      "success": true
+    },
+    "windows_release": {
+      "success": true,
+      "log": "build/migration/windows-delivery-final.log",
+      "data_identity": "com.example/nai_launcher",
+      "identity_validation": "passed",
+      "desktop_multi_window_plugin_present": true,
+      "generated_cmake_restored": true
+    },
+    "lfs_fsck": "passed",
+    "installation_performed": false,
+    "app_launched": false
+  }
+}

@@ -98,7 +98,7 @@ class SettingsBackupActions {
     ref.invalidate(fontScaleNotifierProvider);
     ref.invalidate(settingsFontScaleProvider);
     ref.invalidate(workspaceFontScaleProvider);
-    ref.invalidate(promptAutocompleteEnabledProvider);
+    ref.invalidate(autocompleteSettingsProvider);
     ref.invalidate(localeNotifierProvider);
     ref.invalidate(historyClickBehaviorNotifierProvider);
     ref.invalidate(simpleOutputViewerNotifierProvider);

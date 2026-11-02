@@ -244,12 +244,32 @@ void main() {
         // 2026-10-21：块库工具栏加长搜索框、视图分段加“瀑布流”、新增“按文件夹分组”
         // 开关（用户确认）。只排除工具栏这一行；卡片墙仍按原网格逐像素比对。
         final bar = find.byKey(const Key('blocks-toolbar'));
+        Rect? retiredTranslationLook;
+        if (name.startsWith('edit')) {
+          expect(
+            find.byKey(const Key('block-edit-look-translation')),
+            findsNothing,
+          );
+          for (final look in BlockAppearance.values) {
+            expect(
+              find.byKey(Key('block-edit-look-${look.name}')),
+              findsOneWidget,
+            );
+          }
+          // TranslationPill retirement removes only the sixth appearance tile.
+          // Keep the other five tiles and the rest of the modal pixel-locked.
+          final last = t.getRect(
+            find.byKey(const Key('block-edit-look-gradient')),
+          );
+          retiredTranslationLook = last.shift(Offset(last.width + 6, 0));
+        }
         await expectOutsideApprovedRegions(
           t,
           find.byKey(const Key('blocks-capture')),
           'test/presentation/ui/blocks/goldens/$file.png',
           [
             if (bar.evaluate().isNotEmpty) t.getRect(bar).deflate(1),
+            if (retiredTranslationLook != null) retiredTranslationLook,
             // 2026-10-27 C03（用户确认）：图标网格改为固定 4.5 行高的内部滚动区，
             // 末尾接新增 / NSFW 图标；只排除网格区本身（编辑框其余部分照旧锁定）。
             for (final e

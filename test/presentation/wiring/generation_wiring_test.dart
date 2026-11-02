@@ -4,7 +4,8 @@ import 'dart:async';
 import 'package:nai_launcher/presentation/wiring/resource_window_wiring.dart';
 import 'package:nai_launcher/presentation/ui/tools/tools_sheets.dart';
 import 'dart:io';
-import 'package:nai_launcher/presentation/providers/prompt_translation_provider.dart';
+import 'package:nai_launcher/presentation/providers/prompt_text_reading_provider.dart';
+import 'package:nai_launcher/presentation/widgets/prompt/reading/prompt_completion_wrapper.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -57,30 +58,26 @@ import 'generation_data_wiring_test.dart'
     show DataGeneration, DataSubscription, DataShortcuts;
 import '../../helpers/studio_capture_fonts.dart';
 
-class MemoryViewerTranslation extends PromptTranslationCoordinator {
-  MemoryViewerTranslation(super.ref);
-  final pending = Completer<PillDocument>();
-  @override
-  Future<PillDocument> translateDocument(
-    PillDocument document, {
-    required String sessionId,
-  }) => pending.future;
-}
-
 void main() {
   prepareGenerationDropTestPlatform();
   setUpAll(loadStudioCaptureFonts);
   late Directory directory;
   late ProviderContainer container;
   late MemoryViewerWindow viewerPlatform;
+  late Completer<String> viewerReading;
   setUp(() async {
     viewerPlatform = MemoryViewerWindow();
+    viewerReading = Completer<String>();
     SharedPreferences.setMockInitialValues({});
     directory = await Directory.systemTemp.createTemp('generation-wiring-');
     Hive.init(directory.path);
     await Hive.openBox(StorageKeys.settingsBox);
     container = ProviderContainer(
       overrides: [
+        promptCompletionSearchProvider.overrideWith(
+          (ref) =>
+              (query) async => [],
+        ),
         localStorageServiceProvider.overrideWithValue(MemoryDraftSettings()),
         characterPromptRepositoryProvider.overrideWithValue(MemoryCharacters()),
         promptBlockLibraryNotifierProvider.overrideWith(EmptyBlocks.new),
@@ -90,8 +87,8 @@ void main() {
         subscriptionNotifierProvider.overrideWith(DataSubscription.new),
         tipEpochProvider.overrideWith((ref) => Stream.value(0)),
         shortcutConfigNotifierProvider.overrideWith(DataShortcuts.new),
-        promptTranslationCoordinatorProvider.overrideWith(
-          (ref) => MemoryViewerTranslation(ref),
+        promptTextReadingTranslatorProvider.overrideWithValue(
+          (source, sessionId) => viewerReading.future,
         ),
         generationPlatformProvider.overrideWithValue(
           MemoryGenerationPlatform(),
@@ -683,18 +680,13 @@ void main() {
   testWidgets('大图翻译显示忙态，取消后慢结果不复活，也不写入生图草稿', (tester) async {
     await pumpViewer(tester);
     final before = container.read(generationParamsNotifierProvider);
-    final translation =
-        container.read(promptTranslationCoordinatorProvider)
-            as MemoryViewerTranslation;
     var page = tester.widget<ImageViewerPage>(find.byType(ImageViewerPage));
     page.actions.onToggleTranslation('viewer-image', ViewerPart.prompt);
     await tester.pump();
     page = tester.widget<ImageViewerPage>(find.byType(ImageViewerPage));
     expect(page.data.translations[ViewerPart.prompt]?.busy, isTrue);
     page.actions.onToggleTranslation('viewer-image', ViewerPart.prompt);
-    translation.pending.complete(
-      const PillDocument(text: 'late translation', instances: {}),
-    );
+    viewerReading.complete('late translation');
     await tester.pump();
     await tester.pump();
     page = tester.widget<ImageViewerPage>(find.byType(ImageViewerPage));

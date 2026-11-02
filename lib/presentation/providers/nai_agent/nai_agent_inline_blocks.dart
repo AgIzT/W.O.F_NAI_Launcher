@@ -37,69 +37,6 @@ void _validateDisplay(Map<String, dynamic> changes, {bool required = false}) {
   }
 }
 
-TranslationPill _translation(
-  Object? raw, {
-  TranslationPill? original,
-  String? selected,
-}) {
-  if (raw is! Map ||
-      raw.keys.any(
-        (key) => !const {'source', 'zh', 'language_code'}.contains(key),
-      )) {
-    throw const NaiAgentToolError(
-      'invalid_translation',
-      'Provide translation source/zh/language_code',
-    );
-  }
-  for (final key in ['source', 'zh']) {
-    if (raw.containsKey(key) &&
-        (raw[key] is! String ||
-            (raw[key] as String).isEmpty ||
-            (raw[key] as String).length > 100000 ||
-            PillDocumentEditor.stripMarkers(raw[key] as String) != raw[key])) {
-      throw NaiAgentToolError(
-        'invalid_translation',
-        'Expected nonempty marker-free translation.$key (max 100000 UTF-16 units)',
-      );
-    }
-  }
-  if (selected != null &&
-      raw.containsKey('source') &&
-      raw['source'] != selected) {
-    throw const NaiAgentToolError(
-      'invalid_translation',
-      'Converted translation.source must equal the selected text',
-    );
-  }
-  final source = selected ?? raw['source'] as String? ?? original?.source;
-  final zh = raw['zh'] as String? ?? original?.zh;
-  if (source == null || zh == null) {
-    throw const NaiAgentToolError(
-      'invalid_translation',
-      'translation.source and translation.zh are required',
-    );
-  }
-  final language = raw['language_code'] ?? original?.languageCode ?? 'zh';
-  if (!PromptTranslationLanguage.isCode(language)) {
-    throw const NaiAgentToolError(
-      'invalid_translation',
-      'language_code must be zh, zh-TW, en, ja or ko',
-    );
-  }
-  final sourceChanged = original != null && source != original.source;
-  return TranslationPill(
-    source: source,
-    zh: zh,
-    marks: zh == original?.zh ? original!.marks : const [],
-    languageCode: language as String,
-    translationEdited: true,
-    showOriginal: original?.showOriginal ?? false,
-    needsReview:
-        !raw.containsKey('zh') &&
-        (sourceChanged || (original?.needsReview ?? false)),
-  );
-}
-
 PillAnchorRange _anchor(
   Object? raw,
   PillDocument document, {
@@ -161,64 +98,6 @@ int _insertionPosition(Map<String, dynamic> params, PillDocument document) {
   return offset as int? ?? document.text.length;
 }
 
-/// Resolve generation-text anchors while preserving complete reading blocks.
-({PillAnchorRange range, String content, List<TranslationPill> translations})
-_temporarySelection(Object? anchor, PillDocument document) {
-  final projected = StringBuffer();
-  final boundaries = <int, int>{0: 0};
-  for (var index = 0; index < document.text.length; index++) {
-    final marker = document.text[index];
-    final instance = document.instances[marker];
-    if (instance?.translation != null &&
-        !instance!.temporary &&
-        instance.enabled) {
-      projected.write(instance.translation!.source);
-    } else {
-      projected.write(marker);
-    }
-    boundaries[projected.length] = index + 1;
-  }
-  final range = _anchor(
-    anchor,
-    PillDocument(text: projected.toString(), instances: const {}),
-    replace: true,
-  );
-  final start = boundaries[range.start], end = boundaries[range.end];
-  if (start == null || end == null) {
-    throw const NaiAgentToolError(
-      'invalid_position',
-      'Include complete translation blocks when converting to a temporary block',
-    );
-  }
-  final translations = <TranslationPill>[];
-  for (var index = start; index < end; index++) {
-    final instance = document.instances[document.text[index]];
-    if (instance?.translation != null &&
-        !instance!.temporary &&
-        instance.enabled) {
-      translations.add(instance.translation!);
-    }
-  }
-  return (
-    range: (start: start, end: end),
-    content: projected.toString().substring(range.start, range.end),
-    translations: translations,
-  );
-}
-
-void _validateTempTranslations(
-  String content,
-  List<TranslationPill> translations,
-) {
-  if (PillTempContent.retainTranslations(content, translations).length !=
-      translations.length) {
-    throw const NaiAgentToolError(
-      'invalid_translation',
-      'Translation sources must occur completely in content, in source order',
-    );
-  }
-}
-
 List<PillInlineEdit> _inlinePlan(
   Map<String, dynamic> params,
   PillDocument document,
@@ -238,12 +117,7 @@ List<PillInlineEdit> _inlinePlan(
       if (raw is! Map ||
           (convert &&
               raw.keys.any(
-                (key) => !const {
-                  'anchor',
-                  'kind',
-                  'instance',
-                  'translation',
-                }.contains(key),
+                (key) => !const {'anchor', 'kind', 'instance'}.contains(key),
               ))) {
         throw const NaiAgentToolError(
           'invalid_arguments',
@@ -252,10 +126,10 @@ List<PillInlineEdit> _inlinePlan(
       }
       final part = Map<String, dynamic>.from(raw);
       final kind = part['kind'];
-      if (kind != 'temporary' && kind != 'translation') {
+      if (kind != 'temporary') {
         throw const NaiAgentToolError(
           'unsupported_kind',
-          'kind must be temporary or translation',
+          'kind must be temporary',
         );
       }
       final changes = _instanceChanges(
@@ -263,40 +137,17 @@ List<PillInlineEdit> _inlinePlan(
         optional: true,
         inline: true,
       );
-      if (changes.containsKey('negative_content') ||
-          changes.containsKey('negative_translations')) {
+      if (changes.containsKey('negative_content')) {
         throw const NaiAgentToolError(
           'unsupported_bundle',
           'Inline creation/conversion does not support negative_content; create a separate negative-scope instance',
         );
       }
-      if (kind == 'translation' &&
-          (changes.containsKey('content') ||
-              changes.containsKey('translations') ||
-              _hasDisplay(changes))) {
-        throw const NaiAgentToolError(
-          'invalid_arguments',
-          'Translation instances do not accept content/title/color/icon',
-        );
-      }
-      if (kind == 'temporary' && part.containsKey('translation')) {
-        throw const NaiAgentToolError(
-          'invalid_arguments',
-          'Temporary instances do not accept translation',
-        );
-      }
       final PillAnchorRange range;
       String? selectedContent;
-      var selectedTranslations = <TranslationPill>[];
       if (convert) {
-        if (kind == 'temporary') {
-          final selected = _temporarySelection(part['anchor'], document);
-          range = selected.range;
-          selectedContent = selected.content;
-          selectedTranslations = selected.translations;
-        } else {
-          range = _anchor(part['anchor'], document, replace: true);
-        }
+        range = _anchor(part['anchor'], document, replace: true);
+        selectedContent = document.text.substring(range.start, range.end);
       } else {
         final offset = _insertionPosition(part, document);
         range = (start: offset, end: offset);
@@ -319,7 +170,6 @@ List<PillInlineEdit> _inlinePlan(
         );
       }
       PillTempContent? temp;
-      TranslationPill? translation;
       if (kind == 'temporary') {
         _validateDisplay(changes, required: true);
         final content = selected ?? changes['content'];
@@ -338,10 +188,6 @@ List<PillInlineEdit> _inlinePlan(
             'Converted content must equal the selected text',
           );
         }
-        final translations =
-            changes['translations'] as List<TranslationPill>? ??
-            selectedTranslations;
-        _validateTempTranslations(content, translations);
         temp = PillTempContent(
           content: content,
           originalContent: '',
@@ -350,17 +196,13 @@ List<PillInlineEdit> _inlinePlan(
           title: changes['title'] as String,
           color: changes['color'] as String?,
           iconName: changes['icon'] as String?,
-          translations: translations,
         );
-      } else {
-        translation = _translation(part['translation'], selected: selected);
       }
       edits.add(
         PillInlineEdit(
           start: range.start,
           end: range.end,
-          temp: temp,
-          translation: translation,
+          temp: temp!,
           enabled: changes['enabled'] as bool? ?? true,
         ),
       );
@@ -379,27 +221,7 @@ List<PillInlineEdit> _inlinePlan(
 void _validateExisting(Map<String, dynamic> params, PillInstance instance) {
   final action = params['action'];
   if (action == 'instance_update') {
-    final changes = _instanceChanges(
-      params['instance'],
-      optional: params.containsKey('translation'),
-    );
-    for (final (key, text) in [
-      ('translations', changes['content'] as String? ?? instance.temp?.content),
-      (
-        'negative_translations',
-        changes['negative_content'] as String? ??
-            instance.temp?.negativeContent,
-      ),
-    ]) {
-      if (!changes.containsKey(key)) continue;
-      if (text == null) {
-        throw const NaiAgentToolError(
-          'invalid_translation',
-          'Provide content together with translations when editing a library block',
-        );
-      }
-      _validateTempTranslations(text, changes[key] as List<TranslationPill>);
-    }
+    final changes = _instanceChanges(params['instance'], optional: false);
     if (_hasDisplay(changes) &&
         (instance.blockId.isNotEmpty || !instance.temporary)) {
       throw const NaiAgentToolError(
@@ -407,39 +229,23 @@ void _validateExisting(Map<String, dynamic> params, PillInstance instance) {
         'Display fields can only edit library-free temporary blocks',
       );
     }
-    if (instance.blockId.isEmpty &&
-        !instance.temporary &&
-        instance.translation == null) {
+    if (instance.blockId.isEmpty && !instance.temporary) {
       throw const NaiAgentToolError(
         'unsupported_kind',
         'Invalid empty block instance',
       );
     }
-    if (instance.blockId.isEmpty &&
-        (changes.containsKey('negative_content') ||
-            changes.containsKey('negative_translations'))) {
+    if (instance.blockId.isEmpty && changes.containsKey('negative_content')) {
       throw const NaiAgentToolError(
         'unsupported_bundle',
         'Library-free instances do not support negative_content',
       );
     }
-    if (params.containsKey('translation')) {
-      if (instance.translation == null ||
-          instance.temporary ||
-          changes.containsKey('content') ||
-          changes.containsKey('negative_content')) {
-        throw const NaiAgentToolError(
-          'unsupported_kind',
-          'Use translation fields only on a non-temporary translation instance',
-        );
-      }
-      _translation(params['translation'], original: instance.translation);
-    }
   } else if (action == 'instance_promote') {
-    if (instance.translation != null || instance.temp == null) {
+    if (instance.temp == null) {
       throw const NaiAgentToolError(
         'unsupported_kind',
-        'Only temporary blocks can be promoted; translations are unsupported',
+        'Only temporary blocks can be promoted',
       );
     }
     final raw = params['changes'] ?? <String, dynamic>{};
@@ -512,23 +318,6 @@ List<String> _applyInline(
           !tail.endsWith(',')
       ? ', '
       : '';
-  // Keep the native translation insertion entry point for single creation.
-  final translation = convert ? null : edits.single.translation;
-  if (translation != null) {
-    final edit = edits.single;
-    final marker = PillDocumentEditor.allocateMarker(document);
-    lane.insertTranslationAt(
-      offset: edit.start,
-      source: translation.source,
-      zh: translation.zh,
-      languageCode: translation.languageCode,
-      translationEdited: true,
-      enabled: edit.enabled,
-      prefix: prefix,
-      document: document,
-    );
-    return [marker];
-  }
   return lane.applyInlineEdits(
     edits,
     prefix: prefix,
@@ -558,20 +347,7 @@ void _removeInline(Ref ref, Map<String, dynamic> params, String scope) {
     }
     lane.removeMarker(marker);
   } else {
-    final original = ref
-        .read(pillWorkspaceProvider(scope))
-        .document
-        .instances[marker]!;
-    if (original.translation != null && original.bundleId == null) {
-      marker = lane.isolateMarkerOccurrence(
-        marker,
-        occurrence: params['occurrence'] as int? ?? 0,
-      );
-      lane.unwrapTranslation(marker, source: original.translation!.source);
-    } else {
-      // Native expansion also unwraps both faces of library-backed bundles.
-      lane.expandMarker(marker, occurrence: params['occurrence'] as int? ?? 0);
-    }
+    lane.expandMarker(marker, occurrence: params['occurrence'] as int? ?? 0);
   }
 }
 

@@ -82,9 +82,6 @@ BridgeDraftSnapshot readBridgeDraft(
     return PillWorkspaceState(
       document: document,
       projection: PillDocumentEditor.project(document, (instance) {
-        if (instance.translation case final translation?) {
-          return translation.source;
-        }
         if (instance.settings.hasRoll) return instance.currentRoll;
         final block = library?.blockById(instance.blockId);
         return instance.useNegativeContent

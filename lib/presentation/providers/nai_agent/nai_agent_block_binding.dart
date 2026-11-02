@@ -7,7 +7,6 @@ import '../../../core/nai_agent/agent_tool.dart';
 import '../../../core/nai_agent/block_tools.dart';
 import '../../../core/utils/prompt_block_thumbnails.dart';
 import '../../../core/utils/pill_document_editor.dart';
-import '../../../core/utils/prompt_translation_language.dart';
 import '../../widgets/prompt/blocks/prompt_block_icons.dart';
 import '../../../data/models/prompt_block/pill_document.dart';
 import '../../../data/models/prompt_block/prompt_block.dart';
@@ -34,8 +33,6 @@ const _instanceKeys = {
   'title',
   'color',
   'icon',
-  'translations',
-  'negative_translations',
 };
 String _scope(Map<String, dynamic> params, BridgeDraftSnapshot draft) {
   final scope = params['scope'] ?? PillScopes.main;
@@ -97,19 +94,6 @@ Map<String, dynamic> _instanceChanges(
     );
   }
   final changes = Map<String, dynamic>.from(raw);
-  for (final key in ['translations', 'negative_translations']) {
-    if (!changes.containsKey(key)) continue;
-    final value = changes[key];
-    if (value is! List || value.length > 64) {
-      throw const NaiAgentToolError(
-        'invalid_translation',
-        'Provide at most 64 translations in source order',
-      );
-    }
-    changes[key] = <TranslationPill>[
-      for (final item in value) _translation(item),
-    ];
-  }
   if (!inline) _validateDisplay(changes);
   for (final key in ['content', 'negative_content']) {
     if (changes.containsKey(key) &&
@@ -186,6 +170,12 @@ NaiAgentBlockTools bindNaiAgentBlocks(
     PromptBlock? block,
     BridgeDraftSnapshot draft,
   ) {
+    if (params.containsKey('translation')) {
+      throw const NaiAgentToolError(
+        'invalid_arguments',
+        'Translation fields are not supported; readings are rendered by the editor',
+      );
+    }
     final scope = _scope(params, draft);
     final doc = _document(draft, scope);
     if (params['action'] == 'instance_create' ||
@@ -369,14 +359,9 @@ NaiAgentBlockTools bindNaiAgentBlocks(
         } else {
           final lane = ref.read(pillWorkspaceProvider(scope).notifier);
           var marker = params['marker'] as String;
-          final changes = _instanceChanges(
-            params['instance'],
-            optional: params['translation'] != null,
-          );
+          final changes = _instanceChanges(params['instance'], optional: false);
           if (changes.containsKey('content') ||
               changes.containsKey('negative_content') ||
-              changes.containsKey('translations') ||
-              changes.containsKey('negative_translations') ||
               _hasDisplay(changes)) {
             final original = ref
                 .read(pillWorkspaceProvider(scope))
@@ -406,24 +391,6 @@ NaiAgentBlockTools bindNaiAgentBlocks(
               title: changes['title'] as String?,
               color: changes['color'] as String?,
               iconName: changes['icon'] as String?,
-              translations: changes['translations'] as List<TranslationPill>?,
-              negativeTranslations:
-                  changes['negative_translations'] as List<TranslationPill>?,
-            );
-          }
-          if (params['translation'] != null) {
-            marker = lane.isolateMarkerOccurrence(
-              marker,
-              occurrence: params['occurrence'] as int? ?? 0,
-            );
-            final original = ref
-                .read(pillWorkspaceProvider(scope))
-                .document
-                .instances[marker]!
-                .translation!;
-            lane.updateTranslation(
-              marker,
-              _translation(params['translation'], original: original),
             );
           }
           var current = ref

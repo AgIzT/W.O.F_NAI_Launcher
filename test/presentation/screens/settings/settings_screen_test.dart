@@ -510,7 +510,7 @@ void main() {
       await tester.pump();
       await tester.testTextInput.receiveAction(TextInputAction.done);
       await tester.pumpAndSettle();
-      expect(find.text('原文 → 阅读语言'), findsWidgets);
+      expect(find.text('目标语言'), findsWidgets);
       await capturePolish(tester, 'model-task-form');
       final fields = find.byWidgetPredicate(
         (widget) => widget is ModelCompactDropdown<String>,

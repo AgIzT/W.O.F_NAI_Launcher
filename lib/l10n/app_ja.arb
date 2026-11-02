@@ -3093,7 +3093,7 @@
   "promptBlockLibrary_sourceFile": "ソースファイル",
   "promptBlockLibrary_importedAt": "インポート日時",
   "promptBlockPalette_tooltip": "ブロック",
-  "promptBlockPalette_emptyHint": "よく使うプロンプトブロックや翻訳ブロックをここに収納。クリックでカーソル位置に挿入するか、プロンプト欄へドラッグできます。",
+  "promptBlockPalette_emptyHint": "よく使うプロンプトブロックをここにドラッグして保存します。クリックしてカーソル位置に挿入するか、入力欄にドラッグできます。",
   "promptBlockPalette_remove": "ブロックから削除",
   "promptBlockPalette_clearAll": "ブロックをすべて削除",
   "promptBlockPalette_clearAllArmed": "もう一度押してすべて削除",
@@ -3234,9 +3234,9 @@
   "@tips_studio_trick_5": {
     "description": "Button count = nSamples x imagesPerRequest; estimatedCost uses both."
   },
-  "tips_studio_trick_6": "翻訳ブロックを中クリックすると、原文と訳文を切り替えられます。AI の翻訳がどれだけ優秀でも、たまには原文をのぞいて cat ears が変なものになっていないか確かめましょう。",
+  "tips_studio_trick_6": "タグの訳名はプロンプトの下に表示されます。いつでも切り替えられ、原文は直接編集できます。",
   "@tips_studio_trick_6": {
-    "description": "promptTranslation_guideMiddleText."
+    "description": "Prompt reading display tip."
   },
   "tips_studio_trick_7": "設定の「画像生成の頻度を制限」を使うと、生成と生成のあいだに強制クールダウンを入れられます。少しランダムな揺らぎも足せば、リズムが機械っぽくなりません。のんびり回す夜にも、手が止まらない自分にも。",
   "@tips_studio_trick_7": {
@@ -4199,42 +4199,10 @@
   "toast_titleInfo": "お知らせ",
   "toast_titleProgress": "処理中",
   "tagExpansion_autoTranslateVisible": "表示中のタグを自動翻訳",
-  "translationEditor_title": "翻訳ブロック",
-  "translationEditor_source": "原文",
-  "translationEditor_sourcePrefix": "原",
-  "translationEditor_generation": "画像生成用",
-  "translationEditor_editable": "編集可能",
-  "translationEditor_modified": "変更済み",
-  "translationEditor_edited": "編集済み",
-  "translationEditor_close": "閉じる",
-  "translationEditor_save": "保存",
-  "translationEditor_delete": "ブロックを削除",
-  "translationEditor_restore": "原文テキストに戻す",
-  "translationEditor_configure": "翻訳モデルを設定",
-  "translationEditor_readingFieldTitle": "{language}の表示テキスト",
-  "@translationEditor_readingFieldTitle": {
-    "placeholders": {
-      "language": {}
-    }
-  },
-  "translationEditor_sourceWarning": "原文が変更されました。{language}との同期が必要です",
-  "@translationEditor_sourceWarning": {
-    "placeholders": {
-      "language": {}
-    }
-  },
-  "translationEditor_editHint": "訳文の手動編集履歴です。原文の確認状態は変わりません",
-  "translationLanguage_chinese": "中国語",
-  "translationLanguage_english": "英語",
-  "translationLanguage_japanese": "日本語",
-  "translationLanguage_korean": "韓国語",
-  "translationLanguage_traditionalChinese": "繁体字中国語",
-  "modelTask_translateTitle": "原文 → 表示言語",
-  "modelTask_promptReverseTitle": "表示言語 → 原文",
+  "modelTask_translateTitle": "全文の閲覧用翻訳",
   "modelTask_tagTranslateTitle": "タグ翻訳・意味情報",
   "modelTask_wikiTranslateTitle": "百科本文の翻訳",
-  "modelTask_translateDescription": "プロンプトとブロックを翻訳し、重み・グループ・タグの意味を保ちます。",
-  "modelTask_promptReverseDescription": "訳文での追加・削除・変更を原文に反映し、確認用に原文へ戻します。",
+  "modelTask_translateDescription": "プロンプト全文を独立した閲覧用訳文に翻訳し、原文を保持します。",
   "modelTask_tagTranslateDescription": "表示中のタグを翻訳し、既存資料を再利用して中国語の基本名・同義語・短い説明を補います。",
   "modelTask_wikiTranslateDescription": "百科本文を翻訳してレイアウトを整え、文脈に応じてクリックできるタグを選びます。",
   "modelTask_connectionTest": "モデル接続テスト",
@@ -4347,9 +4315,6 @@
   "modelRequest_fieldParameters": "適用パラメーター",
   "modelRequest_redacted": "[マスク済み]",
   "modelRequest_emptyResponse": "モデルが空の内容を返しました。",
-  "modelService_testFieldsIncomplete": "テストの応答にフィールドが不足しています。",
-  "modelService_testFieldsInvalid": "テストの応答のフィールドが正しくありません。",
-  "modelService_testGroupsInvalid": "テストの応答のグループが正しくありません。",
   "modelService_testSourceEmpty": "テストの応答の原文が空です。",
   "modelService_conversionCancelled": "変換をキャンセルしました",
   "modelService_chooseInterfaceModel": "先に「設定 → モデルとAPI → 機能インターフェース」でサービスとモデルを選択してください。",
@@ -4447,9 +4412,6 @@
   "modelSettings_reasoningHelp": "翻訳では通常、思考は不要です。これらの機能は構造化出力を使うため、モデルが対応する最も低い思考レベルをおすすめします。",
   "modelSettings_reasoningHelpLabel": "思考レベルのヒント",
   "modelSettings_usePreset": "使用するプリセット",
-  "modelSettings_outputLanguage": "出力言語",
-  "modelSettings_englishPrompt": "英語の生成プロンプト",
-  "modelSettings_englishPromptHelp": "原文に変更を反映し、英語の生成プロンプトを出力します。",
   "modelSettings_targetLanguage": "翻訳先の言語",
   "modelSettings_effective": "現在の設定",
   "modelSettings_noModelSelected": "利用できるモデルが選択されていません",
@@ -4465,7 +4427,6 @@
       "level": {}
     }
   },
-  "modelSettings_promptBlocksHint": "翻訳が不要なときは、プロンプトをモジュールに分け、ブロック機能で自由に組み立てることもできます。",
   "modelSettings_wikiFormatHint": "翻訳が不要なときも、レイアウトを整えて関連タグにリンクを付けられます。",
   "modelSettings_unsavedChanges": "未保存の変更があります",
   "modelSettings_testPreset": "プリセットをテスト",
@@ -4730,73 +4691,6 @@
   "modelOverrides_valueTypes": "文字列・数値・真偽値・配列・オブジェクトに対応",
   "modelOverrides_addBodyField": "ボディのフィールドを追加",
   "modelOverrides_addHeader": "ヘッダーを追加",
-  "promptTranslation_translating": "翻訳中",
-  "promptTranslation_needsModel": "翻訳 · 先にモデルを設定",
-  "promptTranslation_withRoute": "翻訳 · {provider} / {model}",
-  "@promptTranslation_withRoute": {
-    "placeholders": {
-      "provider": {},
-      "model": {}
-    }
-  },
-  "promptTranslation_actions": "翻訳の操作",
-  "promptTranslation_promptChanged": "プロンプトが変更されたため、新しい編集は上書きしませんでした",
-  "promptTranslation_nothingToTranslate": "翻訳する通常のテキストはありません",
-  "promptTranslation_failed": "翻訳に失敗しました：{error}",
-  "@promptTranslation_failed": {
-    "placeholders": {
-      "error": {}
-    }
-  },
-  "promptTranslation_setupTitle": "先に翻訳モデルを設定してください",
-  "promptTranslation_setupBody": "翻訳にはサービスとモデルを明示的に選ぶ必要があります。「設定 → 連携 → モデルとAPI」でサービスを追加してモデル一覧を取得し、プロンプト翻訳のモデルを選択してください。",
-  "promptTranslation_later": "後で",
-  "promptTranslation_openSettings": "設定を開く",
-  "promptTranslation_toolTitle": "翻訳",
-  "promptTranslation_noModel": "モデル未設定",
-  "promptTranslation_configureModel": "翻訳モデルを設定",
-  "promptTranslation_translateNew": "追加した内容を翻訳",
-  "promptTranslation_undoRestore": "原文への復元を取り消し、翻訳ブロックに戻す",
-  "promptTranslation_restoreAll": "すべての翻訳ブロックを原文テキストに戻す",
-  "promptTranslation_tutorial": "使い方",
-  "promptTranslation_guideBack": "操作に戻る",
-  "promptTranslation_guideMiddleTitle": "ブロックを中クリック",
-  "promptTranslation_guideMiddleText": "原文と訳文を切り替え",
-  "promptTranslation_guideSourceTitle": "原文を左クリック",
-  "promptTranslation_guideSourceText": "カーソルを置いて直接編集",
-  "promptTranslation_guideReadingTitle": "訳文を左クリック",
-  "promptTranslation_guideReadingText": "ブロック編集を開く",
-  "promptTranslation_guideCtrlTitle": "Ctrl + クリック / ドラッグ選択",
-  "promptTranslation_guideCtrlText": "編集画面でタグ検索 / 関連タグ",
-  "promptTranslation_guideConvertTitle": "↑ 訳文から原文へ",
-  "promptTranslation_guideConvertText": "↓ 原文から訳文へ。確認してから保存",
-  "promptTranslation_guideRestoreTitle": "グループ全体の表示切替",
-  "promptTranslation_guideRestoreText": "翻訳メニューで原文 / 訳文をまとめて切り替え",
-  "promptTranslation_middleButton": "マウス中ボタン",
-  "promptTranslation_leftButton": "マウス左ボタン",
-  "promptTranslation_blockShowingOriginal": "翻訳ブロック（原文を表示）",
-  "promptTranslation_blockShowingReading": "翻訳ブロック（訳文を表示）",
-  "promptTranslation_blockNeedsReview": "原文が変更されました · 訳文の更新が必要です",
-  "promptTranslation_badgeTooltip": "原文が変更されました。訳文の同期が必要です",
-  "promptTranslation_sourceChanged": "原文が変更されました。翻訳ブロックを開き直してください",
-  "promptTranslation_retranslateFailed": "再翻訳に失敗しました：{error}",
-  "@promptTranslation_retranslateFailed": {
-    "placeholders": {
-      "error": {}
-    }
-  },
-  "promptTranslation_draftChanged": "内容が変更されました。もう一度変換してください。新しい下書きは保持されています",
-  "promptTranslation_convertFailed": "変換に失敗しました。下書きは保持されています：{error}",
-  "@promptTranslation_convertFailed": {
-    "placeholders": {
-      "error": {}
-    }
-  },
-  "promptTranslation_invalidResultFormat": "変換結果の形式が正しくありません。下書きは保持されています",
-  "promptTranslation_noValidText": "モデルが有効なテキストを返しませんでした。下書きは保持されています",
-  "promptTranslation_invalidResultContent": "変換結果に無効な書式が含まれています。下書きは保持されています",
-  "promptTranslation_incompleteStructure": "変換結果の重みまたはグループが不完全です。下書きは保持されています",
-  "promptTranslation_inputRequired": "先に変換する内容を入力してください",
   "wiki_configureTagModel": "先に「モデルとAPI」で利用できるタグ翻訳モデルを設定してください。",
   "blockOrganizer_replaceMoveBody": "移動先に同じ元のコピーが {count} 件あります。置き換えると元のブロックはライブラリで非表示になりますが、プロンプトに挿入済みのインスタンスは引き続き元のブロックを参照できます。",
   "@blockOrganizer_replaceMoveBody": {
@@ -4814,7 +4708,6 @@
   "blockAppearance_dots": "ドット",
   "blockAppearance_solid": "ベタ塗り",
   "blockAppearance_gradient": "グラデーション",
-  "blockAppearance_translation": "翻訳",
   "opusUsage_regularRemaining": "通常の無料枠：{percent}%",
   "@opusUsage_regularRemaining": {
     "description": "Separate Opus quota pool; backup means already activated usage boosts, not inventory.",
@@ -5152,7 +5045,6 @@
   "imageMenu_editAndDerive": "編集・派生",
   "imageMenu_more": "その他の操作",
   "imageMenu_fileActions": "ファイル操作",
-  "imageMenu_saveToBlock": "ブロックに保存",
   "settings_highAnlasCostEstimate": "推定消費量",
   "settings_highAnlasCostThresholdLabel": "通知のしきい値",
   "settings_highAnlasCostQuestion": "このまま生成しますか？",
@@ -6874,7 +6766,6 @@
     }
   },
   "blocks_title": "ブロックライブラリ",
-  "blocks_translationMark": "訳",
   "blocks_add": "追加",
   "blocks_cancel": "キャンセル",
   "blocks_close": "閉じる",
@@ -6949,7 +6840,6 @@
   "blocks_lookDots": "ドット",
   "blocks_lookSolid": "ソリッド",
   "blocks_lookGradient": "グラデーション",
-  "blocks_lookTranslation": "翻訳",
   "blocks_hasParams": "パラメーター付き",
   "blocks_hasNegative": "ネガ含む",
   "blocks_hintClick": "クリックで挿入",
@@ -7207,8 +7097,6 @@
   "blocks_details": "詳細",
   "blocks_noSelection": "カードをクリックで詳細。ダブルクリックで編集、Enter でプロンプトに挿入。",
   "blocks_changeThumb": "変更 / 調整",
-  "blocks_reading": "翻訳（読み）",
-  "blocks_needsReview": "要確認",
   "blocks_applyToCurrent": "現在に適用",
   "blocks_noParams": "なし。挿入しても現在のパラメーターは変わりません。",
   "blocks_paramModel": "モデル",
@@ -8107,18 +7995,6 @@
   "gen_sdConvertSub": "(tag:1.2) を貼り付けると NAI の重みに変換",
   "gen_related": "共起タグの提案",
   "gen_relatedSub": "一緒に使われやすいタグを提案",
-  "gen_translating": "翻訳中…",
-  "gen_translateNeedsModel": "翻訳モデル未設定。クリックして設定",
-  "gen_translateWith": "翻訳（{route}）",
-  "@gen_translateWith": {
-    "placeholders": {
-      "route": {}
-    }
-  },
-  "gen_translateNew": "追加分を翻訳",
-  "gen_translateShowOriginal": "すべて原文に戻す",
-  "gen_translateShowTranslated": "すべて訳文を表示",
-  "gen_translateSettings": "翻訳モデル設定",
   "gen_qualityPreset": "品質タグ",
   "gen_ucPreset": "除外プリセット",
   "gen_presetNone": "なし",
@@ -8932,17 +8808,65 @@
   "channel_motionSub": "ごく軽い動き。生成中は自動で止まります",
   "channel_toastTitle": "今回のチャンネル",
   "channel_batch": "{time} · {count} 枚",
-  "@channel_batch": {"placeholders": {"time": {"type": "String"}, "count": {"type": "int"}}},
+  "@channel_batch": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "channel_batchNewest": "{time} · {count} 枚 · 最新",
-  "@channel_batchNewest": {"placeholders": {"time": {"type": "String"}, "count": {"type": "int"}}},
+  "@channel_batchNewest": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "channel_batchPending": "生成中 · {count} 枚",
-  "@channel_batchPending": {"placeholders": {"count": {"type": "int"}}},
+  "@channel_batchPending": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "channel_dayToday": "今日 · {date}",
-  "@channel_dayToday": {"placeholders": {"date": {"type": "String"}}},
+  "@channel_dayToday": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "channel_dayYesterday": "昨日 · {date}",
-  "@channel_dayYesterday": {"placeholders": {"date": {"type": "String"}}},
+  "@channel_dayYesterday": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "channel_monthDayWeek": "{month}月{day}日（{weekday}）",
-  "@channel_monthDayWeek": {"placeholders": {"month": {"type": "int"}, "day": {"type": "int"}, "weekday": {"type": "String"}}},
+  "@channel_monthDayWeek": {
+    "placeholders": {
+      "month": {
+        "type": "int"
+      },
+      "day": {
+        "type": "int"
+      },
+      "weekday": {
+        "type": "String"
+      }
+    }
+  },
   "channel_weekday1": "月",
   "channel_weekday2": "火",
   "channel_weekday3": "水",
@@ -8951,7 +8875,16 @@
   "channel_weekday6": "土",
   "channel_weekday7": "日",
   "channel_scrubWhen": "{day} {time}",
-  "@channel_scrubWhen": {"placeholders": {"day": {"type": "String"}, "time": {"type": "String"}}},
+  "@channel_scrubWhen": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "rag_title": "RAG ベクトルシステム",
   "rag_description": "ローカル検索、モデル、文脈に沿ったタグ候補を管理",
   "rag_enabled": "RAG を有効にする",
@@ -9102,8 +9035,23 @@
   "rag_runtimeVerify": "実行環境の互換性を検証中",
   "rag_runtimeElapsed": "このステップの経過時間：{seconds}秒",
   "rag_useRuntime": "既存の環境を使用",
-  "@rag_downloadProgress": {"placeholders": {"done": {"type": "String"}, "total": {"type": "String"}}},
-  "@rag_runtimeElapsed": {"placeholders": {"seconds": {"type": "int"}}},
+  "@rag_downloadProgress": {
+    "placeholders": {
+      "done": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "@rag_runtimeElapsed": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
   "set_title": "設定",
   "set_search": "設定を検索",
   "set_searchResults": "検索結果",
@@ -9801,21 +9749,44 @@
   "set_dcLatest": "最新です",
   "set_dcUpdatesAvailable": "更新があります",
   "set_dcLastChecked": "最終確認 {when}",
-  "@set_dcLastChecked": {"placeholders": {"when": {}}},
+  "@set_dcLastChecked": {
+    "placeholders": {
+      "when": {}
+    }
+  },
   "set_dcRefreshWiki": "Wiki を再適用",
   "set_dcRefreshWikiTip": "現在の Wiki データをダウンロードし、既存の記事を更新します。個人の翻訳は保持されます。",
   "set_dcChanged": "{added} 件追加、{updated} 件更新。ローカルに保存しました。",
-  "@set_dcChanged": {"placeholders": {"added": {}, "updated": {}}},
+  "@set_dcChanged": {
+    "placeholders": {
+      "added": {},
+      "updated": {}
+    }
+  },
   "set_dcRagSyncTip": "意味検索を使用している場合は、Studio を再起動してから、該当ソースの索引を手動で同期してください。",
   "set_dcUpdateTags": "タグを更新",
   "set_dcUpdateWiki": "Wiki を更新",
   "set_dcSources": "利用可能なデータ：Tag {tagDate} · Wiki {wikiDate}",
-  "@set_dcSources": {"placeholders": {"tagDate": {}, "wikiDate": {}}},
+  "@set_dcSources": {
+    "placeholders": {
+      "tagDate": {},
+      "wikiDate": {}
+    }
+  },
   "set_dcDownloading": "ダウンロード中 {received} / {total}",
-  "@set_dcDownloading": {"placeholders": {"received": {}, "total": {}}},
+  "@set_dcDownloading": {
+    "placeholders": {
+      "received": {},
+      "total": {}
+    }
+  },
   "set_dcVerifying": "ダウンロードを検証中…",
   "set_dcImporting": "ローカルデータを補充中 · {n} 件読み込み済み",
-  "@set_dcImporting": {"placeholders": {"n": {}}},
+  "@set_dcImporting": {
+    "placeholders": {
+      "n": {}
+    }
+  },
   "set_dcPublishing": "データのバージョンを切り替え中…",
   "set_dcUpdateFailed": "補充できませんでした。既存データは保持されています。再試行できます。",
   "set_dcUpdateCancelled": "キャンセルしました。既存データは引き続き利用できます。",
@@ -9910,7 +9881,6 @@
   },
   "set_mdDeleteBody": "使用中の機能は別のプロバイダーに切り替わります。",
   "set_mdTaskPrompt": "プロンプト翻訳",
-  "set_mdTaskReverse": "プロンプト逆推定",
   "set_mdTaskTag": "タグ翻訳・意味情報",
   "set_mdTaskWiki": "百科翻訳",
   "set_mdFeature": "機能",
@@ -10097,7 +10067,17 @@
   "set_rgOpening": "ローカルワーカーに接続し、既存のインデックスを確認しています。",
   "set_rgLoadingSaved": "保存済みの検索インデックスを読み込んでいます。",
   "set_rgRestoring": "検索インデックスを復元中：{done} / {total}。既存のベクトルを再利用します。",
-  "@set_rgRestoring": {"description": "Actual local ANN recovery progress; existing embeddings are reused.", "placeholders": {"done": {"type": "String"}, "total": {"type": "String"}}},
+  "@set_rgRestoring": {
+    "description": "Actual local ANN recovery progress; existing embeddings are reused.",
+    "placeholders": {
+      "done": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
   "set_rgSaving": "復元した検索インデックスを保存しています。",
   "set_rgReadingSources": "各ソースのインデックス状態を読み込んでいます。",
   "set_rgLoadingTimeout": "読み込みが長時間進まないか、制限時間に達しました。再試行してください。既存のデータは保持されています。",
@@ -10500,9 +10480,18 @@
   "set_accBalanceUnread": "残高は未取得",
   "set_agBase": "内蔵システムプロンプト",
   "set_agBaseGlobalState": "全体：{state}",
-  "@set_agBaseGlobalState": {"placeholders": {"state": {}}},
+  "@set_agBaseGlobalState": {
+    "placeholders": {
+      "state": {}
+    }
+  },
   "set_agBaseWsState": "ワークスペース「{name}」：{state}",
-  "@set_agBaseWsState": {"placeholders": {"name": {}, "state": {}}},
+  "@set_agBaseWsState": {
+    "placeholders": {
+      "name": {},
+      "state": {}
+    }
+  },
   "set_agBaseBuiltin": "内蔵",
   "set_agBaseCustom": "カスタム",
   "set_agBaseInherit": "全体を使用",
@@ -10511,7 +10500,11 @@
   "set_agBaseCollapse": "閉じる",
   "set_agScopeGlobal": "全体",
   "set_agScopeWorkspace": "ワークスペース · {name}",
-  "@set_agScopeWorkspace": {"placeholders": {"name": {}}},
+  "@set_agScopeWorkspace": {
+    "placeholders": {
+      "name": {}
+    }
+  },
   "set_agBaseUseGlobalOn": "このワークスペースは全体のプロンプトを使用。オフにすると個別に編集できます",
   "set_agBaseUseGlobalOff": "このワークスペースは個別のプロンプトを使用。オンにすると全体に戻ります",
   "set_agBaseHint": "カスタム内容で内蔵システムプロンプトを置き換え、「内蔵プロンプトの前」の内容に続けます。ツールマップはアプリが追加します。全体とワークスペースは別々に保存され、既存のチャットはそのままです。",
@@ -10659,7 +10652,19 @@
   "ag_greetHint": "Agent はまず下書きを読み、Anlas を使う前には必ず確認します。",
   "ag_draftEyebrow": "現在の下書き",
   "ag_draftCounts": "キャラ {characters} 体 · ブロック {blocks} 個 · 参照画像 {references} 枚",
-  "@ag_draftCounts": {"placeholders": {"characters": {"type": "int"}, "blocks": {"type": "int"}, "references": {"type": "int"}}},
+  "@ag_draftCounts": {
+    "placeholders": {
+      "characters": {
+        "type": "int"
+      },
+      "blocks": {
+        "type": "int"
+      },
+      "references": {
+        "type": "int"
+      }
+    }
+  },
   "ag_taskReview": "下書きを確認",
   "ag_taskReviewHint": "競合・重複・モデルが無視する書き方を探します",
   "ag_taskReviewPrompt": "現在の下書きとパラメータを確認し、競合・重複・現在のモデルが無視する書き方を指摘してください。まだ変更はしないでください。",
@@ -10686,11 +10691,29 @@
   "ag_delete": "削除",
   "ag_deleteWorkspaceTitle": "ワークスペースを削除しますか？",
   "ag_deleteWorkspaceBody": "ワークスペース「{name}」とその中のチャットはすべてごみ箱に移動し、元に戻せます。生成した画像はギャラリーと履歴に残ります。",
-  "@ag_deleteWorkspaceBody": {"placeholders": {"name": {"type": "String"}}},
+  "@ag_deleteWorkspaceBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "ag_chatDeleted": "「{title}」を削除しました",
-  "@ag_chatDeleted": {"placeholders": {"title": {"type": "String"}}},
+  "@ag_chatDeleted": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
   "ag_workspaceDeleted": "ワークスペース「{name}」を削除しました",
-  "@ag_workspaceDeleted": {"placeholders": {"name": {"type": "String"}}},
+  "@ag_workspaceDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "ag_chatsContent": "メッセージ内",
   "ag_chatsSearching": "メッセージを検索中…",
   "ag_imageVibe": "Vibe に設定",
@@ -10713,7 +10736,16 @@
   "ag_sloganExternal": "外部ツールと合言葉を交換中…\n返事待ち…",
   "ag_foldDone": "処理済み",
   "ag_foldTimes": "{label} {count} 回",
-  "@ag_foldTimes": {"placeholders": {"label": {"type": "String"}, "count": {"type": "int"}}},
+  "@ag_foldTimes": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_kindThink": "思考",
   "ag_kindRead": "読み取り",
   "ag_kindRun": "コマンド",
@@ -10723,7 +10755,13 @@
   "ag_kindExternal": "外部ツール",
   "ag_kindAsk": "確認",
   "ag_limitTitle": "1 回のタスクのステップ上限（{count}）に達しました",
-  "@ag_limitTitle": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_limitTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_limitBody": "進捗は保存済みです。「続ける」で続きから再開できます。上限は設定で変更できます。",
   "ag_limitContinue": "続ける",
   "ag_limitAdjust": "上限を変更",
@@ -10731,49 +10769,184 @@
   "ag_diffExpand": "すべて表示",
   "ag_diffCollapse": "折りたたむ",
   "ag_readImages": "画像確認 · {count} 枚",
-  "@ag_readImages": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_readImages": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_turnTook": "所要 {time}",
-  "@ag_turnTook": {"placeholders": {"time": {"type": "String"}}},
+  "@ag_turnTook": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "ag_turnAnlas": "{anlas} Anlas",
-  "@ag_turnAnlas": {"placeholders": {"anlas": {"type": "String"}}},
+  "@ag_turnAnlas": {
+    "placeholders": {
+      "anlas": {
+        "type": "String"
+      }
+    }
+  },
   "ag_turnChanges": "変更 {count} 件",
-  "@ag_turnChanges": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_turnChanges": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_turnTools": "ツール {count} 回",
-  "@ag_turnTools": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_turnTools": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_turnTokens": "入力 {input} · 出力 {output} トークン",
-  "@ag_turnTokens": {"placeholders": {"input": {"type": "String"}, "output": {"type": "String"}}},
+  "@ag_turnTokens": {
+    "placeholders": {
+      "input": {
+        "type": "String"
+      },
+      "output": {
+        "type": "String"
+      }
+    }
+  },
   "ag_settingsTitle": "アプリ設定",
   "ag_settingsGo": "設定を開く",
   "ag_tagCopied": "{tag} をコピーしました",
-  "@ag_tagCopied": {"placeholders": {"tag": {"type": "String"}}},
+  "@ag_tagCopied": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
   "ag_tagCount": "{count} 件",
-  "@ag_tagCount": {"placeholders": {"count": {"type": "String"}}},
+  "@ag_tagCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
   "ag_galleryFavorite": "{count} 枚をお気に入りにしました",
-  "@ag_galleryFavorite": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_galleryFavorite": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_galleryUnfavorite": "{count} 枚のお気に入りを外しました",
-  "@ag_galleryUnfavorite": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_galleryUnfavorite": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_galleryTags": "{count} 枚のタグを変更しました",
-  "@ag_galleryTags": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_galleryTags": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_galleryMove": "{count} 枚を「{target}」へ移動しました",
-  "@ag_galleryMove": {"placeholders": {"count": {"type": "int"}, "target": {"type": "String"}}},
+  "@ag_galleryMove": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
   "ag_galleryCopy": "{count} 枚を「{target}」へコピーしました",
-  "@ag_galleryCopy": {"placeholders": {"count": {"type": "int"}, "target": {"type": "String"}}},
+  "@ag_galleryCopy": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
   "ag_galleryDelete": "{count} 枚をゴミ箱へ移しました",
-  "@ag_galleryDelete": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_galleryDelete": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_galleryRestore": "{count} 枚を復元しました",
-  "@ag_galleryRestore": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_galleryRestore": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_galleryCollectionAdd": "{count} 枚をコレクション「{target}」に追加しました",
-  "@ag_galleryCollectionAdd": {"placeholders": {"count": {"type": "int"}, "target": {"type": "String"}}},
+  "@ag_galleryCollectionAdd": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
   "ag_galleryCollectionRemove": "{count} 枚をコレクション「{target}」から外しました",
-  "@ag_galleryCollectionRemove": {"placeholders": {"count": {"type": "int"}, "target": {"type": "String"}}},
+  "@ag_galleryCollectionRemove": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
   "ag_galleryExport": "{count} 枚を書き出しました",
-  "@ag_galleryExport": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_galleryExport": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_galleryMore": "+{count}",
-  "@ag_galleryMore": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_galleryMore": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_compacted": "これまでの会話を圧縮しました",
   "ag_compactedAuto": "コンテキストがいっぱいに近いため、これまでの会話を自動で圧縮しました",
   "ag_compactedTokens": "元 {tokens} トークン",
-  "@ag_compactedTokens": {"placeholders": {"tokens": {"type": "String"}}},
+  "@ag_compactedTokens": {
+    "placeholders": {
+      "tokens": {
+        "type": "String"
+      }
+    }
+  },
   "ag_compactedShow": "要約を見る",
   "ag_compactedHide": "要約を閉じる",
   "ag_editResend": "送信",
@@ -10783,7 +10956,16 @@
   "set_agTrashSub": "削除したチャット、ワークスペース、Skill はここに入り、元に戻せます。完全に削除すると戻せません。",
   "set_agTrashManage": "管理",
   "set_agTrashSummary": "{count} 件 · {size}",
-  "@set_agTrashSummary": {"placeholders": {"count": {"type": "int"}, "size": {"type": "String"}}},
+  "@set_agTrashSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "size": {
+        "type": "String"
+      }
+    }
+  },
   "set_agTrashEmpty": "ごみ箱は空です",
   "set_agTrashAll": "すべて",
   "set_agTrashChats": "チャット",
@@ -10794,24 +10976,63 @@
   "set_agTrashPurgeAll": "ごみ箱を空にする",
   "set_agTrashPurgeTitle": "完全に削除しますか？",
   "set_agTrashPurgeBody": "「{name}」はディスクから削除され、元に戻せません。",
-  "@set_agTrashPurgeBody": {"placeholders": {"name": {"type": "String"}}},
+  "@set_agTrashPurgeBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "set_agTrashPurgeAllBody": "ごみ箱の {count} 件はディスクから削除され、元に戻せません。",
-  "@set_agTrashPurgeAllBody": {"placeholders": {"count": {"type": "int"}}},
+  "@set_agTrashPurgeAllBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "set_agTrashRestored": "「{name}」を元に戻しました",
-  "@set_agTrashRestored": {"placeholders": {"name": {"type": "String"}}},
+  "@set_agTrashRestored": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "set_agTrashPurged": "「{name}」を完全に削除しました",
-  "@set_agTrashPurged": {"placeholders": {"name": {"type": "String"}}},
+  "@set_agTrashPurged": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "set_agTrashNeedWorkspace": "所属するワークスペースもごみ箱にあります。先にワークスペースを元に戻してください。",
   "set_agTrashRestoreFailed": "元に戻せません：同じ名前のものがすでにあります",
   "set_agTrashGoneWorkspace": "削除済みワークスペース",
   "set_agSkillRemoveBody": "「{name}」はごみ箱に移動します。Agent 設定の「ごみ箱」から元に戻すか完全に削除できます。",
-  "@set_agSkillRemoveBody": {"placeholders": {"name": {"type": "String"}}},
+  "@set_agSkillRemoveBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "set_agSkillName": "名前",
   "set_agSkillNewHelp": "小文字・数字・ハイフンのみ（例：watercolor-style）。作成後にフォルダーが開くので、中の SKILL.md を編集してください。",
   "set_agSkillCreate": "作成",
   "set_agSkillAddConfirm": "追加",
   "set_agPromptStats": "{chars} 文字 · 約 {tokens} トークン",
-  "@set_agPromptStats": {"placeholders": {"chars": {"type": "String"}, "tokens": {"type": "String"}}},
+  "@set_agPromptStats": {
+    "placeholders": {
+      "chars": {
+        "type": "String"
+      },
+      "tokens": {
+        "type": "String"
+      }
+    }
+  },
   "set_agFinalLive": "現在のチャットが実際にモデルへ送る完全なシステムプロンプトです。",
   "set_agBuiltinSub": "Studio 内蔵の基本プロンプト。バージョンとともに更新されます。",
   "set_agMcpEditTitle": "MCP サーバーを編集",
@@ -10834,7 +11055,13 @@
   "ag_stepArguments": "引数",
   "ag_stepResult": "結果",
   "ag_stepsMore": "あと {count} ステップ",
-  "@ag_stepsMore": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_stepsMore": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_tool_studio_context": "現在の下書きを読み取り",
   "ag_tool_image_read": "画像を表示",
   "ag_tool_prompt_update": "プロンプトを書き換え",
@@ -10922,40 +11149,112 @@
   "ag_diffLocked": "下書きが再変更されました",
   "ag_diffUndo": "元に戻す",
   "ag_diffCounts": "+{added} −{removed}",
-  "@ag_diffCounts": {"placeholders": {"added": {"type": "int"}, "removed": {"type": "int"}}},
+  "@ag_diffCounts": {
+    "placeholders": {
+      "added": {
+        "type": "int"
+      },
+      "removed": {
+        "type": "int"
+      }
+    }
+  },
   "ag_outputs": "今回の出力",
   "ag_anlasSpent": "{anlas} Anlas 使用",
-  "@ag_anlasSpent": {"placeholders": {"anlas": {"type": "String"}}},
+  "@ag_anlasSpent": {
+    "placeholders": {
+      "anlas": {
+        "type": "String"
+      }
+    }
+  },
   "ag_imageReveal": "履歴で表示",
   "ag_imageAttach": "入力欄に添付",
   "ag_imageZoom": "拡大して表示",
   "ag_askHint": "1–{count} で選択",
-  "@ag_askHint": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_askHint": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_askOther": "その他の案…",
   "ag_askSubmit": "回答",
   "ag_askSkip": "スキップ",
   "ag_approvalTitle": "許可が必要 · {tool}",
-  "@ag_approvalTitle": {"placeholders": {"tool": {"type": "String"}}},
+  "@ag_approvalTitle": {
+    "placeholders": {
+      "tool": {
+        "type": "String"
+      }
+    }
+  },
   "ag_gateTitle": "確認が必要 · {action}",
-  "@ag_gateTitle": {"placeholders": {"action": {"type": "String"}}},
+  "@ag_gateTitle": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
   "ag_gateText2img": "{count} 枚生成",
-  "@ag_gateText2img": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_gateText2img": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_gateImg2img": "画像から {count} 枚",
-  "@ag_gateImg2img": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_gateImg2img": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_gateInpaint": "インペイント {count} 枚",
-  "@ag_gateInpaint": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_gateInpaint": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_gateVariations": "バリエーション {count} 枚",
-  "@ag_gateVariations": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_gateVariations": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_gateEnhance": "エンハンス",
   "ag_gateModelSize": "モデル · サイズ",
   "ag_gateRequests": "リクエスト",
   "ag_gateRequestsValue": "{requests} 回 × {batch} 枚",
-  "@ag_gateRequestsValue": {"placeholders": {"requests": {"type": "int"}, "batch": {"type": "int"}}},
+  "@ag_gateRequestsValue": {
+    "placeholders": {
+      "requests": {
+        "type": "int"
+      },
+      "batch": {
+        "type": "int"
+      }
+    }
+  },
   "ag_gateUnit": "1 回あたり",
   "ag_gateEncoding": "参照画像のエンコード",
   "ag_gateAccount": "アカウント",
   "ag_gateTotal": "合計 · 残高 {balance}",
-  "@ag_gateTotal": {"placeholders": {"balance": {"type": "String"}}},
+  "@ag_gateTotal": {
+    "placeholders": {
+      "balance": {
+        "type": "String"
+      }
+    }
+  },
   "ag_gateTotalNoBalance": "合計",
   "ag_gateConfirm": "確認して生成",
   "ag_gateConfirmTool": "確認して実行",
@@ -10965,7 +11264,13 @@
   "ag_placeholder": "Agent への指示 · @ で参照 · / でスキル",
   "ag_dropHint": "ドロップしてこのメッセージに添付",
   "ag_importing": "{count} 枚の画像を追加中…",
-  "@ag_importing": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_importing": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_attach": "画像を追加",
   "ag_attachFile": "ファイルを選択…",
   "ag_attachCanvas": "キャンバスの現在の画像を添付",
@@ -11036,7 +11341,13 @@
   "ag_usageContext": "現在のコンテキスト · 推定",
   "ag_usageUnknown": "モデルが使用量を返すと表示されます",
   "ag_usageRemaining": "残り {tokens}",
-  "@ag_usageRemaining": {"placeholders": {"tokens": {"type": "String"}}},
+  "@ag_usageRemaining": {
+    "placeholders": {
+      "tokens": {
+        "type": "String"
+      }
+    }
+  },
   "ag_usageSession": "このチャットの累計",
   "ag_usageInput": "入力",
   "ag_usageOutput": "出力",
@@ -11047,13 +11358,37 @@
   "ag_usageCost": "料金はプロバイダーの請求によります",
   "ag_usageCompact": "コンテキストを圧縮",
   "ag_shelfAll": "すべて {count}",
-  "@ag_shelfAll": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_shelfAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_shelfGenerated": "生成 {count}",
-  "@ag_shelfGenerated": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_shelfGenerated": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_shelfAttachments": "添付 {count}",
-  "@ag_shelfAttachments": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_shelfAttachments": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_shelfFiles": "ファイル {count}",
-  "@ag_shelfFiles": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_shelfFiles": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_shelfFilesTitle": "ファイル",
   "ag_shelfHint": "クリックで拡大 · キャンバスへドラッグ",
   "ag_shelfEmpty": "このチャットにはまだ出力がありません",
@@ -11149,36 +11484,71 @@
   "mp_copyId": "モデル ID をコピー",
   "mp_removeModel": "モデルを削除",
   "mp_removeTitle": "モデル「{id}」を削除しますか？",
-  "@mp_removeTitle": {"placeholders": {"id": {}}},
+  "@mp_removeTitle": {
+    "placeholders": {
+      "id": {}
+    }
+  },
   "mp_removeBody": "このモデルを使う機能は他のモデルに切り替わります。",
   "mp_catalogId": "モデル ID",
   "mp_catalogCtx": "コンテキスト",
   "mp_catalogPrice": "入力 / 出力 · 100万",
   "mp_catalogFooter": "一致 {n} 件 · 全 {total} 件 · {when} 取得",
-  "@mp_catalogFooter": {"placeholders": {"n": {}, "total": {}, "when": {}}},
+  "@mp_catalogFooter": {
+    "placeholders": {
+      "n": {},
+      "total": {},
+      "when": {}
+    }
+  },
   "mp_catalogMore": "他に {n} 件。絞り込みで探してください",
-  "@mp_catalogMore": {"placeholders": {"n": {}}},
+  "@mp_catalogMore": {
+    "placeholders": {
+      "n": {}
+    }
+  },
   "mp_catalogIdle": "カタログ未取得",
   "mp_catalogIdleSub": "保存済みの URL とキーでモデル一覧を取得",
   "mp_catalogLoading": "カタログを取得中…",
   "mp_catalogFailed": "カタログを取得できません：{error}",
-  "@mp_catalogFailed": {"placeholders": {"error": {}}},
+  "@mp_catalogFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
   "mp_fetch": "一覧を取得",
   "mp_noMatch": "一致するモデルがありません",
   "mp_picked": "{n} 件選択",
-  "@mp_picked": {"placeholders": {"n": {}}},
+  "@mp_picked": {
+    "placeholders": {
+      "n": {}
+    }
+  },
   "mp_pickEmpty": "追加するモデルを選択",
   "mp_pickHint": "機能・コンテキスト・思考段階はローカルカタログから入力され、追加後に調整できます。",
   "mp_addPicked": "{n} 件のモデルを追加",
-  "@mp_addPicked": {"placeholders": {"n": {}}},
+  "@mp_addPicked": {
+    "placeholders": {
+      "n": {}
+    }
+  },
   "mp_new": "新規",
   "mp_unsaved": "{name} に未保存の変更が {n} 件",
-  "@mp_unsaved": {"placeholders": {"name": {}, "n": {}}},
+  "@mp_unsaved": {
+    "placeholders": {
+      "name": {},
+      "n": {}
+    }
+  },
   "mp_saving": "保存中…",
   "mp_conflict": "他の場所で変更されました。最新値を統合しました。確認して保存してください",
   "mp_saveFailed": "保存に失敗しました。変更は保持されています",
   "mp_invalid": "{n} 件の修正が必要",
-  "@mp_invalid": {"placeholders": {"n": {}}},
+  "@mp_invalid": {
+    "placeholders": {
+      "n": {}
+    }
+  },
   "mp_leaveBody": "サービス設定は保存されていません。移動すると変更は失われます。",
   "mp_show": "表示",
   "mp_hide": "隠す",
@@ -11209,39 +11579,129 @@
   "mp_errorRateLimit": "レート制限を超過",
   "ag_tool_prompt_set": "プロンプトセット",
   "ag_psCount": "{count} {unit}",
-  "@ag_psCount": {"placeholders": {"count": {"type": "int"}, "unit": {"type": "String"}}},
+  "@ag_psCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
   "ag_psPosition": "第{index}{unit} / 全{count}{unit}",
-  "@ag_psPosition": {"placeholders": {"index": {"type": "int"}, "count": {"type": "int"}, "unit": {"type": "String"}}},
+  "@ag_psPosition": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
   "ag_psOverview": "一覧表示",
   "ag_psSingle": "1件ずつ表示",
   "ag_psPrompt": "プロンプト",
   "ag_psShared": "共通設定",
   "ag_psThisItem": "この{unit}",
-  "@ag_psThisItem": {"placeholders": {"unit": {"type": "String"}}},
+  "@ag_psThisItem": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
   "ag_psMain": "メインプロンプト",
   "ag_psCharacter": "キャラクター {index}",
-  "@ag_psCharacter": {"placeholders": {"index": {"type": "int"}}},
+  "@ag_psCharacter": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
   "ag_psNegative": "ネガティブ",
   "ag_psImport": "キャンバスに読み込む",
   "ag_psImportTip": "メインプロンプト・キャラクター・ネガティブを書き込みます。パラメータと参照画像は変わりません",
   "ag_psImported": "「{title}」をプロンプトに書き込みました",
-  "@ag_psImported": {"placeholders": {"title": {"type": "String"}}},
+  "@ag_psImported": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
   "ag_psGenerate": "生成",
   "ag_psGenerating": "生成中",
   "ag_psRevision": "v{revision} · {count}件変更",
-  "@ag_psRevision": {"placeholders": {"revision": {"type": "int"}, "count": {"type": "int"}}},
+  "@ag_psRevision": {
+    "placeholders": {
+      "revision": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_psSaveBlock": "ブロックとして保存",
   "ag_psSavedBlock": "ブロック「{title}」を保存しました · {count}件",
-  "@ag_psSavedBlock": {"placeholders": {"title": {"type": "String"}, "count": {"type": "int"}}},
+  "@ag_psSavedBlock": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_psCopyItem": "この{unit}のプロンプトをコピー",
-  "@ag_psCopyItem": {"placeholders": {"unit": {"type": "String"}}},
+  "@ag_psCopyItem": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
   "ag_psCopyAll": "すべてコピー",
   "ag_psEditItem": "この{unit}の修正を Agent に頼む",
-  "@ag_psEditItem": {"placeholders": {"unit": {"type": "String"}}},
+  "@ag_psEditItem": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
   "ag_psEditDraft": "「{title}」の第{index}{unit}（{item}）を修正：",
-  "@ag_psEditDraft": {"placeholders": {"title": {"type": "String"}, "index": {"type": "int"}, "unit": {"type": "String"}, "item": {"type": "String"}}},
+  "@ag_psEditDraft": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "index": {
+        "type": "int"
+      },
+      "unit": {
+        "type": "String"
+      },
+      "item": {
+        "type": "String"
+      }
+    }
+  },
   "ag_psTooManyCharacters": "現在のモデルのキャラクターは最大 {count} 人です",
-  "@ag_psTooManyCharacters": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_psTooManyCharacters": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_psNoCharacters": "現在のモデルはキャラクタープロンプトに対応していません",
   "ag_psMissing": "このカードのデータは見つかりません",
   "startup_dataTitle": "アプリのデータを準備できませんでした",
@@ -11295,42 +11755,6 @@
   "ag_historySettings": "設定の変更",
   "ag_historyGallery": "ギャラリーカード",
   "ag_historyChanges": "変更の要約",
-  "gen_translateTapOriginal": "クリック：原文を表示",
-  "gen_translateTapTranslated": "クリック：訳文を表示",
-  "gen_translateClearRestore": "翻訳ブロックを解除して原文に戻す",
-  "gen_translateClearRestoreSub": "通常の原文に戻します。元に戻せます",
-  "gen_translateCleared": "翻訳ブロックを原文に戻しました",
-  "gen_translateAdjust": "続けて翻訳を調整",
-  "gen_translateAdjustSub": "この翻訳を続けて、分割・再翻訳・結合",
-  "gen_translateAdjustTitle": "翻訳の調整",
-  "gen_translateAdjustContext": "この翻訳を継続 · {count} ブロック",
-  "@gen_translateAdjustContext": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "gen_translateAdjustSelected": "{count} ブロックを選択",
-  "@gen_translateAdjustSelected": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "gen_translateAdjustCollapse": "折りたたむ / 展開",
-  "gen_translateAdjustIntro": "この翻訳を続けます。左のブロックをクリックして参照できます。変更は元に戻せます。",
-  "gen_translateAdjustSplit": "再分割",
-  "gen_translateAdjustRetranslate": "選択を再翻訳",
-  "gen_translateAdjustMerge": "選択を結合",
-  "gen_translateAdjustSplitTemplate": "現在のブロックを読み、参照ブロックを意味ごとに細分化し、原文を保持してください。",
-  "gen_translateAdjustRetranslateTemplate": "現在のブロックを読み、原文を変えずに参照ブロックを再翻訳してください。",
-  "gen_translateAdjustMergeTemplate": "現在のブロックを読み、参照ブロックを指定の原文順に結合し、無関係なブロックは保持してください。",
-  "gen_translateAdjustMarkers": "translation_blocks_read の marker 一覧を使用してください。",
-  "gen_translateAdjustHint": "ブロックの調整方法を入力…",
-  "gen_translateAdjustStartFailed": "調整を開始できません。モデルと Agent ランタイムを確認してください。",
-  "gen_translateAdjustRunFailed": "調整が中断または失敗しました。再試行前にブロックを読み直してください。",
   "gen_repeatDragTotal": "{times} 回 · 計 {total} 枚",
   "@gen_repeatDragTotal": {
     "placeholders": {
@@ -11345,10 +11769,6 @@
   "set_cvGroupBatches": "一括生成の結果をグループ化",
   "set_cvGroupBatchesSub": "シンプルビューアーと無限キャンバスの両方に適用されます。オフにすると1枚ずつ表示し、履歴のサムネイルから各画像を選べます。",
   "gen_groupBatches": "グループ",
-  "gen_translateAdjustPickHint": "左のブロックをクリックで参照",
-  "gen_translateAdjustClearRefs": "参照をクリア",
-  "gen_translateAdjustSplitInto": "{source} → {count} ブロック",
-  "gen_translateAdjustContextNote": "コンテキスト：今回の原文・ブロック・訳文",
   "ag_historyStats": "発言 {messages} · カード {cards}",
   "ag_historyKeySelect": "選択",
   "ag_historyKeyJump": "会話へ移動",
@@ -11378,16 +11798,6 @@
   "gen_groupBatchesOff": "1枚ずつ表示中 · クリックでバッチごと",
   "blocks_presetCustom": "カスタム",
   "blocks_presetHint": "付属パラメータの適用時に品質タグとネガティブプリセットも復元します。別モデルでは段階を自動換算し、Turbo は既存の処理に従います。",
-  "@gen_translateAdjustSplitInto": {
-    "placeholders": {
-      "source": {
-        "type": "String"
-      },
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "@ag_historyStats": {
     "placeholders": {
       "messages": {
@@ -11523,9 +11933,6 @@
       }
     }
   },
-  "prompt_autocompleteTitle": "補完",
-  "prompt_autocompleteHint": "↑↓ 選択 · → 関連 · ← 戻る · Tab / Enter で補完 · Esc で閉じる",
-  "prompt_autocompleteHintRelated": "↑↓ 選択 · ← 戻る · Enter / クリックで追加 · Esc で関連を閉じる",
   "resourceWindow_pin": "最前面に表示",
   "resourceWindow_newWindow": "リソースウィンドウをもう一つ開く",
   "resourceWindow_rowHeight": "行の高さ",
@@ -11620,5 +12027,19 @@
   "set_agMcpTest": "接続テスト",
   "set_agMcpJsonOne": "MCP サーバーを 1 つずつインポートしてください。",
   "set_agMcpPending": "次のターンで適用",
-  "ag_tool_agent_manage": "Agent を管理"
+  "ag_tool_agent_manage": "Agent を管理",
+  "promptCompletion_all": "すべて",
+  "promptCompletion_tags": "タグ",
+  "promptCompletion_summary": "辞書の要約",
+  "promptCompletion_synonyms": "中国語の同義語",
+  "promptReading_showReadings": "タグの訳名を表示",
+  "promptReading_hideReadings": "タグの訳名を隠す",
+  "promptReading_displayHint": "原文の下に利用可能な訳名を表示します。",
+  "promptReading_completion": "入力中にタグを補完",
+  "promptReading_completionHint": "中国語・英語でタグ、キャラクター、作品を検索します。",
+  "promptReading_fillMissing": "表示中のタグと文の未翻訳を補完",
+  "promptReading_autoTranslateHint": "入力が約0.8秒止まると、辞書とキャッシュにない表示中のタグと文をまとめて翻訳します。一時的な通信障害は回数を限って再試行します。「モデルとAPI」でタグ翻訳モデルを設定してください。オフの場合は既存の訳のみ表示します。",
+  "modelSettings_promptReadingHint": "全文翻訳は閲覧用です。プロンプトは変更しません。",
+  "promptCompletion_works": "作品",
+  "promptCompletion_expand": "候補一覧と Wiki プレビュー（候補を右クリックで直接プレビュー）"
 }

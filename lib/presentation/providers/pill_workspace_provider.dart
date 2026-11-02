@@ -227,37 +227,6 @@ class PillWorkspaceNotifier extends FamilyNotifier<PillWorkspaceState, String> {
     String? bundleId,
     int rollScopeMask = 1,
   }) {
-    final block = ref
-        .read(promptBlockLibraryNotifierProvider)
-        .valueOrNull
-        ?.blockById(blockId);
-    final translationZh = block?.readingTranslationZh;
-    if (!useNegativeContent && translationZh != null) {
-      insertTranslationAt(
-        offset: offset,
-        source: block!.content,
-        zh: translationZh,
-        marks: TranslationPill.fromJson({
-          'zh': translationZh,
-          'marks': block.readingTranslationMarks,
-        }).marks,
-        needsReview: block.readingTranslationNeedsReview,
-        languageCode: block.readingTranslationLanguageCode,
-        translationEdited: block.readingTranslationEdited,
-        bundleId: bundleId,
-        rollScopeMask: rollScopeMask,
-        blockId: blockId,
-      );
-      if (countUse) {
-        unawaited(
-          ref
-              .read(promptBlockLibraryNotifierProvider.notifier)
-              .incrementUseCount(blockId)
-              .onError((_, __) {}),
-        );
-      }
-      return;
-    }
     _apply(
       PillDocumentEditor.insertBlock(
         state.document,
@@ -276,49 +245,6 @@ class PillWorkspaceNotifier extends FamilyNotifier<PillWorkspaceState, String> {
             .onError((_, __) {}),
       );
     }
-  }
-
-  void insertTranslationAt({
-    required int offset,
-    required String source,
-    required String zh,
-    List<TranslationTagMark> marks = const [],
-    bool needsReview = false,
-    String languageCode = 'zh',
-    bool translationEdited = false,
-    String? bundleId,
-    int rollScopeMask = 1,
-    String blockId = '',
-    bool enabled = true,
-    String prefix = '',
-    PillDocument? document,
-  }) {
-    final before = document ?? state.document;
-    if (before != state.document) _history.record(before);
-    final marker = PillDocumentEditor.allocateMarker(before);
-    final safe = offset.clamp(0, before.text.length);
-    final instances = Map<String, PillInstance>.of(before.instances)
-      ..[marker] = PillInstance(
-        blockId: blockId,
-        bundleId: bundleId,
-        rollScopeMask: rollScopeMask,
-        enabled: enabled,
-        translation: TranslationPill(
-          source: source,
-          zh: zh,
-          marks: marks,
-          showOriginal: needsReview,
-          needsReview: needsReview,
-          languageCode: languageCode,
-          translationEdited: translationEdited,
-        ),
-      );
-    _apply(
-      before.copyWith(
-        text: before.text.replaceRange(safe, safe, '$prefix$marker'),
-        instances: instances,
-      ),
-    );
   }
 
   /// Apply validated inline ranges in one document write and one undo step.
@@ -341,7 +267,6 @@ class PillWorkspaceNotifier extends FamilyNotifier<PillWorkspaceState, String> {
       instances[marker] = PillInstance(
         blockId: '',
         temp: edit.temp,
-        translation: edit.translation,
         enabled: edit.enabled,
       );
       markers.add(marker);
@@ -658,8 +583,6 @@ class PillWorkspaceNotifier extends FamilyNotifier<PillWorkspaceState, String> {
     String? title,
     String? color,
     String? iconName,
-    List<TranslationPill>? translations,
-    List<TranslationPill>? negativeTranslations,
   }) {
     final local = state.document.instances[marker];
     if (local == null) return marker;
@@ -687,11 +610,7 @@ class PillWorkspaceNotifier extends FamilyNotifier<PillWorkspaceState, String> {
       content: content,
       negativeContent:
           negativeContent ?? existing?.negativeContent ?? currentNegative,
-      originalContent:
-          existing?.originalContent ??
-          local.translation?.source ??
-          block?.content ??
-          '',
+      originalContent: existing?.originalContent ?? block?.content ?? '',
       originalNegativeContent:
           existing?.originalNegativeContent ?? block?.negativeContent,
       editedAt: DateTime.now(),
@@ -699,16 +618,6 @@ class PillWorkspaceNotifier extends FamilyNotifier<PillWorkspaceState, String> {
       title: title ?? existing?.title,
       color: color ?? existing?.color,
       iconName: iconName ?? existing?.iconName,
-      translations: PillTempContent.retainTranslations(
-        content,
-        translations ??
-            existing?.translations ??
-            (local.translation == null ? const [] : [local.translation!]),
-      ),
-      negativeTranslations: PillTempContent.retainTranslations(
-        negativeContent ?? existing?.negativeContent ?? currentNegative ?? '',
-        negativeTranslations ?? existing?.negativeTranslations ?? const [],
-      ),
     );
     final split = bundle.members.any((member) {
       final document = member.scope == arg
@@ -794,7 +703,6 @@ class PillWorkspaceNotifier extends FamilyNotifier<PillWorkspaceState, String> {
       ..[marker] = instance!.copyWith(
         temp: null,
         blockId: blockId,
-        clearTranslation: blockId != null,
         settings: blockId == null
             ? instance.settings
             : PillInstanceSettings.fixedDefault,
@@ -837,13 +745,6 @@ class PillWorkspaceNotifier extends FamilyNotifier<PillWorkspaceState, String> {
           title: actualTitle,
           folderId: folderId,
           content: temp.content,
-          readingTranslationZh: temp.reading,
-          readingTranslationNeedsReview: temp.translations.any(
-            (t) => t.needsReview,
-          ),
-          readingTranslationLanguageCode:
-              temp.translations.firstOrNull?.languageCode ?? 'zh',
-          readingTranslationEdited: temp.translations.isNotEmpty,
           negativeContent: temp.negativeContent ?? '',
           color: color ?? original?.color ?? temp.color ?? '#FF607D8B',
           appearance: original?.appearance ?? 'classic',
@@ -937,57 +838,6 @@ class PillWorkspaceNotifier extends FamilyNotifier<PillWorkspaceState, String> {
     );
   }
 
-  void updateTranslation(String marker, TranslationPill translation) {
-    final before = state.document.instances[marker];
-    if (before?.translation == null) return;
-    final instances = Map<String, PillInstance>.of(state.document.instances)
-      ..[marker] = before!.copyWith(translation: translation);
-    _apply(state.document.copyWith(instances: instances));
-  }
-
-  void unwrapTranslation(String marker, {required String source}) {
-    final before = state.document;
-    final after = PillDocumentEditor.unwrapTranslation(
-      before,
-      marker,
-      source: source,
-    );
-    if (after != before) _apply(after);
-  }
-
-  int unwrapAllTranslations() {
-    final before = state.document;
-    final count = before.instances.values
-        .where((instance) => instance.translation != null)
-        .length;
-    if (count == 0) return 0;
-    _apply(PillDocumentEditor.unwrapAllTranslations(before));
-    _tombstones.removeWhere((_, instance) => instance.translation != null);
-    return count;
-  }
-
-  /// Replace one complete, unchanged document snapshot with translation pills.
-  /// A caller may retain the previous document for a one-step undo.
-  bool replaceIfCurrent(PillDocument expected, PillDocument replacement) {
-    if (state.document != expected) return false;
-    _apply(replacement);
-    return true;
-  }
-
-  void showAllTranslations({required bool original}) {
-    final instances = Map<String, PillInstance>.of(state.document.instances);
-    var changed = false;
-    for (final entry in instances.entries) {
-      final translation = entry.value.translation;
-      if (translation == null || translation.showOriginal == original) continue;
-      instances[entry.key] = entry.value.copyWith(
-        translation: translation.copyWith(showOriginal: original),
-      );
-      changed = true;
-    }
-    if (changed) _apply(state.document.copyWith(instances: instances));
-  }
-
   /// 用外部纯文本整体重建（剥离任何私有区字符，实例清空）。
   void replaceWithPlainText(String text) {
     _apply(
@@ -1048,14 +898,12 @@ class PillWorkspaceNotifier extends FamilyNotifier<PillWorkspaceState, String> {
   /// 物化的 `currentRoll`（投影永不 roll，物化只在文档变更点发生）。
   String? _resolveInstance(PillInstance instance) {
     if (instance.temporary) return instance.tempProjection;
-    if (instance.translation case final translation?) return translation.source;
     if (instance.settings.hasRoll) return instance.currentRoll;
     return _resolveBlockContent(instance);
   }
 
   String? _resolveMarkerInstance(String marker, PillInstance instance) {
     if (instance.temporary) return instance.tempProjection;
-    if (instance.translation case final translation?) return translation.source;
     if (instance.settings.hasRoll) return _effectiveRollFor(marker, instance);
     return _resolveBlockContent(instance);
   }

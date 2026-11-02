@@ -11,6 +11,7 @@ import 'package:sqlite3/sqlite3.dart' as native;
 void main() {
   late Directory temporary;
   late UnifiedTagRepository repository;
+  late TagCatalogRepository catalogRepository;
 
   setUp(() async {
     sqfliteFfiInit();
@@ -21,10 +22,11 @@ void main() {
 
     final bundled = native.sqlite3.open(catalog);
     bundled.execute('''
-      CREATE TABLE tags(name TEXT PRIMARY KEY, category INTEGER, post_count INTEGER);
-      INSERT INTO tags VALUES ('blue_eyes', 0, 100);
-      INSERT INTO tags VALUES ('old_character', 4, 20);
-      INSERT INTO tags VALUES ('only_bundled', 0, 10);
+      CREATE TABLE tags(id INTEGER PRIMARY KEY, name TEXT UNIQUE, category INTEGER, post_count INTEGER);
+      CREATE TABLE aliases(id INTEGER PRIMARY KEY, tag_id INTEGER, alias TEXT);
+      INSERT INTO tags VALUES (1, 'blue_eyes', 0, 100);
+      INSERT INTO tags VALUES (2, 'old_character', 4, 20);
+      INSERT INTO tags VALUES (3, 'only_bundled', 0, 10);
     ''');
     bundled.dispose();
 
@@ -44,8 +46,9 @@ void main() {
     ''');
     articles.dispose();
 
+    catalogRepository = TagCatalogRepository(path: () async => catalog);
     repository = UnifiedTagRepository(
-      catalog: TagCatalogRepository(),
+      catalog: catalogRepository,
       runtime: () async => throw StateError('Not used in browse tests'),
       unionDatabase: ({required includeWiki}) async {
         final database = await databaseFactoryFfi.openDatabase(
@@ -61,7 +64,10 @@ void main() {
     );
   });
 
-  tearDown(() async => temporary.delete(recursive: true));
+  tearDown(() async {
+    await catalogRepository.dispose();
+    await temporary.delete(recursive: true);
+  });
 
   test('synced count overrides bundled tag and contributes new tags', () async {
     final rows = await repository.browse();

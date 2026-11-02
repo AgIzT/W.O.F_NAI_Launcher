@@ -5,35 +5,13 @@ import 'package:nai_launcher/data/models/prompt_block/pill_document.dart';
 void main() {
   const markerA = '\uE000';
   const markerB = '\uE001';
-  const markerC = '\uE002';
-
-  test('disabled translations unwrap without starting to send source', () {
-    const document = PillDocument(
-      text: 'start$markerA,$markerB end',
-      instances: {
-        markerA: PillInstance(
-          blockId: '',
-          translation: TranslationPill(source: 'latest source', zh: 'reading'),
-        ),
-        markerB: PillInstance(
-          blockId: '',
-          enabled: false,
-          translation: TranslationPill(source: 'must not send', zh: 'hidden'),
-        ),
-      },
-    );
-    final projected = PillDocumentEditor.project(document, (_) => null);
-    final all = PillDocumentEditor.unwrapAllTranslations(document);
-    expect(all.text, 'startlatest source, end');
-    expect(all.instances, isEmpty);
-    expect(PillDocumentEditor.project(all, (_) => null), projected);
-    final single = PillDocumentEditor.unwrapTranslation(
-      document,
-      markerB,
-      source: 'must not send',
-    );
-    expect(PillDocumentEditor.project(single, (_) => null), projected);
-    expect(single.instances.containsKey(markerB), isFalse);
+  test('block instances require a nonempty library identity', () {
+    for (final invalidId in [null, '', 1]) {
+      expect(
+        () => PillInstance.fromJson({'blockId': invalidId}),
+        throwsFormatException,
+      );
+    }
   });
 
   group('anchor UTF-16 mapping', () {
@@ -271,61 +249,6 @@ void main() {
   });
 
   group('removeMarker / reconcile', () {
-    test(
-      'unwrapAllTranslations restores exact source and keeps library pills',
-      () {
-        const doc = PillDocument(
-          text: 'prefix $markerA$markerB$markerA $markerC suffix',
-          instances: {
-            markerA: PillInstance(
-              blockId: '',
-              translation: TranslationPill(source: 'blue, ', zh: '蓝色'),
-            ),
-            markerB: PillInstance(blockId: 'library'),
-            markerC: PillInstance(
-              blockId: '',
-              translation: TranslationPill(source: 'green\n', zh: '绿色'),
-            ),
-          },
-        );
-        final restored = PillDocumentEditor.unwrapAllTranslations(doc);
-        expect(restored.text, 'prefix blue, ${markerB}blue,  green\n suffix');
-        expect(restored.instances.keys, [markerB]);
-        expect(PillDocumentEditor.unwrapAllTranslations(restored), restored);
-      },
-    );
-
-    test('unwrapTranslation restores source at each occurrence only', () {
-      const doc = PillDocument(
-        text: 'start $markerA, $markerB, $markerA end',
-        instances: {
-          markerA: PillInstance(
-            blockId: '',
-            translation: TranslationPill(source: 'blue eyes', zh: '蓝眼睛'),
-          ),
-          markerB: PillInstance(blockId: 'other'),
-        },
-      );
-      final unwrapped = PillDocumentEditor.unwrapTranslation(
-        doc,
-        markerA,
-        source: 'edited $markerA source',
-      );
-      expect(
-        unwrapped.text,
-        'start edited  source, $markerB, edited  source end',
-      );
-      expect(unwrapped.instances.keys, [markerB]);
-      expect(
-        PillDocumentEditor.unwrapTranslation(
-          unwrapped,
-          markerB,
-          source: 'untouched',
-        ),
-        unwrapped,
-      );
-    });
-
     test('removeMarker strips all occurrences and the instance', () {
       const doc = PillDocument(
         text: 'x$markerA y$markerA',
@@ -361,126 +284,6 @@ void main() {
       );
     });
   });
-
-  test(
-    'expansion preserves send text for fixed/rolled/translation/disabled/shared',
-    () {
-      for (final instance in [
-        const PillInstance(blockId: 'b'),
-        const PillInstance(
-          blockId: 'b',
-          settings: PillInstanceSettings(mode: PillRollMode.random),
-          currentRoll: '1.2::rolled::',
-        ),
-        const PillInstance(
-          blockId: 'b',
-          settings: PillInstanceSettings(mode: PillRollMode.sequential),
-          currentRoll: 'next',
-        ),
-        const PillInstance(
-          blockId: '',
-          translation: TranslationPill(source: 'source', zh: '译文'),
-        ),
-        const PillInstance(
-          blockId: '',
-          enabled: false,
-          translation: TranslationPill(source: 'hidden', zh: '禁用'),
-        ),
-      ]) {
-        const marker = '\uE000';
-        final doc = PillDocument(
-          text: 'a${marker}b${marker}c',
-          instances: {marker: instance},
-        );
-        String? resolve(String _, PillInstance i) =>
-            i.settings.hasRoll ? i.currentRoll : 'fixed';
-        final send = PillDocumentEditor.projectWithMarker(doc, resolve);
-        final expanded = PillDocumentEditor.expandOccurrence(
-          doc,
-          marker,
-          occurrence: 1,
-          resolveMarker: resolve,
-        );
-        expect(PillDocumentEditor.projectWithMarker(expanded, resolve), send);
-        expect(expanded.text.startsWith('a${marker}b'), isTrue);
-        expect(expanded.instances[marker], instance);
-        if (instance.translation != null) {
-          expect(
-            PillDocumentEditor.projectWithMarker(
-              PillDocumentEditor.unwrapAllTranslations(doc),
-              resolve,
-            ),
-            send,
-          );
-          expect(
-            PillDocumentEditor.projectWithMarker(
-              PillDocumentEditor.unwrapTranslation(
-                doc,
-                marker,
-                source: instance.translation!.source,
-              ),
-              resolve,
-            ),
-            send,
-          );
-        }
-      }
-    },
-  );
-
-  test(
-    'temporary content wins over translation and roll, round trips and can be cleared',
-    () {
-      final temp = PillTempContent(
-        content: 'fixed temp',
-        negativeContent: 'temp UC',
-        originalContent: 'old',
-        editedAt: DateTime(2026, 10, 26),
-        editedBy: 'agent',
-      );
-      final instance = PillInstance(
-        blockId: 'b',
-        temp: temp,
-        translation: const TranslationPill(source: 'old source', zh: '译文'),
-        settings: const PillInstanceSettings(mode: PillRollMode.random),
-        currentRoll: 'old roll',
-      );
-      final document = PillDocument(
-        text: markerA,
-        instances: {markerA: instance},
-      );
-      expect(
-        PillDocumentEditor.project(document, (_) => 'library'),
-        'fixed temp',
-      );
-      expect(
-        PillDocumentEditor.project(
-          document.copyWith(
-            instances: {markerA: instance.copyWith(useNegativeContent: true)},
-          ),
-          (_) => 'library',
-        ),
-        'temp UC',
-      );
-      final disabled = document.copyWith(
-        instances: {markerA: instance.copyWith(enabled: false)},
-      );
-      expect(PillDocumentEditor.unwrapAllTranslations(disabled).text, '');
-      expect(
-        PillDocumentEditor.unwrapAllTranslations(document).text,
-        'fixed temp',
-      );
-      final expanded = PillDocumentEditor.expandOccurrence(
-        document,
-        markerA,
-        resolveMarker: (_, __) => 'library',
-      );
-      expect(expanded.text, 'fixed temp');
-      expect(PillDocument.fromJson(document.toJson()), document);
-      expect(instance.copyWith().temp, temp);
-      expect(instance.copyWith(temp: null).temp, isNull);
-    },
-  );
 
   group('project / stripMarkers', () {
     test('enabled instances expand, disabled and unknown vanish', () {

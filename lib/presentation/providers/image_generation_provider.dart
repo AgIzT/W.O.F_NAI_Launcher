@@ -531,6 +531,24 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
     return (charCaptions, charNegCaptions);
   }
 
+  /// Embeds [params], character prompts included, into bytes that carry no
+  /// NovelAI metadata of their own.
+  Future<Uint8List> _embedParamsMetadata(
+    Uint8List bytes,
+    ImageParams params, {
+    int? seed,
+  }) {
+    final (charCaptions, charNegCaptions) = _buildCharacterCaptions(params);
+    return ImageSaveUtils.rebuildImageBytesWithMetadata(
+      imageBytes: bytes,
+      params: params,
+      actualSeed: seed,
+      charCaptions: charCaptions,
+      charNegCaptions: charNegCaptions,
+      useCoords: params.useCoords,
+    );
+  }
+
   String _modelSourceName(String model) {
     if (model.contains('diffusion-5')) {
       if (model.contains('curated')) {
@@ -1396,11 +1414,7 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
       try {
         final source = ImageSaveUtils.hasEmbeddedNovelAiMetadata(raw.bytes)
             ? raw.bytes
-            : await ImageSaveUtils.rebuildImageBytesWithMetadata(
-                imageBytes: raw.bytes,
-                params: params,
-                actualSeed: params.seed,
-              );
+            : await _embedParamsMetadata(raw.bytes, params, seed: params.seed);
         if (_shouldAbortGenerationRun(runId)) break;
         upscaled = await ref
             .read(localUpscaleTaskProvider.notifier)

@@ -27,7 +27,7 @@ const agentSettingRows = <String, (SettingKey?, String)>{
   'prompt_weight_scroll_modifier': (SettingKey.wheelModifier, 'generation'),
   'tag_expansion_result_limit': (null, 'generation'),
   'enable_cooccurrence_recommendation': (SettingKey.relatedTags, 'generation'),
-  'prompt_autocomplete_enabled': (SettingKey.promptAutocomplete, 'generation'),
+  'enable_autocomplete': (SettingKey.promptAutocomplete, 'generation'),
   'share_strip_metadata': (SettingKey.stripMetadata, 'privacy'),
   'protection_confirm_dangerous_actions': (
     SettingKey.confirmDangerous,

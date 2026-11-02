@@ -94,7 +94,7 @@ void main() {
       readModelRevision: readModelRevision,
       startClient: (workspace, chat, settings, prompt, resume) =>
           PiHostClient.start(
-            nodeExecutable: 'E:/node/node.exe',
+            nodeExecutable: Platform.environment['NAI_AGENT_NODE'] ?? 'node',
             hostScript: File('tool/nai_agent/host.mjs').absolute.path,
             workspaceId: workspace.id,
             workspaceDirectory: workspace.directory,

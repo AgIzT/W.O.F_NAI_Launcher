@@ -10,9 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nai_launcher/core/storage/local_storage_service.dart';
-import 'package:nai_launcher/data/models/prompt_block/pill_document.dart';
 import 'package:nai_launcher/presentation/themes/app_theme.dart';
-import 'package:nai_launcher/presentation/widgets/prompt/pills/translation_pill_view.dart';
 import 'package:nai_launcher/presentation/widgets/prompt/unified/unified_prompt_config.dart';
 import 'package:nai_launcher/presentation/widgets/prompt/unified/unified_prompt_input.dart';
 
@@ -43,16 +41,14 @@ void main() {
           final external = TextEditingController(text: text);
           addTearDown(external.dispose);
           var changed = text;
-          var pill = const TranslationPill(
-            source: text,
-            zh: '译文',
-            showOriginal: true,
-          );
           final boundaryKey = GlobalKey();
           await tester.pumpWidget(
             ProviderScope(
               overrides: [
-                localStorageServiceProvider.overrideWithValue(MemoryStorage()),
+                localStorageServiceProvider.overrideWithValue(
+                  MemoryStorage()
+                    ..setSetting("prompt_show_readings", translation),
+                ),
               ],
               child: MaterialApp(
                 theme: AppTheme.getTheme(AppStyle.geist, brightness).copyWith(
@@ -71,25 +67,15 @@ void main() {
                         child: Align(
                           alignment: Alignment.topLeft,
                           child: StatefulBuilder(
-                            builder: (context, setState) => translation
-                                ? TranslationPillView(
-                                    pill: pill,
-                                    onToggle: () {},
-                                    onEdit: (_) {},
-                                    onSourceChanged: (value) => setState(() {
-                                      changed = value;
-                                      pill = pill.copyWith(source: value);
-                                    }),
-                                  )
-                                : UnifiedPromptInput(
-                                    controller: external,
-                                    config: const UnifiedPromptConfig(
-                                      enableAutoFormat: false,
-                                      embedded: true,
-                                    ),
-                                    fitContent: true,
-                                    onChanged: (value) => changed = value,
-                                  ),
+                            builder: (context, setState) => UnifiedPromptInput(
+                              controller: external,
+                              config: const UnifiedPromptConfig(
+                                enableAutoFormat: false,
+                                embedded: true,
+                              ),
+                              fitContent: true,
+                              onChanged: (value) => changed = value,
+                            ),
                           ),
                         ),
                       ),

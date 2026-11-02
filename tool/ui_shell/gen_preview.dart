@@ -470,42 +470,14 @@ class GenPreviewSim extends ChangeNotifier {
         );
       },
       onOpenPalette: base.onOpenPalette,
-      onTranslate: () {
-        _set(
-          _d.copyWith(
-            prompt: _prompt(
-              translate: GenTranslate(
-                busy: true,
-                route: _d.prompt.translate.route,
-              ),
-            ),
-          ),
-          'onTranslate',
-        );
-        Timer(const Duration(milliseconds: 900), () {
-          _d = _d.copyWith(
-            prompt: _prompt(
-              translate: GenTranslate(
-                showing: true,
-                route: _d.prompt.translate.route,
-              ),
-            ),
-          );
-          notifyListeners();
-        });
-      },
       onToggleTranslation: () => _set(
         _d.copyWith(
           prompt: _prompt(
-            translate: GenTranslate(
-              showing: !_d.prompt.translate.showing,
-              route: _d.prompt.translate.route,
-            ),
+            translate: GenTranslate(showing: !_d.prompt.translate.showing),
           ),
         ),
         'onToggleTranslation',
       ),
-      onTranslationSettings: base.onTranslationSettings,
       onOpenBridge: base.onOpenBridge,
       onAddCharacter: (g) => _set(
         _d.copyWith(

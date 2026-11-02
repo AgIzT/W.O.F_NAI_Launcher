@@ -35,7 +35,7 @@ ProviderContainer _launch(_MemoryStorage storage) => ProviderContainer(
 );
 
 void main() {
-  for (final blocks in [false, true]) {
+  for (final blocks in [true]) {
     testWidgets(
       'existing badge call sites persist only when shown, blocks=$blocks',
       (tester) async {

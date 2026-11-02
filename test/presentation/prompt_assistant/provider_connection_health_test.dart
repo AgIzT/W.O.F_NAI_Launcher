@@ -88,6 +88,7 @@ class _OfflineAdapter implements HttpClientAdapter {
 ResponseBody _response([
   int status = 200,
   ProviderProtocol protocol = ProviderProtocol.openaiChatCompletions,
+  String content = 'OK',
 ]) => ResponseBody.fromString(
   jsonEncode(
     status == 200
@@ -97,14 +98,14 @@ ResponseBody _response([
                 {
                   'type': 'message',
                   'content': [
-                    {'type': 'output_text', 'text': 'OK'},
+                    {'type': 'output_text', 'text': content},
                   ],
                 },
               ],
             },
             ProviderProtocol.anthropicMessages => {
               'content': [
-                {'type': 'text', 'text': 'OK'},
+                {'type': 'text', 'text': content},
               ],
             },
             ProviderProtocol.geminiGenerateContent => {
@@ -112,7 +113,7 @@ ResponseBody _response([
                 {
                   'content': {
                     'parts': [
-                      {'text': 'OK'},
+                      {'text': content},
                     ],
                   },
                 },
@@ -121,7 +122,7 @@ ResponseBody _response([
             _ => {
               'choices': [
                 {
-                  'message': {'content': 'OK'},
+                  'message': {'content': content},
                 },
               ],
             },
@@ -215,6 +216,82 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   setUpAll(ModelCatalogRepository.load);
 
+  for (final status in [401, 429, 503]) {
+    test(
+      'request failures retain bounded retry hints for HTTP $status',
+      () async {
+        final adapter = _OfflineAdapter(
+          (_, __) => ResponseBody.fromString(
+            '{"error":{"message":"synthetic failure"}}',
+            status,
+            headers: {
+              Headers.contentTypeHeader: ['application/json'],
+              'retry-after': ['120'],
+            },
+          ),
+        );
+        final client = _client(adapter, _health(_Memory()));
+        await expectLater(
+          client
+              .complete(
+                request: _request(
+                  'failure-$status',
+                  provider: _provider.copyWith(retryAttempts: 0),
+                ),
+              )
+              .toList(),
+          throwsA(
+            isA<PromptAssistantRequestFailure>()
+                .having((e) => e.statusCode, 'status', status)
+                .having((e) => e.retryable, 'retryable', status != 401)
+                .having(
+                  (e) => e.retryAfter,
+                  'retry delay',
+                  const Duration(seconds: 120),
+                ),
+          ),
+        );
+        expect(adapter.requests, hasLength(1));
+      },
+    );
+  }
+
+  for (final type in [
+    DioExceptionType.connectionTimeout,
+    DioExceptionType.connectionError,
+    DioExceptionType.cancel,
+  ]) {
+    test(
+      'request failures distinguish $type from permanent failures',
+      () async {
+        final client = _client(
+          _OfflineAdapter(
+            (options, _) =>
+                throw DioException(requestOptions: options, type: type),
+          ),
+          _health(_Memory()),
+        );
+        await expectLater(
+          client
+              .complete(
+                request: _request(
+                  'network-${type.name}',
+                  provider: _provider.copyWith(retryAttempts: 0),
+                ),
+              )
+              .toList(),
+          throwsA(
+            isA<PromptAssistantRequestFailure>().having(
+              (e) => e.retryable,
+              'retryable',
+              type != DioExceptionType.cancel,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   for (final protocol in [
     ProviderProtocol.openaiChatCompletions,
     ProviderProtocol.openaiResponses,
@@ -294,7 +371,11 @@ void main() {
     () async {
       final storage = _Memory(), secrets = _Secrets();
       final adapter = _OfflineAdapter(
-        (_, call) => _response(call == 2 || call == 3 ? 503 : 200),
+        (_, call) => _response(
+          call == 2 || call == 3 ? 503 : 200,
+          ProviderProtocol.openaiChatCompletions,
+          '{"text":"蓝眼睛"}',
+        ),
       );
       final container = await _container(storage, secrets, adapter);
       final health = container.read(providerConnectionHealthProvider);
@@ -305,30 +386,20 @@ void main() {
         ProviderConnectionStatus.healthy,
       );
       await expectLater(
-        service.translatePromptGroup('{}', sessionId: 'translation'),
+        service.translatePromptReading('blue eyes', sessionId: 'translation'),
         throwsStateError,
       );
       expect(
         health.resultFor(_provider.id).status,
         ProviderConnectionStatus.failed,
       );
-      final raw = await service.translatePromptGroup(
-        '{}',
-        sessionId: 'prompt-translation-pos',
-      );
-      final exchange = service.takeTranslationExchange(
-        'prompt-translation-pos',
-      )!;
-      expect(exchange.raw, raw);
-      expect(exchange.providerId, _provider.id);
-      expect(exchange.modelId, _model.name);
       expect(
-        exchange.system,
-        contains(PromptAssistantService.promptTranslationSystemPrompt),
+        await service.translatePromptReading(
+          'blue eyes',
+          sessionId: 'recovery',
+        ),
+        '蓝眼睛',
       );
-      expect(exchange.request, contains('target_language'));
-      expect(service.takeTranslationExchange('prompt-translation-pos'), isNull);
-      expect(service.takeTranslationExchange('translation'), isNull);
       expect(
         health.resultFor(_provider.id).status,
         ProviderConnectionStatus.healthy,

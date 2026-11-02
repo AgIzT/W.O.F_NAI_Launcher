@@ -403,35 +403,22 @@ class _ModelTaskEditorState extends ConsumerState<ModelTaskEditor> {
                   : (value) => _edit(_slot.copyWith(presetId: value)),
             ),
           ),
-          second: widget.task == LauncherInterface.promptReverse
-              ? _property(
-                  label: context.l10n.modelSettings_outputLanguage,
-                  control: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: Text(
-                      context.l10n.modelSettings_englishPrompt,
-                      style: valueStyle,
-                    ),
-                  ),
-                  help: context.l10n.modelSettings_englishPromptHelp,
-                )
-              : _property(
-                  label: context.l10n.modelSettings_targetLanguage,
-                  control: ModelCompactDropdown<String>(
-                    key: const Key('task-language'),
-                    value: _slot.targetLanguage,
-                    decoration: decoration,
-                    textStyle: valueStyle,
-                    choices: [
-                      for (final entry in languages.entries)
-                        ModelDropdownChoice(entry.key, entry.value),
-                    ],
-                    onChanged: _busy
-                        ? null
-                        : (value) =>
-                              _edit(_slot.copyWith(targetLanguage: value)),
-                  ),
-                ),
+          second: _property(
+            label: context.l10n.modelSettings_targetLanguage,
+            control: ModelCompactDropdown<String>(
+              key: const Key('task-language'),
+              value: _slot.targetLanguage,
+              decoration: decoration,
+              textStyle: valueStyle,
+              choices: [
+                for (final entry in languages.entries)
+                  ModelDropdownChoice(entry.key, entry.value),
+              ],
+              onChanged: _busy
+                  ? null
+                  : (value) => _edit(_slot.copyWith(targetLanguage: value)),
+            ),
+          ),
         ),
         const SizedBox(height: 26),
         const Divider(),
@@ -476,10 +463,8 @@ class _ModelTaskEditorState extends ConsumerState<ModelTaskEditor> {
                   ),
                 Text(preset.displayNameIn(context.l10n)),
                 Text(
-                  widget.task == LauncherInterface.promptReverse
-                      ? context.l10n.modelSettings_englishPrompt
-                      : languages[_slot.targetLanguage] ??
-                            context.l10n.modelSettings_followUiLanguage,
+                  languages[_slot.targetLanguage] ??
+                      context.l10n.modelSettings_followUiLanguage,
                 ),
               ],
             ),
@@ -490,12 +475,10 @@ class _ModelTaskEditorState extends ConsumerState<ModelTaskEditor> {
   }
 
   Widget _effectiveFooter(Widget summary) {
-    final promptTask =
-        widget.task == LauncherInterface.translate ||
-        widget.task == LauncherInterface.promptReverse;
+    final promptTask = widget.task == LauncherInterface.translate;
     final hint = Text(
       promptTask
-          ? context.l10n.modelSettings_promptBlocksHint
+          ? context.l10n.modelSettings_promptReadingHint
           : context.l10n.modelSettings_wikiFormatHint,
       key: const Key('task-format-hint'),
       textAlign: TextAlign.right,

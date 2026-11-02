@@ -60,6 +60,7 @@ import '../../../widgets/character/character_module_test.dart'
 import '../../../../helpers/generation_history_fixture.dart'
     show
         HistoryCaptureStorage,
+        generationFixtureImage,
         historyCaptureImages,
         prepareHistoryCaptureImages;
 
@@ -176,9 +177,7 @@ ProviderContainer _container(String model) {
               VibeReference(
                 displayName: file,
                 vibeEncoding: 'fixture',
-                thumbnail: File(
-                  '../../mockups/generation/assets/$file.jpg',
-                ).readAsBytesSync(),
+                thumbnail: generationFixtureImage(file),
                 sourceType: VibeSourceType.png,
               ),
           ]

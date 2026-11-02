@@ -1,5 +1,4 @@
 import 'package:flutter/widgets.dart';
-import '../../../data/models/prompt_block/pill_document.dart';
 
 import '../kit/ui_block_pill.dart';
 
@@ -212,8 +211,6 @@ class BlockData {
     this.sourcePath,
     this.importedAt,
     this.sourceState = BlockSourceState.none,
-    this.reading,
-    this.readingNeedsReview = false,
   });
 
   final String id;
@@ -249,12 +246,6 @@ class BlockData {
   final String? sourcePath;
   final DateTime? importedAt;
   final BlockSourceState sourceState;
-
-  /// 翻译阅读（`readingTranslationZh`），只在详情里显示。
-  final String? reading;
-
-  /// 原文改过、翻译待复核。
-  final bool readingNeedsReview;
 
   /// 项数：正面原子数；只有负面的块（负面词块）算负面原子数。
   int get itemCount => primaryAtoms.length;
@@ -1074,8 +1065,6 @@ class BlockInstanceViewData {
     this.standalone = false,
     this.tempContent,
     this.tempNegativeContent,
-    this.tempTranslations = const [],
-    this.tempNegativeTranslations = const [],
     this.originalContent,
     this.originalNegativeContent,
     this.editedAt,
@@ -1117,8 +1106,6 @@ class BlockInstanceViewData {
   final bool standalone;
   final String? tempContent;
   final String? tempNegativeContent;
-  final List<TranslationPill> tempTranslations;
-  final List<TranslationPill> tempNegativeTranslations;
   final String? originalContent;
   final String? originalNegativeContent;
   final DateTime? editedAt;

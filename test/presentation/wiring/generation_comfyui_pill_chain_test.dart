@@ -22,6 +22,7 @@ import 'generation_comfyui_import_test.dart' as control;
 import '../ui/refs/refs_test_harness.dart' show refsApp;
 import '../../helpers/studio_capture_fonts.dart';
 import '../../helpers/app_logger_test_isolation.dart';
+import '../../helpers/prompt_reading_test_overrides.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -42,6 +43,7 @@ void main() {
     await Hive.openBox(StorageKeys.settingsBox);
     container = ProviderContainer(
       overrides: [
+        ...promptReadingTestOverrides(),
         localStorageServiceProvider.overrideWithValue(MemoryDraftSettings()),
         characterPromptRepositoryProvider.overrideWithValue(MemoryCharacters()),
         promptBlockLibraryNotifierProvider.overrideWith(EmptyBlocks.new),

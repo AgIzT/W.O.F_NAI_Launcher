@@ -95,9 +95,6 @@ void main() {
         referencePanelNotifierProvider.overrideWith(DataRecents.new),
         localUpscaleModelsProvider.overrideWith((ref) async => []),
         generationFavoriteImagesProvider.overrideWith((ref) async => {}),
-        generationTranslationRouteLabelProvider.overrideWithValue(
-          'Local · test-model',
-        ),
         promptTokenUsageProvider.overrideWith(
           (ref, target) async =>
               const PromptTokenUsage(usedTokens: 12, limit: 1471),
@@ -199,7 +196,7 @@ void main() {
     expect(data.prompt.transparent, isFalse);
     expect(data.refs.vibes, isNull);
     expect(data.refs.precise, isNull);
-    expect(data.prompt.translate.route, 'Local · test-model');
+    expect(data.prompt.translate.showing, isTrue);
 
     final account = container.read(subscriptionNotifierProvider).subscription!;
     for (final (usage, expected) in <(OpusUsage?, double?)>[

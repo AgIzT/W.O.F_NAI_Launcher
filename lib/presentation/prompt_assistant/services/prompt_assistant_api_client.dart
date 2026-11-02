@@ -15,6 +15,21 @@ import 'provider_adapters/prompt_assistant_adapter.dart';
 import '../../../core/utils/localization_extension.dart';
 import '../../../core/nai_agent/model_request_gate.dart';
 
+/// Retains retry information after the API client's own immediate retries.
+/// It remains a StateError for existing callers displaying request failures.
+class PromptAssistantRequestFailure extends StateError {
+  PromptAssistantRequestFailure(
+    super.message, {
+    required this.retryable,
+    this.statusCode,
+    this.retryAfter,
+  });
+
+  final bool retryable;
+  final int? statusCode;
+  final Duration? retryAfter;
+}
+
 class PromptAssistantApiClient {
   PromptAssistantApiClient({
     required Dio dio,
@@ -231,7 +246,26 @@ class PromptAssistantApiClient {
               : 'HTTP ${error.response!.statusCode}',
         );
       }
-      throw StateError(_formatDioException(error, request));
+      final status = error.response?.statusCode;
+      final retrySeconds = int.tryParse(
+        error.response?.headers.value('retry-after') ?? '',
+      );
+      throw PromptAssistantRequestFailure(
+        _formatDioException(error, request),
+        statusCode: status,
+        retryable:
+            !cancelToken.isCancelled &&
+            (const [408, 429, 500, 502, 503, 504].contains(status) ||
+                const [
+                  DioExceptionType.connectionError,
+                  DioExceptionType.connectionTimeout,
+                  DioExceptionType.sendTimeout,
+                  DioExceptionType.receiveTimeout,
+                ].contains(error.type)),
+        retryAfter: retrySeconds != null && retrySeconds > 0
+            ? Duration(seconds: retrySeconds.clamp(1, 300))
+            : null,
+      );
     } catch (error) {
       if (requested && !cancelToken.isCancelled) {
         connectionHealth?.failed(probe, error);

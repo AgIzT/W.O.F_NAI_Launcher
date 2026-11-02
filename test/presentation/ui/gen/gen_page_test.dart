@@ -277,7 +277,7 @@ void main() {
       expect(find.byKey(const Key('gen-fullscreen-editor')), findsNothing);
     });
 
-    testWidgets('翻译：没配模型时点了去设置', (t) async {
+    testWidgets('译名显示独立于模型配置，点击只切换阅读状态', (t) async {
       final d = GenFixture.view();
       await pump(
         t,
@@ -289,7 +289,8 @@ void main() {
         ),
       );
       await tapKey(t, 'gen-translate-run');
-      expect(r.called('onTranslationSettings'), isTrue);
+      expect(r.called('onToggleTranslation'), isTrue);
+      expect(r.called('onTranslationSettings'), isFalse);
     });
 
     testWidgets('translation primary toggles repeatedly even without a route', (
@@ -302,7 +303,7 @@ void main() {
           d.copyWith(
             prompt: GenPromptData(
               qualityPresets: d.prompt.qualityPresets,
-              translate: GenTranslate(hasTranslations: true, showing: showing),
+              translate: GenTranslate(showing: showing),
             ),
           ),
         );
@@ -312,58 +313,6 @@ void main() {
       expect(r.called('onTranslate'), isFalse);
       expect(r.called('onTranslationSettings'), isFalse);
     });
-
-    testWidgets(
-      'new translation calls translate, clear and adjustment menus are gated',
-      (t) async {
-        final d = GenFixture.view();
-        await pump(
-          t,
-          d.copyWith(
-            prompt: GenPromptData(
-              qualityPresets: d.prompt.qualityPresets,
-              translate: const GenTranslate(route: 'fake'),
-            ),
-          ),
-        );
-        await tapKey(t, 'gen-translate-run');
-        expect(r.called('onTranslate'), isTrue);
-        await tapKey(t, 'gen-translate-menu');
-        expect(find.byKey(const Key('gen-translate-adjust')), findsOneWidget);
-        expect(find.byKey(const Key('gen-translate-clear')), findsOneWidget);
-        await tapKey(t, 'gen-translate-adjust');
-        await tapKey(t, 'gen-translate-clear');
-        expect(r.called('onTranslationAdjust'), isFalse);
-        expect(r.called('onClearTranslations'), isFalse);
-        // Replace the page to close the still-open, disabled menu.
-        await t.pumpWidget(const SizedBox());
-        await pump(
-          t,
-          d.copyWith(
-            prompt: GenPromptData(
-              qualityPresets: d.prompt.qualityPresets,
-              translate: const GenTranslate(
-                route: 'fake',
-                hasTranslations: true,
-                canAdjust: true,
-              ),
-            ),
-          ),
-        );
-        await tapKey(t, 'gen-translate-menu');
-        await captureUiuxRegion(
-          t,
-          find.byKey(const Key('gen-capture')),
-          'translate-menu',
-          const Rect.fromLTWH(0, 0, 700, 520),
-        );
-        await tapKey(t, 'gen-translate-clear');
-        expect(r.called('onClearTranslations'), isTrue);
-        await tapKey(t, 'gen-translate-menu');
-        await tapKey(t, 'gen-translate-adjust');
-        expect(r.called('onTranslationAdjust'), isTrue);
-      },
-    );
 
     testWidgets('块库侧栏按钮开关 dock', (t) async {
       await pump(t);

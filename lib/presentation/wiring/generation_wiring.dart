@@ -20,13 +20,11 @@ import '../providers/pill_workspace_provider.dart';
 import '../providers/image_generation_provider.dart';
 import '../providers/image_save_settings_provider.dart';
 import '../providers/krita/krita_bridge_notifier.dart';
-import '../providers/prompt_translation_provider.dart';
-import '../widgets/common/undo_snack_bar.dart';
+import '../providers/prompt_reading_preferences_provider.dart';
 import '../providers/subscription_provider.dart';
 import '../router/app_router.dart';
 import '../ui/gen/gen_contract.dart';
 import '../ui/gen/gen_page.dart';
-import 'translation_adjustment_overlay.dart';
 import '../widgets/bridge/agent_bridge_indicator.dart';
 import 'generation_backend.dart';
 import 'generation_canvas_wiring.dart';
@@ -44,7 +42,6 @@ import 'simple_viewer_wiring.dart';
 import '../providers/nai_agent/nai_agent_window_controller.dart';
 import '../providers/nai_agent/nai_agent_workspace_provider.dart';
 import 'nai_agent/agent_toggle_wiring.dart';
-import '../widgets/common/prompt_translation_guide.dart';
 import '../screens/generation/widgets/generation_welcome.dart';
 
 class GenerationRoute extends ConsumerStatefulWidget {
@@ -180,7 +177,6 @@ class GenerationWiring extends ConsumerStatefulWidget {
 }
 
 class _GenerationWiringState extends ConsumerState<GenerationWiring> {
-  final _translationAdjustment = TranslationAdjustmentOverlay();
   GenActions? _actions;
   GenSlots? _slots;
   Object? _slotInputs;
@@ -203,7 +199,6 @@ class _GenerationWiringState extends ConsumerState<GenerationWiring> {
   void dispose() {
     // 积木悬浮窗不随页面点击关闭；离开生成页时一并收起。
     PromptBlockPaletteButton.closeFloating();
-    _translationAdjustment.close();
     super.dispose();
   }
 
@@ -272,7 +267,6 @@ class _GenerationWiringState extends ConsumerState<GenerationWiring> {
         panelBackdrop: (context, viewport) =>
             GenerationPanelBackdropWiring(canvasViewport: viewport),
         emptyCanvas: (_) => const GenerationWelcome(),
-        translationGuide: (_, onBack) => PromptTranslationGuide(onBack: onBack),
         agentToggle: agentAvailable ? const AgentToggleWiring() : null,
         historyCaptionInset: !agentExpanded,
         preserveHistory: agentExpanded,
@@ -333,33 +327,11 @@ class _GenerationWiringState extends ConsumerState<GenerationWiring> {
         onOpenPalette: (rect) => run(() => operations.openPalette(rect)),
         onOpenResourceWindow: (kind) =>
             run(() => ref.read(resourceWindowOpenerProvider).open(kind)),
-        onTranslate: () => run(() async {
-          await ref
-              .read(promptTranslationCoordinatorProvider)
-              .translate(currentData().prompt.negative);
-        }),
-        onToggleTranslation: () => ref
-            .read(promptTranslationCoordinatorProvider)
-            .toggleAll(currentData().prompt.negative),
-        onTranslationAdjust: (rect) => _translationAdjustment.toggle(
-          context,
-          rect,
-          currentData().prompt.negative,
+        onToggleTranslation: () => run(
+          () => ref
+              .read(promptReadingPreferencesProvider.notifier)
+              .toggleReadings(),
         ),
-        onClearTranslations: () {
-          final negative = currentData().prompt.negative;
-          final coordinator = ref.read(promptTranslationCoordinatorProvider);
-          if (coordinator.clearTranslations(negative) == 0) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            undoSnackBar(
-              content: Text(context.l10n.gen_translateCleared),
-              undoLabel: context.l10n.common_undo,
-              onUndo: () => coordinator.restoreTranslations(negative),
-            ),
-          );
-        },
-        onTranslationSettings: () =>
-            context.go('${AppRoutes.settings}?section=promptAssistant'),
         onOpenBridge: (rect) => run(
           () => AgentBridgeIndicator.openPanel(context, ref, anchorRect: rect),
         ),

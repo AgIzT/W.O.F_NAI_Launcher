@@ -3,7 +3,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:nai_launcher/l10n/app_localizations.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:nai_launcher/presentation/widgets/common/studio_icons.dart';
 
 import '../../../../core/autocomplete/autocomplete_settings.dart'
@@ -21,18 +20,16 @@ import '../../../providers/image_generation_provider.dart';
 import '../../../providers/layout_state_provider.dart';
 import '../../../providers/prompt_maximize_provider.dart';
 import '../../../providers/pill_workspace_provider.dart';
-import '../../../providers/prompt_translation_provider.dart';
-import '../../../prompt_assistant/providers/prompt_assistant_config_provider.dart';
-import '../../../router/app_router.dart';
+import '../../../providers/prompt_reading_preferences_provider.dart';
 import '../../../providers/prompt_token_counter_provider.dart';
 import '../../../providers/quality_preset_provider.dart';
 import '../../../providers/tips_provider.dart';
 import '../../../providers/uc_preset_provider.dart';
 import '../../../widgets/common/app_toast.dart';
-import '../../../widgets/common/prompt_translation_guide.dart';
 import '../../../widgets/prompt/pills/prompt_pill_editor.dart';
 import '../../../widgets/prompt/unified/unified_prompt_config.dart';
 import '../../../widgets/prompt/nai_syntax_controller.dart';
+import '../../../widgets/prompt/reading/prompt_reading_layer.dart';
 import '../../../widgets/prompt/prompt_token_count_bar.dart';
 import '../../../widgets/prompt/quality_tags_selector.dart';
 import '../../../widgets/prompt/transparent_background_chip.dart';
@@ -561,6 +558,9 @@ class _PromptInputWidgetState extends ConsumerState<PromptInputWidget> {
   }
 
   Widget _buildFullLayout(ThemeData theme, bool numericEmphasisEnabled) {
+    final showReadings = ref
+        .watch(promptReadingPreferencesProvider)
+        .showReadings;
     final model = ref.watch(
       generationParamsNotifierProvider.select((params) => params.model),
     );
@@ -573,7 +573,8 @@ class _PromptInputWidgetState extends ConsumerState<PromptInputWidget> {
             builder: (context, constraints) => buildEditor(
               _squareMinLines(
                 constraints.maxWidth,
-                MediaQuery.textScalerOf(context).scale(14) * 1.55,
+                MediaQuery.textScalerOf(context).scale(14) *
+                    (showReadings ? PromptReadingLayer.lineHeight : 1.55),
               ),
             ),
           )
@@ -700,145 +701,33 @@ class _PromptInputWidgetState extends ConsumerState<PromptInputWidget> {
   }
 
   Widget _buildTranslationToolButton(ThemeData theme) {
-    final busy = ref.watch(promptTranslationBusyProvider);
-    final negativeSide = _isNegativeMode;
-    final route = ref
-        .watch(promptAssistantConfigProvider)
-        .promptTranslationRoute;
-    final outline = theme.colorScheme.outlineVariant;
-    return Container(
-      key: const Key('prompt-translation-control'),
-      decoration: BoxDecoration(
-        border: Border.all(color: outline),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          IconButton(
-            key: const Key('prompt-translation-toggle'),
-            constraints: const BoxConstraints.tightFor(width: 24, height: 22),
-            padding: EdgeInsets.zero,
-            tooltip: busy
-                ? context.l10n.promptTranslation_translating
-                : route == null
-                ? context.l10n.promptTranslation_needsModel
-                : context.l10n.promptTranslation_withRoute(
-                    route.provider.name,
-                    route.model.displayName,
-                  ),
-            onPressed: busy ? null : () => _handleTranslationButton(),
-            style: IconButton.styleFrom(
-              overlayColor: Colors.transparent,
-              splashFactory: NoSplash.splashFactory,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-            icon: TranslationIcon(
-              size: 18,
-              busy: busy,
-              color: busy
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-          Container(width: 1, height: 11, color: outline),
-          SizedBox(
-            width: 17,
-            height: 22,
-            child: PopupMenuButton<String>(
-              key: const Key('prompt-translation-actions'),
-              tooltip: context.l10n.promptTranslation_actions,
-              padding: EdgeInsets.zero,
-              position: PopupMenuPosition.under,
-              constraints: const BoxConstraints.tightFor(width: 176),
-              menuPadding: EdgeInsets.zero,
-              offset: const Offset(0, 6),
-              color: theme.colorScheme.surfaceContainerLow,
-              surfaceTintColor: Colors.transparent,
-              shadowColor: Colors.black.withValues(alpha: 0.14),
-              elevation: 8,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: BorderSide(color: outline),
-              ),
-              child: const Center(child: Icon(Icons.arrow_drop_down, size: 13)),
-              itemBuilder: (_) => [
-                _TranslationMenuContents(
-                  negative: negativeSide,
-                  onTranslate: _runTranslation,
-                  onConfigure: _openTranslationSettings,
-                ),
-              ],
-            ),
-          ),
-        ],
+    final showing = ref.watch(promptReadingPreferencesProvider).showReadings;
+    return IconButton(
+      key: const Key('prompt-translation-toggle'),
+      tooltip: showing
+          ? context.l10n.promptReading_hideReadings
+          : context.l10n.promptReading_showReadings,
+      onPressed: () async {
+        try {
+          await ref
+              .read(promptReadingPreferencesProvider.notifier)
+              .toggleReadings();
+        } catch (error) {
+          if (mounted) {
+            AppToast.error(
+              context,
+              context.l10n.globalSettings_saveFailed('$error'),
+            );
+          }
+        }
+      },
+      icon: TranslationIcon(
+        size: 18,
+        color: showing
+            ? theme.colorScheme.primary
+            : theme.colorScheme.onSurfaceVariant,
       ),
     );
-  }
-
-  void _handleTranslationButton() {
-    final coordinator = ref.read(promptTranslationCoordinatorProvider);
-    if (coordinator.hasTranslations(_isNegativeMode)) {
-      coordinator.toggleAll(_isNegativeMode);
-    } else {
-      _runTranslation();
-    }
-  }
-
-  Future<void> _runTranslation() async {
-    if (ref.read(promptAssistantConfigProvider).promptTranslationRoute ==
-        null) {
-      _showTranslationSetupDialog();
-      return;
-    }
-    try {
-      final result = await ref
-          .read(promptTranslationCoordinatorProvider)
-          .translate(_isNegativeMode);
-      if (!mounted) return;
-      if (result.convertedFields == 0) {
-        AppToast.info(
-          context,
-          result.skippedChangedFields > 0
-              ? context.l10n.promptTranslation_promptChanged
-              : context.l10n.promptTranslation_nothingToTranslate,
-        );
-        return;
-      }
-    } catch (error) {
-      if (mounted) {
-        AppToast.error(
-          context,
-          context.l10n.promptTranslation_failed('$error'),
-        );
-      }
-    }
-  }
-
-  Future<void> _showTranslationSetupDialog() async {
-    final openSettings = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(context.l10n.promptTranslation_setupTitle),
-        content: Text(context.l10n.promptTranslation_setupBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(context.l10n.promptTranslation_later),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: Text(context.l10n.promptTranslation_openSettings),
-          ),
-        ],
-      ),
-    );
-    if (mounted && openSettings == true) _openTranslationSettings();
-  }
-
-  void _openTranslationSettings() {
-    context.go('${AppRoutes.settings}?section=integrations');
   }
 
   /// 「模块与开关」弹层钮（官网 prompt-chunks 钮）：官方 prompt_chunk 图标。
@@ -898,7 +787,7 @@ class _PromptInputWidgetState extends ConsumerState<PromptInputWidget> {
             size: 18,
             color: theme.colorScheme.onSurfaceVariant,
           ),
-          title: context.l10n.promptTranslation_toolTitle,
+          title: context.l10n.promptReading_showReadings,
           theme: theme,
           onTap: () => ref
               .read(layoutStateNotifierProvider.notifier)
@@ -2181,268 +2070,6 @@ class _CopyIconButtonState extends State<_CopyIconButton> {
                 : widget.color.withValues(alpha: 0.6),
           ),
         ),
-      ),
-    );
-  }
-}
-
-/// 菜单内操作不退出弹层，并直接订阅翻译和文档状态。
-class _TranslationMenuContents extends PopupMenuEntry<String> {
-  const _TranslationMenuContents({
-    required this.negative,
-    required this.onTranslate,
-    required this.onConfigure,
-  });
-
-  final bool negative;
-  final VoidCallback onTranslate;
-  final VoidCallback onConfigure;
-
-  @override
-  double get height => 126;
-
-  @override
-  bool represents(String? value) => false;
-
-  @override
-  State<_TranslationMenuContents> createState() =>
-      _TranslationMenuContentsState();
-}
-
-class _TranslationMenuContentsState extends State<_TranslationMenuContents> {
-  bool _showGuide = false;
-  @override
-  Widget build(BuildContext context) {
-    return Consumer(
-      builder: (context, ref, _) {
-        final theme = Theme.of(context);
-        final busy = ref.watch(promptTranslationBusyProvider);
-        final route = ref
-            .watch(promptAssistantConfigProvider)
-            .promptTranslationRoute;
-        final characters = ref
-            .watch(characterPromptNotifierProvider)
-            .characters;
-        ref.watch(
-          pillWorkspaceProvider(
-            widget.negative ? PillScopes.negative : PillScopes.main,
-          ),
-        );
-        for (final character in characters) {
-          ref.watch(
-            pillWorkspaceProvider(
-              widget.negative
-                  ? PillScopes.charNeg(character.id)
-                  : PillScopes.charPos(character.id),
-            ),
-          );
-        }
-        final coordinator = ref.read(promptTranslationCoordinatorProvider);
-        final restores = coordinator.canRestoreTranslations(widget.negative);
-        final canConvert = coordinator.hasAnyTranslations(widget.negative);
-        final modelLabel = route == null
-            ? context.l10n.promptTranslation_noModel
-            : '${route.provider.name} / ${route.model.displayName}';
-        return Container(
-          key: const Key('prompt-translation-menu'),
-          width: 176,
-          height: _showGuide ? null : widget.height,
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.sizeOf(context).height - 32,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: _showGuide
-                ? PromptTranslationGuide(
-                    key: const Key('prompt-translation-guide'),
-                    onBack: () => setState(() => _showGuide = false),
-                  )
-                : Column(
-                    children: [
-                      SizedBox(
-                        height: 26,
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Tooltip(
-                                message: modelLabel,
-                                child: Text(
-                                  route?.model.displayName ??
-                                      context.l10n.promptTranslation_noModel,
-                                  key: const Key('prompt-translation-model'),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    fontSize: 11,
-                                    color: theme.colorScheme.onSurfaceVariant,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            IconButton(
-                              key: const Key('prompt-translation-configure'),
-                              tooltip:
-                                  context.l10n.promptTranslation_configureModel,
-                              constraints: const BoxConstraints.tightFor(
-                                width: 26,
-                                height: 26,
-                              ),
-                              padding: EdgeInsets.zero,
-                              style: IconButton.styleFrom(
-                                foregroundColor:
-                                    theme.colorScheme.onSurfaceVariant,
-                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              ),
-                              onPressed: () {
-                                Navigator.pop(context);
-                                widget.onConfigure();
-                              },
-                              icon: const Icon(
-                                Icons.settings_outlined,
-                                size: 15,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _TranslationMenuAction(
-                              buttonKey: const Key('prompt-translation-add'),
-                              tooltip:
-                                  context.l10n.promptTranslation_translateNew,
-                              primary: true,
-                              onPressed: busy ? null : widget.onTranslate,
-                              icon: Stack(
-                                clipBehavior: Clip.none,
-                                children: [
-                                  TranslationIcon(size: 21, busy: busy),
-                                  if (!busy)
-                                    Positioned(
-                                      right: -5,
-                                      bottom: -3,
-                                      child: DecoratedBox(
-                                        decoration: BoxDecoration(
-                                          color: theme
-                                              .colorScheme
-                                              .surfaceContainerHighest,
-                                          borderRadius: BorderRadius.circular(
-                                            3,
-                                          ),
-                                        ),
-                                        child: const Icon(Icons.add, size: 11),
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: _TranslationMenuAction(
-                              buttonKey: const Key(
-                                'prompt-translation-plain-text',
-                              ),
-                              tooltip: restores
-                                  ? context.l10n.promptTranslation_undoRestore
-                                  : context.l10n.promptTranslation_restoreAll,
-                              onPressed: !busy && (restores || canConvert)
-                                  ? () {
-                                      if (coordinator.canRestoreTranslations(
-                                        widget.negative,
-                                      )) {
-                                        coordinator.restoreTranslations(
-                                          widget.negative,
-                                        );
-                                      } else {
-                                        coordinator.clearTranslations(
-                                          widget.negative,
-                                        );
-                                      }
-                                    }
-                                  : null,
-                              icon: restores
-                                  ? const Icon(Icons.undo, size: 21)
-                                  : const Text(
-                                      'A',
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      SizedBox(
-                        height: 26,
-                        width: double.infinity,
-                        child: TextButton.icon(
-                          key: const Key('prompt-translation-tutorial'),
-                          onPressed: () => setState(() => _showGuide = true),
-                          icon: const Icon(Icons.info_outline, size: 13),
-                          label: Text(context.l10n.promptTranslation_tutorial),
-                          style: TextButton.styleFrom(
-                            padding: EdgeInsets.zero,
-                            minimumSize: Size.zero,
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            foregroundColor: theme.colorScheme.onSurfaceVariant,
-                            textStyle: theme.textTheme.bodySmall?.copyWith(
-                              fontSize: 11,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _TranslationMenuAction extends StatelessWidget {
-  const _TranslationMenuAction({
-    required this.buttonKey,
-    required this.tooltip,
-    required this.icon,
-    required this.onPressed,
-    this.primary = false,
-  });
-
-  final Key buttonKey;
-  final String tooltip;
-  final Widget icon;
-  final VoidCallback? onPressed;
-  final bool primary;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    return SizedBox(
-      height: 40,
-      child: IconButton(
-        key: buttonKey,
-        tooltip: tooltip,
-        onPressed: onPressed,
-        padding: EdgeInsets.zero,
-        style: IconButton.styleFrom(
-          foregroundColor: primary ? colors.primary : colors.onSurface,
-          disabledForegroundColor: colors.onSurface.withValues(alpha: 0.24),
-          backgroundColor: colors.surfaceContainerHighest,
-          disabledBackgroundColor: colors.surfaceContainerHighest.withValues(
-            alpha: 0.6,
-          ),
-          hoverColor: colors.onSurface.withValues(alpha: 0.06),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        ),
-        icon: icon,
       ),
     );
   }

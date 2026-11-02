@@ -49,7 +49,7 @@ final settingsRefreshProvider = StateProvider<int>((ref) => 0);
 final workspaceTextSettingValuesProvider = Provider<Map<SettingKey, Object>>(
   (ref) => {
     SettingKey.workspaceFontScale: ref.watch(workspaceFontScaleProvider),
-    SettingKey.promptAutocomplete: ref.watch(promptAutocompleteEnabledProvider),
+    SettingKey.promptAutocomplete: ref.watch(autocompleteSettingsProvider),
   },
 );
 
@@ -231,9 +231,7 @@ class SettingsValueStore {
       case SettingKey.workspaceFontScale:
         await ref.read(workspaceFontScaleProvider.notifier).setFontScale(n);
       case SettingKey.promptAutocomplete:
-        await ref
-            .read(promptAutocompleteEnabledProvider.notifier)
-            .setEnabled(b);
+        ref.read(autocompleteSettingsProvider.notifier).set(b);
       case SettingKey.language:
         await ref.read(localeNotifierProvider.notifier).setLocale(text!);
       case SettingKey.reduceMotion:

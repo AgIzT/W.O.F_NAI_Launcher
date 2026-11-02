@@ -1,7 +1,9 @@
 // Prompt document undo/redo regressions, promoted from R14 probes P1–P18.
 import 'package:flutter/gestures.dart';
+import '../../../../helpers/prompt_reading_test_overrides.dart';
 import 'package:nai_launcher/presentation/widgets/common/text_editing_shortcuts.dart';
 import 'package:flutter/material.dart';
+import 'package:nai_launcher/core/utils/pill_document_editor.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -137,6 +139,7 @@ Future<ProviderContainer> _pumpEditor(
 
   final app = ProviderScope(
     overrides: [
+      ...promptReadingTestOverrides(),
       blocksPlatformProvider.overrideWithValue(_TestBlocksPlatform()),
       localStorageServiceProvider.overrideWithValue(_MemorySettings()),
       characterPromptNotifierProvider.overrideWith(_MemoryCharacters.new),
@@ -226,6 +229,7 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
+              ...promptReadingTestOverrides(),
               localStorageServiceProvider.overrideWithValue(_MemorySettings()),
             ],
             child: MaterialApp(
@@ -291,19 +295,25 @@ void main() {
           snapshots.add(container.read(pillWorkspaceNotifierProvider).document);
       notifier.replaceWithPlainText('initial');
       save();
-      notifier.insertTranslationAt(
-        offset: 0,
-        source: 'blue eyes',
-        zh: 'reading',
-      );
+      final now = DateTime(2026, 11, 2);
+      notifier.applyInlineEdits([
+        PillInlineEdit(
+          start: 0,
+          end: 0,
+          temp: PillTempContent(
+            content: 'blue eyes',
+            originalContent: '',
+            title: 'Eyes',
+            editedAt: now,
+            editedBy: 'user',
+          ),
+        ),
+      ]);
       save();
       final marker = snapshots.last.instances.keys.single;
-      notifier.updateTranslation(
-        marker,
-        snapshots.last.instances[marker]!.translation!.copyWith(zh: 'edited'),
-      );
+      notifier.editTempContent(marker, 'green eyes', null);
       save();
-      notifier.unwrapTranslation(marker, source: 'blue eyes');
+      notifier.expandMarker(marker);
       save();
       notifier.restoreDocument(
         const PillDocument(text: 'agent import', instances: {}),
@@ -640,6 +650,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          ...promptReadingTestOverrides(),
           blocksPlatformProvider.overrideWithValue(_TestBlocksPlatform()),
           localStorageServiceProvider.overrideWithValue(_MemorySettings()),
           characterPromptNotifierProvider.overrideWith(_MemoryCharacters.new),
@@ -794,6 +805,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          ...promptReadingTestOverrides(),
           blocksPlatformProvider.overrideWithValue(_TestBlocksPlatform()),
           localStorageServiceProvider.overrideWithValue(_MemorySettings()),
           characterPromptNotifierProvider.overrideWith(_MemoryCharacters.new),

@@ -6,10 +6,10 @@
 
 ## 构建、测试与开发命令
 
-当前整合分支使用登记的 `E:/A.I/NovelAI/.devin/sdk/flutter-3.47.7/`（Flutter 3.47.7 / Dart 3.13.5），最低约束以 `pubspec.yaml` 为准。PATH / `C:/flutter` 上旧 3.44.2 不作为本分支验证入口，执行前核对 `flutter --version`。Shell 使用 Bash，原生 `.ps1` 使用 PowerShell 执行。以下按实际修改选用，不是每次必跑清单：
+本迁移分支使用 Flutter 3.47.7 / Dart 3.13.5 验证，最低约束以 `pubspec.yaml` 为准。SDK 路径按本机配置，通过 `FLUTTER_ROOT` 指定；执行前核对 `flutter --version`。下方示例使用 Bash，原生 `.ps1` 使用 PowerShell 执行。以下按实际修改选用，不是每次必跑清单：
 
 ```bash
-studio_sdk="E:/A.I/NovelAI/.devin/sdk/flutter-3.47.7"
+studio_sdk="${FLUTTER_ROOT:?Set FLUTTER_ROOT to Flutter 3.47.7}"
 export PATH="$studio_sdk/bin:$PATH"
 flutter --version
 flutter pub get
@@ -49,9 +49,13 @@ Pi 本地回归在 `tool/nai_agent/` 执行 `npm test`，使用本地合成服�
 
 ## 代码风格与输入组件
 
+本分支沿用上游存储、RAG、图库、资源小窗、普通／临时块和文档撤销能力。提示词补全统一由 `PromptCompletionWrapper` 提供，译名由 `PromptReadingLayer` 按原文几何绘制，不进入原文、生成参数、块数据或撤销记录；中英文／角色／作品筛选与 Wiki 摘要、别名共用现有标签数据层。
+
+词库／缓存立即显示；自动翻译等待每个输入框停顿 800ms，输入法组词中不发请求。标签与自然语言共用串行队列，每批最多 8 项／2,400 字符，批间至少 300ms；发送前剔除过期片段。临时网络故障最多重试两次（30／60 秒），429 至少等待 90 秒并遵循 Retry-After（上限 300 秒）；配置、鉴权和无效响应不自动重试。关闭或切换路由取消待请求。UI 通用测试复用 `test/helpers/prompt_reading_test_overrides.dart`，避免启动真实词库或模型。
+
 遵循 `analysis_options.yaml` 和 Dart formatter；复用 core / data / presentation 现有 service、provider 和 widget。生成工具的语法支持以锁定依赖和实际诊断为准，不根据旧 SDK 记录推定能力。
 
-可写标签框复用 `TagExpansionWrapper`：Ctrl+单击 / Ctrl+拖选显式查标签，按原输入框语义提交；普通输入不弹旧补全。空格查询设置 `splitOnSpaces: true`。本地图库、在线 AI TAG 搜索、块管理、黑名单与批量元数据框沿用各自提交路径。中文输入不再依赖已退役的 ffdkj 词库。
+可写标签框复用 `TagExpansionWrapper`：Ctrl+单击 / Ctrl+拖选显式查标签，按原输入框语义提交；普通输入使用新补全入口。空格查询设置 `splitOnSpaces: true`。本地图库、在线 AI TAG 搜索、块管理、黑名单与批量元数据框沿用各自提交路径。中文输入不再依赖已退役的 ffdkj 词库。
 
 ## 测试规范
 
@@ -92,7 +96,7 @@ flutter gen-l10n
 
 `CHANGELOG.md` 记录用户可见结果；当前开发变化放 Unreleased，真正发布时核对上一 tag 至当前代码、版本号、LFS、Windows 构建、release notes 和资产清单，再整理对应版本段落。交付到本机和发布 GitHub Release 是不同状态，不能把本地安装当新 Release 已发布。
 
-README 中英文同批同步，保留相互切换和上游归属链接。截图须说明是否为历史界面或合成数据的部件实绘，不能把旧图包装成当前窗口。保留原创项目归属、许可和本分支更新仓库；观察上游后自主实现需要的变化，不 merge / cherry-pick 上游。
+README 中英文同批同步，保留相互切换和上游归属链接。截图须说明是否为历史界面或合成数据的部件实绘，不能把旧图包装成当前窗口。保留原创项目归属、许可和本分支更新仓库；在开发分支审阅并合入上游，验证定制交点后再决定主线切换。基线与检查游标见 `docs/upstream-tracking.json`。
 
 提交采用 Conventional Commits，限定改动范围。PR 描述面向未看过聊天的读者，说明实际结果、验证、资源 / 生成文件和界面证据；不提交账号、API Key、本机运行日志、构建产物或私有工作流。
 

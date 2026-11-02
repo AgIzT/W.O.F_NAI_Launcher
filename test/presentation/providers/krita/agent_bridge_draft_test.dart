@@ -105,7 +105,7 @@ void main() {
       final lane = container.read(
         pillWorkspaceProvider(PillScopes.charPos('kept')).notifier,
       );
-      lane.insertTranslationAt(offset: 0, source: 'raw character', zh: '角色原文');
+      lane.replaceWithPlainText('raw character');
       final document = container
           .read(pillWorkspaceProvider(PillScopes.charPos('kept')))
           .document;

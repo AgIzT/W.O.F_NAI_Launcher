@@ -73,8 +73,8 @@ test('block schema accepts presets and occurrence-local content, rejects invalid
   assert.equal(Value.Check(tool.parameters,{action:'instance_update',instance:{content:42}}),false);
   assert.equal(Value.Check(tool.parameters,{action:'instance_update',occurrence:-1,instance:{content:'new'}}),false);
   const reading = {source:'brown cloak',zh:'棕色斗篷'};
-  assert.equal(Value.Check(tool.parameters,{action:'instance_create',kind:'temporary',instance:{title:'服装',content:'brown cloak',translations:[reading]}}),true);
-  assert.equal(Value.Check(tool.parameters,{action:'instance_update',instance:{translations:[],negative_translations:[reading]}}),true);
+  assert.equal(Value.Check(tool.parameters,{action:'instance_create',kind:'temporary',instance:{title:'服装',content:'brown cloak',translations:[reading]}}),false);
+  assert.equal(Value.Check(tool.parameters,{action:'instance_update',instance:{translations:[],negative_translations:[reading]}}),false);
   for (const translations of ['reading',Array(65).fill(reading),[{...reading,language_code:'invalid'}]]) {
     assert.equal(Value.Check(tool.parameters,{action:'instance_update',instance:{translations}}),false);
   }
@@ -87,7 +87,7 @@ test('inline block schema stays one flat object with enums; per-action rules liv
   assert.ok(tool.parameters.properties.action.enum.includes('instance_convert'));
   const segment = {kind:'temporary',anchor:{text:'中文😀',mode:'replace'},instance:{title:'one-off',color:'#80112233',icon:'star'}};
   assert.equal(Value.Check(tool.parameters,{action:'instance_convert',segments:[segment]}),true);
-  assert.equal(Value.Check(tool.parameters,{action:'instance_create',kind:'translation',instance:{enabled:false},translation:{source:'rain',zh:'雨',language_code:'ja'}}),true);
+  assert.equal(Value.Check(tool.parameters,{action:'instance_create',kind:'translation',instance:{enabled:false},translation:{source:'rain',zh:'雨',language_code:'ja'}}),false);
   assert.equal(Value.Check(tool.parameters,{action:'instance_create',kind:'translation',translation:{source:'rain',zh:'雨',marks:[]}}),false);
   for (const segments of [[],Array(65).fill(segment),[{...segment,anchor:{text:'',mode:'replace'}}]]) {
     assert.equal(Value.Check(tool.parameters,{action:'instance_convert',segments}),false);
@@ -105,9 +105,9 @@ test('inline block schema stays one flat object with enums; per-action rules liv
   assert.match(promptDescription,/field_version/);
   assert.ok(promptDescription.length <= 400);
   const skill = await readFile(new URL('../skills/nai-studio/references/blocks.md',import.meta.url),'utf8');
-  for (const phrase of [/1\.\.64 segments/, /`source` \(sent to generation\)/, /compose/]) assert.match(skill,phrase);
+  for (const phrase of [/1\.\.64 segments/, /readings are rendered by the editor/, /compose/]) assert.match(skill,phrase);
   assert.match(skill, /## Merging and splitting/);
-  assert.match(skill, /Missing `needsReview` means false; missing `languageCode` means `zh`/);
+  assert.match(skill, /Do not create translation blocks/);
   const icons = await readFile(new URL('../../../lib/presentation/widgets/prompt/blocks/prompt_block_icons.dart',import.meta.url),'utf8');
   for (const [,key] of icons.split('};')[0].matchAll(/'([a-z_]+)': Icons\./g)) assert.ok(skill.includes('`'+key+'`'),key);
 });

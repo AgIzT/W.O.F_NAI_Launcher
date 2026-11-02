@@ -27,11 +27,6 @@ const naiAgentBlockEditableFields = {
   'tags',
   'generationSettings',
   'isFavorite',
-  'readingTranslationZh',
-  'readingTranslationMarks',
-  'readingTranslationLanguageCode',
-  'readingTranslationEdited',
-  'readingTranslationNeedsReview',
   'sortOrder',
 };
 
@@ -59,13 +54,7 @@ Map<String, dynamic> validateNaiAgentBlockChanges(
       'Creating a block requires title and content',
     );
   }
-  for (final key in [
-    'title',
-    'content',
-    'negativeContent',
-    'appearance',
-    'readingTranslationLanguageCode',
-  ]) {
+  for (final key in ['title', 'content', 'negativeContent', 'appearance']) {
     if (!changes.containsKey(key)) continue;
     final value = changes[key];
     if (value is! String ||
@@ -74,7 +63,7 @@ Map<String, dynamic> validateNaiAgentBlockChanges(
       throw NaiAgentToolError('invalid_changes', 'Invalid block field: $key');
     }
   }
-  for (final key in ['folderId', 'iconName', 'readingTranslationZh']) {
+  for (final key in ['folderId', 'iconName']) {
     if (changes.containsKey(key) &&
         changes[key] != null &&
         changes[key] is! String) {
@@ -94,11 +83,7 @@ Map<String, dynamic> validateNaiAgentBlockChanges(
       'Expected RGB or ARGB hex color',
     );
   }
-  for (final key in [
-    'isFavorite',
-    'readingTranslationEdited',
-    'readingTranslationNeedsReview',
-  ]) {
+  for (final key in ['isFavorite']) {
     if (changes.containsKey(key) && changes[key] is! bool) {
       throw NaiAgentToolError('invalid_changes', 'Expected boolean: $key');
     }
@@ -179,7 +164,7 @@ Map<String, dynamic> validateNaiAgentBlockChanges(
       throw NaiAgentToolError('invalid_changes', error.message);
     }
   }
-  // Model JSON decoders validate nested tag and translation structures before IO.
+  // Model JSON decoders validate nested tag structures before IO.
   try {
     PromptBlock.fromJson({
       ...PromptBlock.create(title: 'validation', content: '').toJson(),
@@ -507,12 +492,7 @@ class NaiAgentBlockTools {
         iconName: value.iconName,
         generationSettings: value.generationSettings,
         tags: value.tags,
-        readingTranslationZh: value.readingTranslationZh,
         isFavorite: value.isFavorite,
-        readingTranslationMarks: value.readingTranslationMarks,
-        readingTranslationLanguageCode: value.readingTranslationLanguageCode,
-        readingTranslationNeedsReview: value.readingTranslationNeedsReview,
-        readingTranslationEdited: value.readingTranslationEdited,
         sortOrder: changes.containsKey('sortOrder') ? value.sortOrder : null,
         beforeWrite: () => check(),
       );

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../ui/kit/ui_colors.dart';
 import '../widgets/common/image_detail/components/detail_prompt_section.dart';
 
-/// Shares the local gallery's explicit translation and isolated pill document.
+/// Shares the local gallery's explicitly opened, read-only tag readings.
 Widget buildOnlineTranslation(
   BuildContext context,
   String identity,

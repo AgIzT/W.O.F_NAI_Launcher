@@ -26,6 +26,7 @@ import 'package:nai_launcher/presentation/ui/gen/gen_page.dart';
 import 'package:nai_launcher/presentation/ui/gen/gen_prompt.dart';
 import 'package:nai_launcher/presentation/widgets/prompt/pills/prompt_pill_editor.dart';
 import 'package:nai_launcher/presentation/widgets/common/text_editing_shortcuts.dart';
+import 'package:nai_launcher/presentation/widgets/prompt/reading/prompt_completion_wrapper.dart';
 import 'package:nai_launcher/presentation/wiring/generation_editor_wiring.dart';
 import '../providers/krita/agent_bridge_draft_test.dart'
     show MemoryCharacters, MemoryDraftSettings, EmptyBlocks;
@@ -46,6 +47,10 @@ void main() {
     epochs = StreamController<int>.broadcast();
     container = ProviderContainer(
       overrides: [
+        promptCompletionSearchProvider.overrideWith(
+          (ref) =>
+              (query) async => [],
+        ),
         localStorageServiceProvider.overrideWithValue(MemoryDraftSettings()),
         characterPromptRepositoryProvider.overrideWithValue(MemoryCharacters()),
         promptBlockLibraryNotifierProvider.overrideWith(EmptyBlocks.new),
@@ -400,7 +405,8 @@ void main() {
           final card = tester.getSize(find.byKey(const Key('gen-prompt')));
           expect(card.height / card.width, inInclusiveRange(.65, .85));
           final field = tester.widget<PromptPillEditor>(mainEditor());
-          expect(field.minLines, inInclusiveRange(4, 16));
+          // Annotated rows reserve both source and reading lines.
+          expect(field.minLines, inInclusiveRange(3, 16));
           expect(field.config.hintText, isNotEmpty);
           expect(find.text(field.config.hintText!), findsOneWidget);
           expect(tester.takeException(), isNull);

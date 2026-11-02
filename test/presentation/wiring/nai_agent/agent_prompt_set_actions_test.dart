@@ -101,7 +101,7 @@ void main() {
       ]) {
         container
             .read(pillWorkspaceProvider(scope).notifier)
-            .insertTranslationAt(offset: 0, source: 'old text', zh: '旧文本');
+            .replaceWithPlainText('old text');
       }
       final params = container.read(generationParamsNotifierProvider.notifier);
       params.updateSeed(123456);

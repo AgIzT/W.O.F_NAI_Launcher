@@ -5,7 +5,6 @@ import 'package:nai_launcher/presentation/widgets/common/studio_material.dart';
 import '../../../themes/studio_typography.dart';
 import '../../common/dashed_rounded_border.dart';
 import '../../common/studio_icons.dart';
-import '../../common/translation_icon.dart';
 import '../../common/uiux_prototype_icon.dart';
 import '../blocks/prompt_block_appearance.dart';
 import 'dna_icon.dart';
@@ -77,7 +76,6 @@ class PromptPill extends StatelessWidget {
     final colors = theme.colorScheme;
     final normal = variant == PromptPillVariant.normal;
     final dark = theme.brightness == Brightness.dark;
-    final translation = appearance == PromptBlockAppearance.translation;
     final solid = appearance == PromptBlockAppearance.solid;
     final dashed = !normal || !enabled;
     final (border, fill, ink, glyph) = switch (variant) {
@@ -100,19 +98,10 @@ class PromptPill extends StatelessWidget {
         icon ?? StudioIcons.promptBlocks,
       ),
       PromptPillVariant.normal => (
-        translation
-            ? colors.outlineVariant
-            : solid
-            ? color
-            : color.withValues(alpha: .45),
+        solid ? color : color.withValues(alpha: .45),
         active && appearance == PromptBlockAppearance.classic
             ? color.withValues(alpha: .16)
-            : PromptBlockAppearance.fill(
-                appearance,
-                color,
-                dark: dark,
-                translationSurface: colors.surfaceContainerHighest,
-              ),
+            : PromptBlockAppearance.fill(appearance, color, dark: dark),
         PromptBlockAppearance.text(
           appearance,
           color,
@@ -122,11 +111,7 @@ class PromptPill extends StatelessWidget {
         icon ?? StudioIcons.promptBlocks,
       ),
     };
-    final iconColor = translation && normal && enabled
-        ? colors.onSurfaceVariant
-        : !normal || !enabled || solid
-        ? ink
-        : color;
+    final iconColor = !normal || !enabled || solid ? ink : color;
     final textStyle = (theme.textTheme.bodyMedium ?? const TextStyle())
         .copyWith(
           fontFamily: StudioTypography.cjk,
@@ -135,7 +120,7 @@ class PromptPill extends StatelessWidget {
             StudioTypography.korean,
           ],
           fontSize: size.fontSize,
-          fontWeight: translation ? FontWeight.w500 : FontWeight.w600,
+          fontWeight: FontWeight.w600,
           height: multiline ? 1.25 : 1,
           color: ink,
           decoration: normal && !enabled
@@ -184,18 +169,12 @@ class PromptPill extends StatelessWidget {
                         strokeWidth: 2,
                       )
                     : leading ??
-                          (translation
-                              ? TranslationIcon(
-                                  size: size.iconSize,
-                                  color: iconColor,
-                                  style: TranslationIconStyle.pill,
-                                )
-                              : UiuxPrototypeIcon(
-                                  glyph,
-                                  size: size.iconSize,
-                                  color: iconColor,
-                                  strokeWidth: 2,
-                                )),
+                          UiuxPrototypeIcon(
+                            glyph,
+                            size: size.iconSize,
+                            color: iconColor,
+                            strokeWidth: 2,
+                          ),
               ),
               SizedBox(width: size.gap),
               Flexible(

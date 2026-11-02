@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:nai_launcher/presentation/widgets/common/studio_material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nai_launcher/core/utils/localization_extension.dart';
 
@@ -8,6 +9,7 @@ import '../../../../core/utils/prompt_input_normalization.dart';
 import '../../../../data/models/character/character_prompt.dart';
 import '../../../../presentation/utils/text_selection_utils.dart';
 import '../../../providers/generation/generation_settings_notifiers.dart';
+import '../../../providers/prompt_reading_preferences_provider.dart';
 import '../../../ui/blocks/blocks_quick.dart';
 import '../../../wiring/blocks_quick_save_wiring.dart';
 import '../../common/app_toast.dart';
@@ -15,6 +17,8 @@ import '../../common/weight_adjust_toolbar.dart';
 import '../../tag_expansion/tag_expansion_wrapper.dart';
 import '../comfyui_import_wrapper.dart';
 import '../nai_syntax_controller.dart';
+import '../reading/prompt_completion_wrapper.dart';
+import '../reading/prompt_reading_layer.dart';
 import 'unified_prompt_config.dart';
 import 'package:nai_launcher/presentation/widgets/common/themed_input.dart';
 import 'package:nai_launcher/presentation/widgets/common/themed_text_selection_toolbar.dart';
@@ -115,6 +119,7 @@ class UnifiedPromptInput extends ConsumerStatefulWidget {
 }
 
 class _UnifiedPromptInputState extends ConsumerState<UnifiedPromptInput> {
+  final _readingKey = GlobalKey<PromptReadingLayerState>();
   late final ValueGetter<TextEditingController> _effectiveControllerProvider;
 
   /// 语法高亮控制器
@@ -309,7 +314,18 @@ class _UnifiedPromptInputState extends ConsumerState<UnifiedPromptInput> {
   }
 
   void _onTagExpansionActiveChanged(bool active) {
+    final changed = _tagExpansionActive != active;
     _tagExpansionActive = active;
+    if (changed && mounted) {
+      if (SchedulerBinding.instance.schedulerPhase ==
+          SchedulerPhase.persistentCallbacks) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) setState(() {});
+        });
+      } else {
+        setState(() {});
+      }
+    }
     if (active) {
       _tagExpansionOpeningText = _effectiveController.text;
       return;
@@ -786,6 +802,18 @@ class _UnifiedPromptInputState extends ConsumerState<UnifiedPromptInput> {
     final List<ContextMenuButtonItem> buttonItems =
         editableTextState.contextMenuButtonItems;
 
+    if (ref.read(promptReadingPreferencesProvider).showReadings) {
+      buttonItems.add(
+        ContextMenuButtonItem(
+          label: context.l10n.promptReading_fillMissing,
+          onPressed: () {
+            editableTextState.hideToolbar();
+            _readingKey.currentState?.requestMissingNames();
+          },
+        ),
+      );
+    }
+
     // 如果有选中文本，添加"保存到块库"选项
     if (hasSelection && !widget.config.readOnly) {
       buttonItems.insert(
@@ -846,17 +874,24 @@ class _UnifiedPromptInputState extends ConsumerState<UnifiedPromptInput> {
     // Keep the input at the same element path when search opens/closes: the
     // EditableText state (and native histories of standalone inputs) must live.
     final fillsHeight = widget.expands || !widget.fitContent;
-    return Column(
-      mainAxisSize: fillsHeight ? MainAxisSize.max : MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        if (_searchVisible)
-          _buildSearchToolbar(context)
-        else
-          const SizedBox.shrink(),
-        SizedBox(height: _searchVisible ? 8 : 0),
-        if (fillsHeight) Expanded(child: inputStack) else inputStack,
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) => Column(
+        mainAxisSize: fillsHeight ? MainAxisSize.max : MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (_searchVisible)
+            _buildSearchToolbar(context)
+          else
+            const SizedBox.shrink(),
+          SizedBox(height: _searchVisible ? 8 : 0),
+          if (fillsHeight)
+            Expanded(child: inputStack)
+          else if (constraints.hasBoundedHeight)
+            Flexible(fit: FlexFit.loose, child: inputStack)
+          else
+            inputStack,
+        ],
+      ),
     );
   }
 
@@ -1058,6 +1093,20 @@ class _UnifiedPromptInputState extends ConsumerState<UnifiedPromptInput> {
 
   /// 构建文本输入框
   Widget _buildTextField() {
+    final preferences = ref.watch(promptReadingPreferencesProvider);
+    final theme = Theme.of(context);
+    final baseStyle =
+        widget.textStyle ??
+        (widget.config.embedded
+            ? theme.textTheme.bodyMedium?.copyWith(fontSize: 14, height: 1.55)
+            : theme.textTheme.bodyLarge) ??
+        const TextStyle(fontSize: 14);
+    final inputStyle = preferences.showReadings
+        ? baseStyle.copyWith(
+            height: PromptReadingLayer.lineHeight,
+            leadingDistribution: TextLeadingDistribution.even,
+          )
+        : baseStyle;
     final enableWheelAdjustment =
         !widget.config.readOnly &&
         ref.watch(promptWeightScrollSettingsProvider);
@@ -1104,18 +1153,16 @@ class _UnifiedPromptInputState extends ConsumerState<UnifiedPromptInput> {
     // 导致 _onFocusChanged 监听不到失焦事件
     final baseInput = ThemedInput(
       embedded: widget.config.embedded,
-      style:
-          widget.textStyle ??
-          (widget.config.embedded
-              ? Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(fontSize: 14, height: 1.55)
-              : null),
-      // A translated pill may span several lines. The default forced strut
-      // only reserves a text line and lets the pill paint over its neighbors.
+      style: inputStyle,
+      // Manual blocks may be taller than a text line.
       strutStyle: widget.config.pillBuilder == null
           ? null
           : StrutStyle.disabled,
+      // The caret covers the glyphs, not the reading line reserved below.
+      cursorHeight: preferences.showReadings
+          ? MediaQuery.textScalerOf(context).scale(baseStyle.fontSize ?? 14) *
+                1.3
+          : null,
       controller: _effectiveController,
       focusNode: _effectiveFocusNode,
       showCursor: widget.showCursor,
@@ -1155,26 +1202,46 @@ class _UnifiedPromptInputState extends ConsumerState<UnifiedPromptInput> {
     );
 
     // Tag expansion opens explicitly on Ctrl + click or selection.
-    Widget result = widget.onUndo == null
-        ? baseInput
-        : Actions(
-            actions: {
-              UndoTextIntent: CallbackAction<UndoTextIntent>(
-                onInvoke: (_) {
-                  widget.onUndo!();
-                  return null;
-                },
-              ),
-              RedoTextIntent: CallbackAction<RedoTextIntent>(
-                onInvoke: (_) {
-                  widget.onRedo!();
-                  return null;
-                },
-              ),
+    Widget result = PromptReadingLayer(
+      key: _readingKey,
+      controller: _effectiveController,
+      enabled: preferences.showReadings,
+      sourceStyle: inputStyle,
+      style: baseStyle.copyWith(
+        fontSize: (baseStyle.fontSize ?? 14) * 0.65,
+        height: 1,
+        color: theme.colorScheme.onSurfaceVariant,
+      ),
+      child: baseInput,
+    );
+    if (widget.onUndo != null) {
+      result = Actions(
+        actions: {
+          UndoTextIntent: CallbackAction<UndoTextIntent>(
+            onInvoke: (_) {
+              widget.onUndo!();
+              return null;
             },
-            child: baseInput,
-          );
+          ),
+          RedoTextIntent: CallbackAction<RedoTextIntent>(
+            onInvoke: (_) {
+              widget.onRedo!();
+              return null;
+            },
+          ),
+        },
+        child: result,
+      );
+    }
     if (!widget.config.readOnly) {
+      result = PromptCompletionWrapper(
+        controller: _effectiveController,
+        focusNode: _effectiveFocusNode,
+        scope: widget.pillScope ?? 'prompt-${identityHashCode(this)}',
+        enabled: preferences.completionEnabled && !_tagExpansionActive,
+        onApplied: _handleTextChanged,
+        child: result,
+      );
       result = TagExpansionWrapper(
         controller: _effectiveController,
         ragContext: true,

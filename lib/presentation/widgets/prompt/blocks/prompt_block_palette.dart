@@ -7,14 +7,10 @@ import '../../common/studio_animated_icon.dart';
 import '../../common/studio_icons.dart';
 
 import '../../../../core/utils/localization_extension.dart';
-import '../../../../core/constants/api_constants.dart';
 import '../../../../data/models/prompt_block/prompt_block.dart';
 import '../../../../data/models/prompt_block/prompt_block_folder.dart';
-import '../../../providers/generation/generation_params_notifier.dart';
-import '../../../providers/generation/generation_settings_notifiers.dart';
 import '../../../providers/prompt_block_palette_provider.dart';
-import '../../../utils/translation_palette_drop.dart';
-import 'prompt_block_pill.dart';
+import '../../../utils/prompt_palette_drop.dart';
 import 'prompt_block_hover_preview.dart';
 import 'prompt_block_drag_data.dart';
 import 'prompt_block_colors.dart';
@@ -730,46 +726,23 @@ class _PaletteChipRowState extends ConsumerState<_PaletteChipRow> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final block = widget.block;
-    final title = block.readingTranslationZh?.trim().isNotEmpty == true
-        ? block.readingTranslationZh!
-        : block.title.trim().isEmpty
-        ? block.content
-        : block.title;
-    final highlightEnabled = ref.watch(highlightEmphasisSettingsProvider);
-    final numericEmphasisEnabled = ImageModels.isV4Model(
-      ref.watch(
-        generationParamsNotifierProvider.select((params) => params.model),
+    final title = block.title.trim().isEmpty ? block.content : block.title;
+    final chip = GestureDetector(
+      key: ValueKey('prompt-block-pill-body-${block.id}'),
+      onTap: widget.onToggleSelected ?? _insertAtCaret,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 374),
+        child: UiBlockPill(
+          label: title,
+          color: promptBlockColorFromString(block.color),
+          icon: block.iconName,
+          look:
+              BlockAppearance.values.asNameMap()[block.appearance] ??
+              BlockAppearance.classic,
+          focused: widget.selected,
+        ),
       ),
     );
-
-    final chip =
-        block.readingTranslationZh != null || block.appearance == 'translation'
-        ? PromptBlockPill(
-            block: block,
-            displayTitle: title,
-            maxWidth: 374,
-            paletteStyle: true,
-            highlightEnabled: highlightEnabled,
-            numericEmphasisEnabled: numericEmphasisEnabled,
-            multiSelected: widget.selected,
-            onTap: widget.onToggleSelected ?? _insertAtCaret,
-          )
-        : GestureDetector(
-            key: ValueKey('prompt-block-pill-body-${block.id}'),
-            onTap: widget.onToggleSelected ?? _insertAtCaret,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 374),
-              child: UiBlockPill(
-                label: title,
-                color: promptBlockColorFromString(block.color),
-                icon: block.iconName,
-                look:
-                    BlockAppearance.values.asNameMap()[block.appearance] ??
-                    BlockAppearance.classic,
-                focused: widget.selected,
-              ),
-            ),
-          );
 
     return DragTarget<PromptBlockDragData>(
       onWillAcceptWithDetails: (details) =>

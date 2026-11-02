@@ -23,6 +23,7 @@ import 'package:nai_launcher/presentation/providers/character_prompt_provider.da
 import 'package:nai_launcher/presentation/providers/image_generation_provider.dart';
 import 'package:nai_launcher/presentation/providers/layout_state_provider.dart';
 import 'package:nai_launcher/presentation/providers/prompt_block_library_provider.dart';
+import 'package:nai_launcher/presentation/providers/prompt_reading_preferences_provider.dart';
 import 'package:nai_launcher/presentation/providers/prompt_token_counter_provider.dart';
 import 'package:nai_launcher/presentation/providers/subscription_provider.dart';
 import 'package:nai_launcher/presentation/providers/tips_provider.dart';
@@ -206,7 +207,10 @@ void main() {
           ),
       ],
     );
-    addTearDown(container.dispose);
+    addTearDown(() async {
+      await tester.pumpWidget(const SizedBox.shrink());
+      container.dispose();
+    });
     await container
         .read(layoutStateNotifierProvider.notifier)
         .setWebLeftPanelWidth(400);
@@ -254,6 +258,17 @@ void main() {
     final cardSize = tester.getSize(card);
     // 一体式布局：提示词卡接近方框（截图口径高 ≈ 0.7 × 宽）
     expect(cardSize.height / cardSize.width, inInclusiveRange(.62, .8));
+    await container
+        .read(promptReadingPreferencesProvider.notifier)
+        .setShowReadings(false);
+    await tester.pumpAndSettle();
+    final plainSize = tester.getSize(card);
+    expect(plainSize.height / plainSize.width, inInclusiveRange(.62, .8));
+    await container
+        .read(promptReadingPreferencesProvider.notifier)
+        .setShowReadings(true);
+    await tester.pumpAndSettle();
+    expect(tester.getSize(card), cardSize);
 
     final characterField = find.byWidgetPredicate(
       (widget) =>

@@ -606,6 +606,13 @@ class _Blacklist extends OnlineGalleryBlacklistNotifier {
 }
 
 class _Readings extends AutoTagTranslationController {
+  @override
+  String? phraseFor(String text) => null;
+  @override
+  void observePhrases({
+    required String surface,
+    required Iterable<String> phrases,
+  }) {}
   _Readings()
     : super(
         assistant: _Assistant(),
@@ -619,6 +626,7 @@ class _Readings extends AutoTagTranslationController {
     required bool visible,
     String? existingNameZh,
     AutoTagTranslationContext? tagContext,
+    TagReadingIntent intent = TagReadingIntent.details,
   }) {}
 }
 

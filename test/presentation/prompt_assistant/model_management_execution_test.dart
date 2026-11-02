@@ -6,6 +6,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:nai_launcher/core/storage/local_storage_service.dart';
 import 'package:nai_launcher/core/storage/secure_storage_service.dart';
+import 'package:nai_launcher/core/wiki/tag_translation_glossary.dart';
+import 'package:nai_launcher/core/wiki/tag_wiki_repository.dart';
+import 'package:nai_launcher/core/wiki/visible_tag_translation_cache.dart';
 import 'package:nai_launcher/presentation/prompt_assistant/models/prompt_assistant_models.dart';
 import 'package:nai_launcher/presentation/prompt_assistant/models/prompt_task_definitions.dart';
 import 'package:nai_launcher/presentation/prompt_assistant/providers/model_request_history_provider.dart';
@@ -17,6 +20,24 @@ import 'package:nai_launcher/presentation/prompt_assistant/services/provider_ada
 class _Dio extends Mock implements Dio {
   @override
   final Interceptors interceptors = Interceptors();
+}
+
+class _Wiki extends Mock implements TagWikiRepository {}
+
+class _Cache extends Mock implements VisibleTagTranslationCache {}
+
+class _Glossary extends TagTranslationGlossary {
+  _Glossary() : super(wiki: _Wiki(), cache: _Cache());
+  final tags = <String>[];
+  @override
+  Future<Map<String, Map<String, String>>> termsFor(
+    Iterable<String> names,
+  ) async {
+    tags.addAll(names);
+    return {
+      for (final tag in names) tag: {'definition': 'Blue colored eyes.'},
+    };
+  }
 }
 
 class _Local extends LocalStorageService {
@@ -42,14 +63,11 @@ class _PendingSecrets extends _Secrets {
 class _CaptureApi extends PromptAssistantApiClient {
   _CaptureApi() : super(dio: Dio());
   final requests = <PromptAssistantRequest>[];
+  String output = '{"tag":"blue_eyes","name_zh":"青い目","wiki_zh":"本文"}';
   @override
   Stream<StreamingChunk> complete({required PromptAssistantRequest request}) {
     requests.add(request);
-    return Stream.value(
-      const StreamingChunk(
-        delta: '{"tag":"blue_eyes","name_zh":"青い目","wiki_zh":"本文"}',
-      ),
-    );
+    return Stream.value(StreamingChunk(delta: output));
   }
 }
 
@@ -79,6 +97,105 @@ Response<dynamic> _response({String text = 'OK', int status = 200}) =>
     );
 
 void main() {
+  test(
+    'batched readings share the configured language and local tag glossary',
+    () async {
+      final api = _CaptureApi()
+        ..output = '{"blue_eyes":"青い目","A cat sits.":"猫が座る。"}';
+      final glossary = _Glossary();
+      final container = ProviderContainer(
+        overrides: [
+          localStorageServiceProvider.overrideWithValue(_Local()),
+          secureStorageServiceProvider.overrideWithValue(_Secrets()),
+          tagTranslationGlossaryProvider.overrideWithValue(glossary),
+          promptAssistantServiceProvider.overrideWith(
+            (ref) => PromptAssistantService(ref: ref, apiClient: api),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      final config = container.read(promptAssistantConfigProvider.notifier);
+      await config.upsertProvider(_provider);
+      await config.replaceProviderModels(_provider.id, [_model]);
+      await config.saveInterface(
+        LauncherInterface.tagTranslate,
+        const InterfaceSlotConfig(
+          providerId: 'service',
+          model: 'model',
+          targetLanguage: 'ja',
+        ),
+      );
+      expect(
+        await container
+            .read(promptAssistantServiceProvider)
+            .translatePromptReadings(
+              ['blue_eyes', 'A cat sits.'],
+              sessionId: 'batch',
+              canonicalTags: ['blue_eyes'],
+            ),
+        {'blue_eyes': '青い目', 'A cat sits.': '猫が座る。'},
+      );
+      expect(glossary.tags, ['blue_eyes']);
+      final request = api.requests.single;
+      final payload =
+          jsonDecode((request.userParts.single as PromptAssistantTextPart).text)
+              as Map;
+      expect(payload['fragments'], ['blue_eyes', 'A cat sits.']);
+      expect(payload['target_language'], 'ja');
+      expect(payload['glossary'], {
+        'blue_eyes': {'definition': 'Blue colored eyes.'},
+      });
+      expect(request.systemPrompt, contains('Danbooru tags'));
+    },
+  );
+
+  test(
+    'whole prompt readings use plain source and a text-only output contract',
+    () async {
+      final api = _CaptureApi()..output = '{"text":"青い目、赤い髪"}';
+      final container = ProviderContainer(
+        overrides: [
+          localStorageServiceProvider.overrideWithValue(_Local()),
+          secureStorageServiceProvider.overrideWithValue(_Secrets()),
+          promptAssistantServiceProvider.overrideWith(
+            (ref) => PromptAssistantService(ref: ref, apiClient: api),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      final config = container.read(promptAssistantConfigProvider.notifier);
+      await config.upsertProvider(_provider);
+      await config.replaceProviderModels(_provider.id, [_model]);
+      await config.saveInterface(
+        LauncherInterface.translate,
+        const InterfaceSlotConfig(
+          providerId: 'service',
+          model: 'model',
+          targetLanguage: 'ja',
+        ),
+      );
+      final service = container.read(promptAssistantServiceProvider);
+      final before = container.read(promptAssistantConfigProvider).encode();
+      const source = 'blue eyes, {red hair}';
+      expect(
+        await service.translatePromptReading(source, sessionId: 'reading'),
+        '青い目、赤い髪',
+      );
+      final request = api.requests.single;
+      expect(
+        jsonDecode((request.userParts.single as PromptAssistantTextPart).text),
+        {'source': source, 'target_language': 'ja'},
+      );
+      expect(request.systemPrompt, contains('{"text":"translated reading"}'));
+      expect(container.read(promptAssistantConfigProvider).encode(), before);
+      api.output = '{"text":""}';
+      await expectLater(
+        service.translatePromptReading(source, sessionId: 'empty'),
+        throwsFormatException,
+      );
+    },
+  );
+
   test('empty services cannot dispatch a hidden preset model', () async {
     final api = _CaptureApi();
     final container = ProviderContainer(
@@ -207,7 +324,7 @@ void main() {
         }),
       );
       expect(
-        config.interfaceFor(LauncherInterface.promptReverse).model,
+        config.interfaceFor(LauncherInterface.tagTranslate).model,
         'model',
       );
       expect(

@@ -64,17 +64,21 @@ void main() {
       when(
         () => assistant.targetLanguageFor(LauncherInterface.tagTranslate),
       ).thenAnswer((_) => reading);
-      when(() => catalog.byNames(any())).thenAnswer(
-        (call) async => [
+      when(() => catalog.resolveExact(any())).thenAnswer(
+        (call) async => {
           if ((call.positionalArguments.single as Iterable<String>).contains(
             'green_eyes',
           ))
-            _eyes,
-        ],
+            'green_eyes': _eyes,
+        },
       );
       when(() => catalog.search(any())).thenAnswer((_) async => [_eyes]);
       when(
-        () => catalog.searchContains(any(), limit: any(named: 'limit')),
+        () => catalog.searchContains(
+          any(),
+          limit: any(named: 'limit'),
+          categoryFilter: CompletionCategoryFilter.all,
+        ),
       ).thenAnswer((_) async => []);
       when(() => related.search(any())).thenAnswer((_) async => [_eyes]);
       final semantics = _Semantics();
@@ -97,7 +101,11 @@ void main() {
       ]);
       verifyNever(() => catalog.search(any()));
       verifyNever(
-        () => catalog.searchContains(any(), limit: any(named: 'limit')),
+        () => catalog.searchContains(
+          any(),
+          limit: any(named: 'limit'),
+          categoryFilter: CompletionCategoryFilter.all,
+        ),
       );
       final english = await service.search('green', locale: 'en');
       expect(english.single.translation, '绿眼睛');

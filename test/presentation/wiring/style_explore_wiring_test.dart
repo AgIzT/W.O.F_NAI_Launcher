@@ -56,6 +56,7 @@ import 'package:nai_launcher/presentation/widgets/navigation/window_chrome_layou
 import 'package:nai_launcher/presentation/wiring/generation_wiring.dart';
 import 'package:nai_launcher/presentation/wiring/nai_agent_generation_host.dart';
 import '../../helpers/studio_capture_fonts.dart';
+import '../../helpers/prompt_reading_test_overrides.dart';
 import '../screens/generation/widgets/reference_module_test.dart'
     show prepareGenerationDropTestPlatform;
 import 'generation_data_wiring_test.dart' show DataShortcuts;
@@ -244,6 +245,10 @@ class _AgentStore extends AgentWorkspaceStore {
     String chatId,
     AgentComposerState state,
   ) async {}
+  // This UI substitute never persists composers or draft attachments. Avoid
+  // starting real filesystem cleanup when the fake widget clock disposes it.
+  @override
+  Future<void> discardDraftChat(String workspaceId, String chatId) async {}
 }
 
 domain.ExploreRun _run(String id) {
@@ -371,6 +376,7 @@ void main() {
       UncontrolledProviderScope(
         container: mountedContainer = ProviderContainer(
           overrides: [
+            ...promptReadingTestOverrides(),
             localStorageServiceProvider.overrideWithValue(settings),
             pillWorkspaceStorageProvider.overrideWithValue(pills),
             styleExploreRunStorageProvider.overrideWithValue(storage),

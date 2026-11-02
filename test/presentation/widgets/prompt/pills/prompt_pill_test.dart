@@ -10,7 +10,6 @@ import 'package:nai_launcher/l10n/app_localizations.dart';
 import 'package:nai_launcher/presentation/widgets/prompt/blocks/prompt_block_pill.dart';
 import 'package:nai_launcher/presentation/themes/presets/geist_theme.dart';
 import 'package:nai_launcher/presentation/widgets/common/dashed_rounded_border.dart';
-import 'package:nai_launcher/presentation/widgets/common/translation_icon.dart';
 import 'package:nai_launcher/presentation/widgets/common/uiux_prototype_icon.dart';
 import 'package:nai_launcher/presentation/widgets/prompt/blocks/prompt_block_appearance.dart';
 import 'package:nai_launcher/presentation/widgets/prompt/blocks/prompt_block_colors.dart';
@@ -291,8 +290,6 @@ void main() {
           );
           final expected = switch (appearance) {
             PromptBlockAppearance.solid => color,
-            PromptBlockAppearance.translation =>
-              theme.colorScheme.surfaceContainerHighest,
             PromptBlockAppearance.stripes ||
             PromptBlockAppearance.gradient => Colors.transparent,
             PromptBlockAppearance.dots => color.withValues(alpha: .05),
@@ -306,18 +303,12 @@ void main() {
             ink.color,
             appearance == PromptBlockAppearance.solid
                 ? Colors.black
-                : appearance == PromptBlockAppearance.translation
-                ? theme.colorScheme.onSurface
                 : Color.lerp(
                     theme.colorScheme.onSurface,
                     color,
                     brightness == Brightness.light ? .72 : .62,
                   ),
           );
-          if (appearance == PromptBlockAppearance.translation) {
-            expect(find.byType(TranslationIcon), findsOneWidget);
-            expect(ink.fontWeight, FontWeight.w500);
-          }
         }
       }
       await _pump(
@@ -379,7 +370,6 @@ void main() {
             block: block,
             displayTitle: 'tag',
             maxWidth: 200,
-            paletteStyle: true,
             selected: true,
             multiSelected: true,
             onTap: () => taps++,
@@ -426,8 +416,6 @@ void main() {
       final expected = switch (appearance) {
         PromptBlockAppearance.classic => color.withValues(alpha: .16),
         PromptBlockAppearance.solid => color,
-        PromptBlockAppearance.translation =>
-          GeistTheme.light.colorScheme.surfaceContainerHighest,
         PromptBlockAppearance.dots => color.withValues(alpha: .05),
         _ => Colors.transparent,
       };
@@ -552,13 +540,6 @@ class _Specification extends StatelessWidget {
       ),
     );
     final ordinary = PromptBlock.create(title: title, content: 'tag');
-    final reading = '$title, $title, $title, $title, $title';
-    final translated = PromptBlock.create(
-      title: title,
-      content: 'tag',
-      appearance: PromptBlockAppearance.translation,
-      readingTranslationZh: reading,
-    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -651,14 +632,6 @@ class _Specification extends StatelessWidget {
                 block: ordinary,
                 displayTitle: title,
                 maxWidth: 260,
-                paletteStyle: true,
-                onTap: () {},
-              ),
-              PromptBlockPill(
-                block: translated,
-                displayTitle: reading,
-                maxWidth: 260,
-                paletteStyle: true,
                 onTap: () {},
               ),
             ],

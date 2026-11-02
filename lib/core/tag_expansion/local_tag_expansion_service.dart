@@ -1,4 +1,5 @@
 import '../autocomplete/completion_models.dart';
+import '../autocomplete/chinese_tag_completion_source.dart';
 import '../utils/tag_normalizer.dart';
 import '../utils/prompt_translation_language.dart';
 import 'tag_semantics_repository.dart';
@@ -8,7 +9,14 @@ typedef SubstringTagSearch =
 typedef PopularTagSearch =
     Future<List<CompletionCandidate>> Function({int limit});
 
-/// The explicit tag picker reads only local tag and semantic databases.
+typedef FilteredTagSearch =
+    Future<List<CompletionCandidate>> Function(
+      String input, {
+      int limit,
+      CompletionCategoryFilter categoryFilter,
+    });
+
+/// Prompt pickers read the local tag catalog and structured Chinese names.
 /// It deliberately does not depend on the autocomplete orchestrator, whose
 /// optional Danbooru and AI branches can make network requests. Chinese names
 /// come from local semantics; missing readings remain the visible-tag queue's job.
@@ -21,6 +29,8 @@ class LocalTagExpansionService {
     this.semanticNames,
     this.semantics,
     this.readingLanguage,
+    this.filteredSubstringSearch,
+    this.filteredSemanticNames,
   });
 
   final CompletionSource catalog;
@@ -30,6 +40,7 @@ class LocalTagExpansionService {
   final SubstringTagSearch? semanticNames;
   final TagSemanticsRepository? semantics;
   final String Function()? readingLanguage;
+  final FilteredTagSearch? filteredSubstringSearch, filteredSemanticNames;
 
   Future<List<CompletionCandidate>> popular({
     required String locale,
@@ -54,6 +65,7 @@ class LocalTagExpansionService {
     required String locale,
     Set<String> existingTags = const {},
     int limit = 40,
+    CompletionCategoryFilter categoryFilter = CompletionCategoryFilter.all,
   }) async {
     final token = TagNormalizer.normalize(input);
     if (token.isEmpty) return const [];
@@ -62,24 +74,34 @@ class LocalTagExpansionService {
       locale: locale,
       existingTags: existingTags,
       limit: limit,
-    );
-    // Chinese names do not exist in the English indexes. In particular, do
-    // not wait for the runtime English index before searching semantic names.
-    final prefix = query.isChinese
-        ? const <CompletionCandidate>[]
-        : await catalog.search(query.copyWith(limit: limit.clamp(1, 100)));
-    final contains = query.isChinese || token.runes.length < 2
-        ? const <CompletionCandidate>[]
-        : await substringSearch(token, limit: limit);
-    final chinese =
-        await semanticNames?.call(input, limit: limit) ??
-        const <CompletionCandidate>[];
-    final candidates = [...prefix, ...chinese, ...contains];
-    // searchNames already orders exact Chinese names before synonyms. Sorting
-    // equal undecorated rows here could discard that order before the limit.
-    if (!query.isChinese) {
-      candidates.sort((a, b) => a.matchKind.index.compareTo(b.matchKind.index));
-    }
+    ).copyWith(categoryFilter: categoryFilter);
+    // Chinese names have a separate data source. Avoid scanning the English
+    // substring index on every committed Chinese keystroke.
+    final batches = await Future.wait([
+      if (!query.isChinese) catalog.search(query),
+      if (!query.isChinese && token.runes.length >= 2)
+        filteredSubstringSearch != null
+            ? filteredSubstringSearch!(
+                token,
+                limit: limit,
+                categoryFilter: categoryFilter,
+              )
+            : substringSearch(token, limit: limit),
+      if (query.isChinese && semanticNames != null)
+        filteredSemanticNames != null
+            ? filteredSemanticNames!(
+                input,
+                limit: limit,
+                categoryFilter: categoryFilter,
+              )
+            : semanticNames!(input, limit: limit),
+    ]);
+    final candidates =
+        batches
+            .expand((batch) => batch)
+            .where((candidate) => categoryFilter.accepts(candidate.category))
+            .toList()
+          ..sort(ChineseTagCompletionSource.compare);
     return _decorate(
       _unique(candidates, limit),
       existingTags,

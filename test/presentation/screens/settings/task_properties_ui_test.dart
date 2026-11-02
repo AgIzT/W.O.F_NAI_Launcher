@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:nai_launcher/l10n/app_localizations.dart';
 import 'package:nai_launcher/presentation/prompt_assistant/models/prompt_assistant_models.dart';
 import 'package:nai_launcher/presentation/prompt_assistant/models/prompt_task_definitions.dart';
 import 'package:nai_launcher/presentation/prompt_assistant/providers/prompt_assistant_config_provider.dart';
@@ -116,12 +117,13 @@ void main() {
         expect(find.byKey(const Key('task-format-hint')), findsOneWidget);
         expect(
           tester.widget<Text>(find.byKey(const Key('task-format-hint'))).data,
-          '无需翻译时，也可将提示词拆分为模块，通过积木功能自由拼装。',
+          AppLocalizations.of(
+            tester.element(find.byKey(const Key('task-format-hint'))),
+          )!.modelSettings_promptReadingHint,
         );
         for (final task in [
           LauncherInterface.tagTranslate,
           LauncherInterface.wikiTranslate,
-          LauncherInterface.promptReverse,
         ]) {
           if (spec.$3 == 'compact') {
             await harness.tapVisible(
@@ -139,34 +141,26 @@ void main() {
           verifyHeading(task);
           await harness.capture(tester, 'task-title-${task.name}-${spec.$3}');
           final hint = find.byKey(const Key('task-format-hint'));
-          if (task == LauncherInterface.promptReverse) {
-            expect(hint, findsOneWidget);
+          expect(hint, findsOneWidget);
+          await tester.ensureVisible(hint);
+          await tester.pumpAndSettle();
+          expect(tester.widget<Text>(hint).data, '无需翻译时，也可整理排版并为相关标签添加链接。');
+          final bounds = tester.getRect(hint);
+          expect(bounds.right, lessThanOrEqualTo(spec.$1.width));
+          if (spec.$3 == 'compact') {
             expect(
-              tester.widget<Text>(hint).data,
-              '无需翻译时，也可将提示词拆分为模块，通过积木功能自由拼装。',
-            );
-          } else {
-            expect(hint, findsOneWidget);
-            await tester.ensureVisible(hint);
-            await tester.pumpAndSettle();
-            expect(tester.widget<Text>(hint).data, '无需翻译时，也可整理排版并为相关标签添加链接。');
-            final bounds = tester.getRect(hint);
-            expect(bounds.right, lessThanOrEqualTo(spec.$1.width));
-            if (spec.$3 == 'compact') {
-              expect(
-                bounds.top,
-                greaterThan(
-                  tester
-                      .getRect(find.byKey(const Key('task-effective-summary')))
-                      .bottom,
-                ),
-              );
-            }
-            await harness.capture(
-              tester,
-              'service-finish-${task.name}-${spec.$3}',
+              bounds.top,
+              greaterThan(
+                tester
+                    .getRect(find.byKey(const Key('task-effective-summary')))
+                    .bottom,
+              ),
             );
           }
+          await harness.capture(
+            tester,
+            'service-finish-${task.name}-${spec.$3}',
+          );
         }
         expect(tester.takeException(), isNull);
       },
@@ -322,41 +316,36 @@ void main() {
     });
   }
 
-  testWidgets(
-    'reverse and empty routes retain output contract and disabled test',
-    (tester) async {
-      await harness.pumpManagement(
-        tester,
-        config: _config.copyWith(models: []),
-      );
-      await _open(tester);
-      expect(find.text('尚未选择可用模型'), findsOneWidget);
-      final modelButton = find.descendant(
-        of: _route,
-        matching: find.byType(TextButton),
-      );
-      expect(tester.widget<TextButton>(modelButton).onPressed, isNull);
-      await tester.tap(modelButton);
-      await tester.pumpAndSettle();
-      expect(find.byType(PopupMenuItem<String>), findsNothing);
-      expect(
-        tester.widget<TextButton>(find.byKey(const Key('task-test'))).onPressed,
-        isNull,
-      );
-      await harness.capture(tester, 'task-properties-empty');
-      await harness.tapVisible(
-        tester,
-        find.widgetWithText(
-          ManagementListItem,
-          LauncherInterface.promptReverse.title,
-        ),
-      );
-      expect(find.byKey(const Key('task-language')), findsNothing);
-      expect(find.text('英文生成提示词'), findsWidgets);
-      await harness.capture(tester, 'task-properties-reverse');
-      await harness.tapVisible(tester, find.text('提示词与输出'));
-      expect(find.text('应用输出约定'), findsOneWidget);
-      expect(tester.takeException(), isNull);
-    },
-  );
+  testWidgets('empty routes retain output contract and disabled test', (
+    tester,
+  ) async {
+    await harness.pumpManagement(tester, config: _config.copyWith(models: []));
+    await _open(tester);
+    expect(find.text('尚未选择可用模型'), findsOneWidget);
+    final modelButton = find.descendant(
+      of: _route,
+      matching: find.byType(TextButton),
+    );
+    expect(tester.widget<TextButton>(modelButton).onPressed, isNull);
+    await tester.tap(modelButton);
+    await tester.pumpAndSettle();
+    expect(find.byType(PopupMenuItem<String>), findsNothing);
+    expect(
+      tester.widget<TextButton>(find.byKey(const Key('task-test'))).onPressed,
+      isNull,
+    );
+    await harness.capture(tester, 'task-properties-empty');
+    await harness.tapVisible(
+      tester,
+      find.widgetWithText(
+        ManagementListItem,
+        LauncherInterface.wikiTranslate.title,
+      ),
+    );
+    expect(find.byKey(const Key('task-language')), findsOneWidget);
+    await harness.capture(tester, 'task-properties-wiki');
+    await harness.tapVisible(tester, find.text('提示词与输出'));
+    expect(find.text('应用输出约定'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }

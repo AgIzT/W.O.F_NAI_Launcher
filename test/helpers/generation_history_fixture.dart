@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'dart:typed_data';
+import 'package:image/image.dart' as img;
 
 import 'light_theme_contrast.dart' show InMemoryLocalStorageService;
 import 'package:nai_launcher/core/utils/image_share_sanitizer.dart';
@@ -13,8 +15,28 @@ class HistoryCaptureStorage extends InMemoryLocalStorageService {
       HistoryClickBehavior.selectPreview.storageValue;
 }
 
-// Read-only prototype assets; preparation uses their paths without creating
-// generated files, querying galleries, or calling generation services.
+// Layout tests use prototype assets when present, otherwise deterministic
+// synthetic images. No external workspace or user gallery is required.
+final _syntheticImages = <String, Uint8List>{};
+Uint8List generationFixtureImage(String name) {
+  final file = File('../../mockups/generation/assets/$name.jpg');
+  if (file.existsSync()) return file.readAsBytesSync();
+  return _syntheticImages.putIfAbsent(name, () {
+    final seed = name.codeUnits.fold(0, (a, b) => a + b);
+    final image = img.Image(width: 832, height: 1216);
+    img.fill(image, color: img.ColorRgb8(40 + seed % 100, 75, 110));
+    img.fillRect(
+      image,
+      x1: 80,
+      y1: 160,
+      x2: 750,
+      y2: 1040,
+      color: img.ColorRgb8(120, 100 + seed % 100, 160),
+    );
+    return Uint8List.fromList(img.encodePng(image));
+  });
+}
+
 List<GeneratedImage> historyCaptureImages({bool mixed = false}) {
   final now = DateTime.now();
   final names = mixed
@@ -26,10 +48,7 @@ List<GeneratedImage> historyCaptureImages({bool mixed = false}) {
     for (var batch = 0; batch < names.length; batch++)
       for (var index = 0; index < counts[batch]; index++)
         () {
-          final file = File(
-            '../../mockups/generation/assets/${names[batch]}.jpg',
-          );
-          final bytes = file.readAsBytesSync();
+          final bytes = generationFixtureImage(names[batch]);
           final dimensions = NaiResolutionAdapter.readImageSize(bytes)!;
           return GeneratedImage(
             id: 'capture-${mixed ? 'mixed' : 'prototype'}-$batch-$index',
@@ -67,9 +86,14 @@ Future<void> prepareHistoryCaptureImages(List<GeneratedImage> images) async {
       imageBytes: image.bytes,
       fileName: '${image.id}.jpg',
       stripMetadata: false,
-      sourceFilePath: File(
-        '../../mockups/generation/assets/${names[batch]}.jpg',
-      ).absolute.path,
+      sourceFilePath:
+          File(
+            '../../mockups/generation/assets/${names[batch]}.jpg',
+          ).existsSync()
+          ? File(
+              '../../mockups/generation/assets/${names[batch]}.jpg',
+            ).absolute.path
+          : null,
     );
     await service
         .waitUntilReady(image.id, stripMetadata: false)

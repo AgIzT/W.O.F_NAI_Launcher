@@ -14,7 +14,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nai_launcher/data/models/gallery/local_image_record.dart';
 import 'package:nai_launcher/data/models/gallery/nai_image_metadata.dart';
-import 'package:nai_launcher/data/models/prompt_block/pill_document.dart';
 import 'package:nai_launcher/l10n/app_localizations.dart';
 import 'package:nai_launcher/presentation/providers/image_generation_provider.dart';
 import 'package:nai_launcher/presentation/providers/prompt_block_library_provider.dart';
@@ -28,7 +27,7 @@ import 'package:nai_launcher/presentation/themes/presets/geist_theme.dart';
 import 'package:nai_launcher/presentation/ui/viewer/viewer_contract.dart';
 import 'package:nai_launcher/presentation/ui/viewer/viewer_page.dart';
 import 'package:nai_launcher/presentation/utils/image_viewer_opener.dart';
-import 'package:nai_launcher/presentation/widgets/common/image_detail/components/detail_prompt_translation.dart';
+import 'package:nai_launcher/presentation/providers/prompt_text_reading_provider.dart';
 import 'package:nai_launcher/presentation/widgets/common/image_detail/image_detail_data.dart';
 import 'package:nai_launcher/presentation/widgets/navigation/integrated_title_bar.dart';
 import 'package:nai_launcher/presentation/wiring/image_viewer_backend.dart';
@@ -151,7 +150,7 @@ void main() {
   late _Gallery gallery;
   late GoRouter router;
   late BuildContext openerContext;
-  late Future<PillDocument> Function(PillDocument, String) translator;
+  late Future<String> Function(String, String) translator;
   setUp(() {
     SharedPreferences.setMockInitialValues({});
     platform = _Platform();
@@ -168,7 +167,7 @@ void main() {
             },
           ),
         ),
-        detailPromptTranslatorProvider.overrideWithValue(
+        promptTextReadingTranslatorProvider.overrideWithValue(
           (document, session) => translator(document, session),
         ),
         imageViewerGalleryProvider.overrideWith(
@@ -556,21 +555,14 @@ void main() {
     },
   );
 
-  testWidgets('translation pills are rendered as reading text, not markers', (
+  testWidgets('whole prompt reading stays separate from source', (
     tester,
   ) async {
     await pump(tester, viewer: session());
-    translator = (document, session) async => const PillDocument(
-      text: '\uE000',
-      instances: {
-        '\uE000': PillInstance(
-          blockId: 'reading',
-          translation: TranslationPill(source: 'original', zh: '译文'),
-        ),
-      },
-    );
+    translator = (source, session) async => '译文';
     page(tester).actions.onToggleTranslation('0', ViewerPart.prompt);
     await flush(tester);
     expect(page(tester).data.translations[ViewerPart.prompt]!.text, '译文');
+    expect(page(tester).data.detail!.prompt, 'prompt-0');
   });
 }

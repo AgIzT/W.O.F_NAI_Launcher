@@ -104,7 +104,7 @@ void main() {
       PiHostClient? host;
       try {
         host = await PiHostClient.start(
-          nodeExecutable: 'E:/node/node.exe',
+          nodeExecutable: Platform.environment['NAI_AGENT_NODE'] ?? 'node',
           hostScript: File('tool/nai_agent/host.mjs').absolute.path,
           workspaceId: 'workspace',
           workspaceDirectory: root,

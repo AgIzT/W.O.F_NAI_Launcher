@@ -6,13 +6,12 @@ Scopes: `main`, `negative`, `char:<ID>:pos|neg`. Versions: `expected_version` fr
 
 ## Instances
 
-- `instance_create`: `kind=temporary` with `instance.title/content`, or `kind=translation` with `translation.source/zh`. Place by `anchor` (before/after) or `offset`; default append. `instance_convert` uses 1..64 segments with replace anchors, preserving generation text in one undo.
-- Types: `temporary` (has `temp`), `translation`, otherwise a library reference. Library-free instances have `blockId:""`. Missing `needsReview` means false; missing `languageCode` means `zh`.
-- Temporary fields: `title`, `color`, `icon` (keys below); omitted color/icon use native defaults. Translations carry `source` (sent to generation) and `zh` (reading only), with `language_code` from the schema.
-- Temporary blocks accept `instance.translations:[{source,zh,language_code?}]`, usually one whole-content translation. Sources match complete substrings in content order; empty arrays clear readings. Conversion preserves complete translation blocks, content edits retain matching readings, promotion preserves the combined reading.
+- `instance_create`: `kind=temporary` with `instance.title/content`. Place by `anchor` (before/after) or `offset`; default append. `instance_convert` uses 1..64 segments with replace anchors, preserving generation text in one undo.
+- Instances are temporary (have `temp`) or reference a library entry. Library-free temporary instances have `blockId:""`.
+- Temporary fields: `title`, `color`, `icon` (keys below); omitted color/icon use native defaults. Tag and sentence readings are rendered by the editor, outside the prompt document. Do not create translation blocks or store translation fields on instances.
 - Create/convert options: `enabled` only. Library-free blocks have no negative side: create a separate block in the negative scope.
-- Convert segments need `title` (temporary) or `zh` (translation); selected text fills content/source.
-- `instance_update`: content edits change that occurrence into a temporary block, leaving the library entry intact. Display fields apply to library-free temps; translation and content edits are separate. Source-only changes mark readings for review.
+- Convert segments need a title; selected text fills content.
+- `instance_update`: content edits change that occurrence into a temporary block, leaving the library entry intact. Display fields apply to library-free temps.
 - `instance_unwrap` expands the generation text; `instance_delete` removes the occurrence. `instance_promote` saves a temporary block to the library, defaulting to its title/color/icon.
 
 ## Merging and splitting
@@ -25,12 +24,12 @@ No dedicated actions; compose them. Each write returns the next `draft_version`,
 
 ## Positioning
 
-`instance_convert` to temporary blocks also matches the source text of existing translation blocks and must include them completely. Otherwise `anchor.text` matches the prompt's handwritten text (markers stripped), not block contents; it may touch but not cross a marker. Several matches need zero-based `occurrence`. `offset` is a raw UTF-16 position (never inside an emoji pair); offset and anchor are exclusive.
+`anchor.text` matches handwritten prompt text (markers stripped), not block contents; it may touch but not cross a marker. Several matches need zero-based `occurrence`. `offset` is a raw UTF-16 position (never inside an emoji pair); offset and anchor are exclusive.
 
 ```json
 {"action":"instance_convert","scope":"main","expected_draft_version":"<fresh>","segments":[
-  {"anchor":{"text":"rooftop, after rain","mode":"replace"},"kind":"temporary","instance":{"title":"Setting","icon":"city","translations":[{"source":"rooftop, after rain","zh":"雨后的屋顶"}]}},
-  {"anchor":{"text":"soft lighting","mode":"replace"},"kind":"translation","translation":{"zh":"柔和光照"}}
+  {"anchor":{"text":"rooftop, after rain","mode":"replace"},"kind":"temporary","instance":{"title":"Setting","icon":"city"}},
+  {"anchor":{"text":"soft lighting","mode":"replace"},"kind":"temporary","instance":{"title":"Lighting","icon":"sun"}}
 ]}
 ```
 

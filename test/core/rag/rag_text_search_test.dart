@@ -65,7 +65,6 @@ void main() {
         negativeContent: 'sunlight',
         thumbnail: 'C:/private/photo.png',
         sourcePath: 'C:/private/source.txt',
-        readingTranslationZh: '雨景',
         tags: const [PromptBlockTag(name: 'weather')],
       );
       final raw = encodeRagBlocks([
@@ -76,7 +75,6 @@ void main() {
       expect(rows.length, 1);
       expect(rows.single['positive'], 'rain');
       expect(rows.single['negative'], 'sunlight');
-      expect(rows.single['reading'], '雨景');
       expect(raw, isNot(contains('C:/private')));
       expect(raw, isNot(contains('archived')));
       expect(
@@ -84,14 +82,6 @@ void main() {
         raw,
       );
       expect(encodeRagBlocks([block.copyWith(content: 'night')]), isNot(raw));
-      final stale =
-          jsonDecode(
-                encodeRagBlocks([
-                  block.copyWith(readingTranslationNeedsReview: true),
-                ]),
-              )
-              as Map;
-      expect((stale['blocks'] as List).single.containsKey('reading'), isFalse);
     },
   );
 }

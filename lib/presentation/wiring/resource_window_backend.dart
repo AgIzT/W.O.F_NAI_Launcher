@@ -13,7 +13,6 @@ import '../../core/utils/image_share_sanitizer.dart';
 import '../../core/utils/gallery_path_utils.dart';
 import '../../core/utils/localization_extension.dart';
 import '../../data/models/gallery/local_image_record.dart';
-import '../../data/models/prompt_block/pill_document.dart';
 import '../../data/models/prompt_block/prompt_block.dart';
 import '../../data/models/gallery/gallery_category.dart';
 import '../../data/services/gallery/gallery_sort_store.dart';
@@ -48,7 +47,7 @@ import '../widgets/gallery/gallery_nai_versions.dart';
 import '../utils/gallery_category_label.dart';
 import '../utils/local_gallery_metadata_resolver.dart';
 import '../ui/viewer/viewer_contract.dart';
-import '../widgets/common/image_detail/components/detail_prompt_translation.dart';
+import '../providers/prompt_text_reading_provider.dart';
 import 'refs_preferences.dart';
 import 'refs_generation_target.dart';
 import 'blocks_mapping.dart';
@@ -247,11 +246,11 @@ class ResourceLibraryBackend implements ResourceWindowBackend {
                 },
         );
         if (text == null || text.isEmpty) return null;
-        final translated = await ref.read(detailPromptTranslatorProvider)(
-          PillDocument(text: text, instances: const {}),
+        final translated = await ref.read(promptTextReadingTranslatorProvider)(
+          text,
           resourceString(arguments, 'session'),
         );
-        return viewerTranslationText(translated);
+        return translated;
       case 'action':
         final action = ViewerAction.values
             .asNameMap()[resourceString(arguments, 'action')];

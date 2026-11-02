@@ -75,6 +75,7 @@ class _Tags extends UnifiedTagRepository {
   Future<List<CompletionCandidate>> searchContains(
     String input, {
     int limit = 20,
+    CompletionCategoryFilter categoryFilter = CompletionCategoryFilter.all,
   }) async => entries.where((e) => e.canonicalTag.contains(input)).toList();
 
   @override

@@ -40,7 +40,6 @@ class StorageKeys {
   static const String fontFamily = 'font_family';
   static const String fontScale = 'font_scale';
   static const String workspaceFontScale = 'workspace_font_scale';
-  static const String promptAutocompleteEnabled = 'prompt_autocomplete_enabled';
   static const String settingsFontScale = 'settings_font_scale';
   static const String locale = 'locale';
   static const String fileLoggingEnabled = 'file_logging_enabled';

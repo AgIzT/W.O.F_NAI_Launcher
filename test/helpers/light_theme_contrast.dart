@@ -9,6 +9,7 @@
 library;
 
 import 'dart:io';
+import 'prompt_reading_test_overrides.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -36,6 +37,7 @@ ProviderContainer createStorageFreeContainer({
   SharedPreferences.setMockInitialValues(const {});
   return ProviderContainer(
     overrides: [
+      ...promptReadingTestOverrides(),
       localStorageServiceProvider.overrideWith(
         (ref) => InMemoryLocalStorageService(),
       ),

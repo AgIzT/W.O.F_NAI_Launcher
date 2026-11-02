@@ -25,7 +25,7 @@ import 'package:nai_launcher/presentation/wiring/floating_resource_drag.dart';
 import 'package:nai_launcher/presentation/wiring/image_viewer_session.dart';
 import 'package:nai_launcher/presentation/wiring/image_viewer_gallery.dart';
 import 'package:nai_launcher/presentation/ui/viewer/viewer_contract.dart';
-import 'package:nai_launcher/presentation/widgets/common/image_detail/components/detail_prompt_translation.dart';
+import 'package:nai_launcher/presentation/providers/prompt_text_reading_provider.dart';
 import 'package:nai_launcher/presentation/ui/refs/refs_contract.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nai_launcher/core/constants/storage_keys.dart';
@@ -433,8 +433,8 @@ void main() {
         ),
         thumbnailCacheServiceProvider.overrideWithValue(thumbnails),
         imageViewerGalleryProvider.overrideWith(ViewerGallery.new),
-        detailPromptTranslatorProvider.overrideWithValue(
-          (document, session) async => document.copyWith(text: 'translated'),
+        promptTextReadingTranslatorProvider.overrideWithValue(
+          (text, session) async => 'translated',
         ),
         shortcutConfigNotifierProvider.overrideWith(() => shortcuts),
         imageClipboardServiceProvider.overrideWithValue(

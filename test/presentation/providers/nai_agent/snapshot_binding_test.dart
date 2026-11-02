@@ -537,12 +537,12 @@ void main() {
     },
   );
   test(
-    'real providers restore images, references, inline translation and character metadata with backup',
+    'real providers restore images, references, prompt text and character metadata with backup',
     () async {
       final lane = container.read(
         pillWorkspaceProvider(PillScopes.main).notifier,
       );
-      lane.insertTranslationAt(offset: 0, source: 'snapshot raw', zh: '快照原文');
+      lane.replaceWithPlainText('snapshot raw');
       final originalDocument = container
           .read(pillWorkspaceProvider(PillScopes.main))
           .document;

@@ -8,17 +8,8 @@ import '../../core/shortcuts/shortcut_config.dart';
 import '../../core/shortcuts/shortcut_manager.dart';
 import '../../data/models/gallery/image_collection.dart';
 import '../../data/models/gallery/nai_image_metadata.dart';
-import '../../data/models/prompt_block/pill_document.dart';
 import '../../data/services/gallery/gallery_sort.dart';
 import '../ui/viewer/viewer_contract.dart';
-
-String viewerTranslationText(PillDocument document) => document.text
-    .split('')
-    .map(
-      (character) =>
-          document.instances[character]?.translation?.zh ?? character,
-    )
-    .join();
 
 ViewerDetail viewerDetailOf(
   String key,

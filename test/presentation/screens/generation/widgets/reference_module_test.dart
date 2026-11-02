@@ -1,3 +1,5 @@
+import '../../../../helpers/generation_history_fixture.dart'
+    show generationFixtureImage;
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' as ui;
@@ -168,9 +170,7 @@ void main() {
     (tester) async {
       await tester.binding.setSurfaceSize(const Size(800, 1200));
       addTearDown(() => tester.binding.setSurfaceSize(null));
-      final bytes = File(
-        '../../mockups/generation/assets/g07.jpg',
-      ).readAsBytesSync();
+      final bytes = generationFixtureImage('g07');
       final container = referenceContainer(
         ImageParams(model: 'nai-diffusion-4-5-full', sourceImage: bytes),
       );

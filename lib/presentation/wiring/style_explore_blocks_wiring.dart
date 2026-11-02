@@ -73,8 +73,6 @@ BlockData styleExploreBlockData(
   updatedAt: block.updatedAt,
   sourcePath: block.sourcePath,
   importedAt: block.importedAt,
-  reading: block.readingTranslationZh,
-  readingNeedsReview: block.readingTranslationNeedsReview,
 );
 
 BlockRollSettings styleExploreBlockRules(PillInstanceSettings s) =>
@@ -338,9 +336,7 @@ class StyleExploreVariableWiring extends ConsumerWidget {
           standalone: standalone,
           tempContent: instance.temp?.content,
           tempNegativeContent: instance.temp?.negativeContent,
-          tempTranslations: instance.temp?.translations ?? const [],
-          tempNegativeTranslations:
-              instance.temp?.negativeTranslations ?? const [],
+
           originalContent: instance.temp?.originalContent,
           originalNegativeContent: instance.temp?.originalNegativeContent,
           editedAt: instance.temp?.editedAt,

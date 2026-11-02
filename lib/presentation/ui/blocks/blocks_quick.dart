@@ -173,7 +173,6 @@ class _BlockQuickSaveState extends State<BlockQuickSave> {
                               : _title.trim(),
                           color: _color,
                           icon: _icon,
-                          translationMark: l10n.blocks_translationMark,
                         ),
                       ),
                     ),

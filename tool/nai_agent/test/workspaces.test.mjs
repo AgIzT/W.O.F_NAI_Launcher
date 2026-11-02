@@ -1,7 +1,7 @@
 import { listenFetchTestServer } from './fixture-http.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdir, mkdtemp, readFile, writeFile, rename } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, writeFile, rename, realpath } from 'node:fs/promises';
 import { resolve, join } from 'node:path';
 import { createServer } from 'node:http';
 import { createStudioSession } from '../lib/session.mjs';
@@ -92,7 +92,7 @@ test('moved sessions keep the project cwd and native read follows old output ref
     await rename(f.options.sessionDirectory,join(data,'sessions'));
     const file = join(data,'sessions',originalFile.split(/[\\/]/).at(-1));
     opened = await createStudioSession({...f.options,agentDir:data,sessionDirectory:join(data,'sessions'),sessionFile:file});
-    assert.equal(opened.manager.getCwd(),f.options.cwd);
+    assert.equal(await realpath(opened.manager.getCwd()),await realpath(f.options.cwd));
     assert.equal(await readFile(file,'utf8'),original);
     assert.equal(opened.session.getActiveToolNames().filter(name=>name==='read').length,1);
     await opened.session.prompt('Read the report after migration');

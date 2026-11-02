@@ -143,7 +143,6 @@ class _BlocksDockState extends State<BlocksDock> {
                 icon: b.icon,
                 look: b.look,
                 dragging: true,
-                translationMark: context.l10n.blocks_translationMark,
               ),
             ),
             childWhenDragging: Opacity(opacity: .35, child: pill),

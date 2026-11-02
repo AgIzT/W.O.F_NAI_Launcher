@@ -28,7 +28,6 @@ import 'package:nai_launcher/data/models/gallery/gallery_category.dart';
 import 'package:nai_launcher/data/models/gallery/image_collection.dart';
 import 'package:nai_launcher/data/models/gallery/local_image_record.dart';
 import 'package:nai_launcher/data/models/gallery/nai_image_metadata.dart';
-import 'package:nai_launcher/data/models/prompt_block/pill_document.dart';
 import 'package:nai_launcher/data/services/gallery/gallery_column_width_store.dart';
 import 'package:nai_launcher/data/services/gallery/unified_gallery_service.dart';
 import 'package:nai_launcher/data/services/thumbnail_service.dart';
@@ -46,10 +45,7 @@ import 'package:nai_launcher/presentation/widgets/drop/image_destination_dialog.
 import 'package:nai_launcher/presentation/widgets/gallery/gallery_inspector_panel.dart';
 import 'package:nai_launcher/presentation/widgets/gallery/gallery_add_menu_button.dart';
 import 'package:nai_launcher/presentation/widgets/gallery/local_gallery_toolbar.dart';
-import 'package:nai_launcher/presentation/widgets/common/image_detail/components/detail_prompt_section.dart';
-import 'package:nai_launcher/presentation/widgets/common/image_detail/components/detail_prompt_translation.dart';
 import 'package:nai_launcher/presentation/widgets/common/studio_icons.dart';
-import 'package:nai_launcher/presentation/widgets/prompt/blocks/prompt_block_drag_data.dart';
 import 'package:nai_launcher/presentation/widgets/gallery/local_image_card.dart';
 import 'package:nai_launcher/presentation/widgets/gallery/timeline/gallery_timeline_view.dart';
 import 'package:nai_launcher/presentation/widgets/navigation/window_chrome_layout.dart';
@@ -650,119 +646,6 @@ void main() {
   );
 
   testWidgets(
-    'inspector translates each field independently and stores at the click point',
-    (tester) async {
-      final disableShadows = debugDisableShadows;
-      debugDisableShadows = false;
-      addTearDown(() => debugDisableShadows = disableShadows);
-      final metadata = records[1].metadata!.copyWith(
-        prompt: '1.5::blue eyes, white hair ::, scenery',
-        characterPrompts: ['girl, 1.3::long hair::'],
-        negativePrompt: 'lowres, 0.8::bad quality::',
-      );
-      final samples = [...records];
-      samples[1] = samples[1].copyWith(metadata: metadata);
-      final requests = <String>[];
-      final container = await _pumpScreen(
-        tester,
-        records: samples,
-        dimensions: dimensions,
-        locale: const Locale('zh'),
-        dark: false,
-        size: const Size(1600, 1000),
-        translator: (doc, _) async {
-          requests.add(doc.text);
-          return PillDocument(
-            text: '\uE000',
-            instances: {
-              '\uE000': PillInstance(
-                blockId: '',
-                translation: TranslationPill(
-                  source: doc.text,
-                  zh: '测试译文：${doc.text}',
-                  languageCode: 'zh',
-                ),
-              ),
-            },
-          );
-        },
-      );
-      await tester.tap(_cardFor(samples[1]));
-      await _settle(tester);
-      expect(find.byType(PromptSection), findsAtLeastNWidgets(1));
-      expect(requests, isEmpty);
-      await _capture(tester, 'feedback-aligned-original');
-      final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
-      addTearDown(mouse.removePointer);
-      await mouse.addPointer(location: Offset.zero);
-      for (var i = 0; i < 3; i++) {
-        final field = ['positive', 'character-0', 'negative'][i];
-        final section = find.byKey(
-          ValueKey('gallery-prompt-${samples[1].path}-$field'),
-        );
-        await tester.scrollUntilVisible(
-          section,
-          200,
-          scrollable: find
-              .descendant(
-                of: find.byType(GalleryInspectorPanel),
-                matching: find.byType(Scrollable),
-              )
-              .first,
-        );
-        await Scrollable.ensureVisible(tester.element(section), alignment: .3);
-        await tester.pumpAndSettle();
-        await mouse.moveTo(tester.getCenter(section));
-        await tester.pumpAndSettle();
-        final button = find
-            .descendant(
-              of: section,
-              matching: find.byKey(const Key('detail-prompt-translate')),
-            )
-            .hitTestable();
-        expect(button, findsOneWidget);
-        await _capture(tester, 'feedback-hover-field-$i');
-        await tester.tap(button);
-        await tester.pumpAndSettle();
-        await _capture(tester, 'feedback-blocks-field-$i');
-      }
-      expect(requests, [
-        metadata.prompt,
-        metadata.characterPrompts.single,
-        metadata.negativePrompt,
-      ]);
-      final section = find.byType(PromptSection).first;
-      await Scrollable.ensureVisible(tester.element(section), alignment: .3);
-      await tester.pumpAndSettle();
-      final block = find.descendant(
-        of: section,
-        matching: find.byWidgetPredicate(
-          (w) => w is Draggable<PromptBlockDragData>,
-        ),
-      );
-      expect(
-        tester
-            .widget<Draggable<PromptBlockDragData>>(block)
-            .data!
-            .translation!
-            .source,
-        metadata.prompt,
-      );
-      await tester.tap(block);
-      await tester.pumpAndSettle();
-      expect(find.text('存入积木'), findsOneWidget);
-      expect(find.byIcon(StudioIcons.promptBlockPalette), findsOneWidget);
-      expect(tester.getSize(find.byType(MenuItemButton)).width, lessThan(190));
-      await _capture(tester, 'feedback-gallery-store');
-      expect(tester.takeException(), isNull);
-      await tester.pumpWidget(const SizedBox.shrink());
-      container.dispose();
-      await tester.pump(const Duration(minutes: 1));
-      debugDisableShadows = disableShadows;
-    },
-  );
-
-  testWidgets(
     'statistics navigation survives preference restoration and retained gallery updates',
     (tester) async {
       final criteria = FilterCriteria(
@@ -893,7 +776,6 @@ Future<ProviderContainer> _pumpScreen(
   required Locale locale,
   required bool dark,
   required Size size,
-  Future<PillDocument> Function(PillDocument, String)? translator,
   ValueNotifier<GalleryNavigationRequest?>? navigation,
   GoRouter? router,
   List<Override> extraOverrides = const [],
@@ -909,8 +791,6 @@ Future<ProviderContainer> _pumpScreen(
       galleryFileMonitorProvider.overrideWith(
         (ref) => fakeGalleryFileMonitor(),
       ),
-      if (translator != null)
-        detailPromptTranslatorProvider.overrideWithValue(translator),
       galleryServiceProvider.overrideWith(
         () => FakeGalleryServiceNotifier(service),
       ),

@@ -162,28 +162,18 @@ void main() {
       final lane = container.read(
         pillWorkspaceProvider(PillScopes.main).notifier,
       );
-      // Same generation text, but a new reusable translation document.
+      // Manual block structure and enabled state belong to the draft.
       lane.syncFromPlainText('');
       params.updatePromptImmediately('');
       previous = version();
-      changed(
-        () => lane.insertTranslationAt(offset: 0, source: '', zh: '显示翻译'),
-      );
+      changed(() => lane.insertBlockAt(offset: 0, blockId: 'quality'));
       final marker = container
           .read(pillWorkspaceProvider(PillScopes.main))
           .document
           .instances
           .keys
           .single;
-      final translation = container
-          .read(pillWorkspaceProvider(PillScopes.main))
-          .document
-          .instances[marker]!
-          .translation!;
-      changed(
-        () =>
-            lane.updateTranslation(marker, translation.copyWith(zh: '另一种显示翻译')),
-      );
+      changed(() => lane.toggleEnabled(marker));
       changed(
         () => container
             .read(qualityPresetNotifierProvider.notifier)

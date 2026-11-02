@@ -6,13 +6,11 @@ extension PromptTaskDefinition on LauncherInterface {
   String get title => titleIn(currentL10n);
   String titleIn(AppLocalizations l10n) => switch (this) {
     LauncherInterface.translate => l10n.modelTask_translateTitle,
-    LauncherInterface.promptReverse => l10n.modelTask_promptReverseTitle,
     LauncherInterface.tagTranslate => l10n.modelTask_tagTranslateTitle,
     LauncherInterface.wikiTranslate => l10n.modelTask_wikiTranslateTitle,
   };
   String descriptionIn(AppLocalizations l10n) => switch (this) {
     LauncherInterface.translate => l10n.modelTask_translateDescription,
-    LauncherInterface.promptReverse => l10n.modelTask_promptReverseDescription,
     LauncherInterface.tagTranslate => l10n.modelTask_tagTranslateDescription,
     LauncherInterface.wikiTranslate => l10n.modelTask_wikiTranslateDescription,
   };
@@ -20,7 +18,6 @@ extension PromptTaskDefinition on LauncherInterface {
   // Stable built-in names keep route fingerprints and caches language-neutral.
   String get _builtinName => switch (this) {
     LauncherInterface.translate => '原文 → 阅读语言',
-    LauncherInterface.promptReverse => '阅读语言 → 原文',
     LauncherInterface.tagTranslate => '标签名称翻译',
     LauncherInterface.wikiTranslate => '百科正文翻译',
   };
@@ -28,8 +25,6 @@ extension PromptTaskDefinition on LauncherInterface {
   String get builtinPrompt => switch (this) {
     LauncherInterface.translate =>
       '''Translate image-generation prompts into the requested reading language. Preserve subject relationships, counts, names, weights, grouping and prompt punctuation. Use glossary entries as optional reference material and judge ambiguous words from context. Prefer clear, natural reading text. Preserve canonical names where a translation would obscure their identity.''',
-    LauncherInterface.promptReverse =>
-      '''Use the edited reading text as the user's desired description. Compare it with the original reading to identify additions, deletions and replacements. Refer to the original generation prompt and apply only requested changes. Preserve unrelated artist tags, names, weights, groups and prompt style. Glossary entries and selected terms are optional reference material. Return an English generation prompt; do not restore deleted phrases or add unrequested content.''',
     LauncherInterface.tagTranslate =>
       '''Translate complete Danbooru tags into concise labels in the requested reading language, and fill missing Simplified Chinese core names, synonym arrays and short summaries for semantic retrieval. Reuse nonempty semantic_profile fields. Use category, aliases and wiki context to distinguish characters, artists, works and ordinary terms. Preserve an existing supplied reading exactly. Keep Chinese reference data separate from the reading language and full Wiki article; leave unsupported meanings unknown.''',
     LauncherInterface.wikiTranslate =>

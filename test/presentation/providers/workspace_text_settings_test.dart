@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:nai_launcher/presentation/providers/generation/generation_settings_notifiers.dart'
+    as generation;
 import 'package:nai_launcher/core/autocomplete/autocomplete_settings.dart';
 import 'package:nai_launcher/core/constants/storage_keys.dart';
 import 'package:nai_launcher/core/storage/local_storage_service.dart';
@@ -29,7 +31,7 @@ void main() {
       );
       expect(container.read(workspaceTextSettingValuesProvider), {
         SettingKey.workspaceFontScale: 1.0,
-        SettingKey.promptAutocomplete: false,
+        SettingKey.promptAutocomplete: true,
       });
       await container
           .read(settingsValueStoreProvider)
@@ -42,12 +44,12 @@ void main() {
       );
       await container
           .read(settingsValueStoreProvider)
-          .write(SettingKey.promptAutocomplete, true);
+          .write(SettingKey.promptAutocomplete, false);
       expect(
         container.read(
           workspaceTextSettingValuesProvider,
         )[SettingKey.promptAutocomplete],
-        true,
+        false,
       );
       expect(updates, hasLength(3));
     },
@@ -119,30 +121,30 @@ void main() {
   });
 
   test(
-    'typed autocomplete defaults off and never rewrites explicit picker settings',
+    'typed autocomplete defaults on and never rewrites explicit picker settings',
     () async {
       final storage = MemoryStorage();
       ProviderContainer create() => ProviderContainer(
         overrides: [localStorageServiceProvider.overrideWithValue(storage)],
       );
       final container = create();
-      expect(container.read(promptAutocompleteEnabledProvider), false);
+      expect(container.read(generation.autocompleteSettingsProvider), true);
       expect(container.read(autocompleteSettingsProvider).enabled, true);
       await container
           .read(settingsValueStoreProvider)
           .write(SettingKey.promptAutocomplete, true);
-      expect(container.read(promptAutocompleteEnabledProvider), true);
-      expect(storage.values[StorageKeys.promptAutocompleteEnabled], true);
+      expect(container.read(generation.autocompleteSettingsProvider), true);
+      expect(storage.values[StorageKeys.enableAutocomplete], true);
       expect(container.read(autocompleteSettingsProvider).enabled, true);
       container.dispose();
       final reloaded = create();
       addTearDown(reloaded.dispose);
-      expect(reloaded.read(promptAutocompleteEnabledProvider), true);
+      expect(reloaded.read(generation.autocompleteSettingsProvider), true);
       await reloaded
           .read(settingsValueStoreProvider)
           .write(SettingKey.promptAutocomplete, false);
-      expect(reloaded.read(promptAutocompleteEnabledProvider), false);
-      expect(SettingSpec.of(SettingKey.promptAutocomplete).defaultValue, false);
+      expect(reloaded.read(generation.autocompleteSettingsProvider), false);
+      expect(SettingSpec.of(SettingKey.promptAutocomplete).defaultValue, true);
     },
   );
 }

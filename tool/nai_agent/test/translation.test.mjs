@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
@@ -39,7 +40,7 @@ test('translation host seeds exact history, exposes only block tools and persist
     response.end('data: [DONE]\n\n');
   });
   await listenFetchTestServer(server);
-  const host = spawn(process.execPath, [new URL('../host.mjs', import.meta.url).pathname.replace(/^\/(\w:)/, '$1')], { stdio: ['pipe', 'pipe', 'pipe'] });
+  const host = spawn(process.execPath, [fileURLToPath(new URL('../host.mjs', import.meta.url))], { stdio: ['pipe', 'pipe', 'pipe'] });
   let sessionId, sequence = 0;
   const pending = new Map();
   const send = message => host.stdin.write(JSON.stringify({ protocol: 1, workspaceId: 'translation-test', sessionId, ...message }) + '\n');

@@ -56,6 +56,30 @@ enum CompletionSourceKind { base, danbooruApi, cooccurrence, ai, library }
 
 enum CompletionQueryKind { tag, libraryAlias }
 
+/// Applied in local SQL before the result limit, so popular general tags do
+/// not prevent a less frequent character or work from being discovered.
+enum CompletionCategoryFilter {
+  all,
+  tags,
+  characters,
+  works;
+
+  bool accepts(TagCategory category) => switch (this) {
+    all => true,
+    characters => category == TagCategory.character,
+    works => category == TagCategory.copyright,
+    tags =>
+      category != TagCategory.character && category != TagCategory.copyright,
+  };
+
+  String sql(String column) => switch (this) {
+    all => '1=1',
+    characters => '$column IN (4,11)',
+    works => '$column IN (3,10)',
+    tags => '$column NOT IN (3,4,10,11)',
+  };
+}
+
 enum CompletionMatchKind {
   englishExact,
   englishPrefix,
@@ -66,6 +90,27 @@ enum CompletionMatchKind {
   chineseContains,
   related,
   fullText,
+}
+
+/// Chinese lookup evidence stays distinct from official English aliases.
+class ChineseNameMatch {
+  const ChineseNameMatch({
+    required this.term,
+    required this.isCore,
+    required this.kind,
+  });
+
+  final String term;
+  final bool isCore;
+  final CompletionMatchKind kind;
+
+  int get priority =>
+      (switch (kind) {
+        CompletionMatchKind.chineseExact => 0,
+        CompletionMatchKind.chinesePrefix => 2,
+        _ => 4,
+      }) +
+      (isCore ? 0 : 1);
 }
 
 class TextReplacementRange {
@@ -86,6 +131,7 @@ class CompletionQuery {
     required this.locale,
     this.relatedTag,
     this.kind = CompletionQueryKind.tag,
+    this.categoryFilter = CompletionCategoryFilter.all,
   });
 
   final String fullText;
@@ -97,6 +143,7 @@ class CompletionQuery {
   final String locale;
   final String? relatedTag;
   final CompletionQueryKind kind;
+  final CompletionCategoryFilter categoryFilter;
 
   bool get isChinese => RegExp(r'[\u3400-\u9fff]').hasMatch(token);
   bool get isEnglish => !isChinese;
@@ -112,6 +159,7 @@ class CompletionQuery {
     String? relatedTag,
     bool clearRelatedTag = false,
     CompletionQueryKind? kind,
+    CompletionCategoryFilter? categoryFilter,
   }) {
     return CompletionQuery(
       fullText: fullText ?? this.fullText,
@@ -123,6 +171,7 @@ class CompletionQuery {
       locale: locale ?? this.locale,
       relatedTag: clearRelatedTag ? null : relatedTag ?? this.relatedTag,
       kind: kind ?? this.kind,
+      categoryFilter: categoryFilter ?? this.categoryFilter,
     );
   }
 }
@@ -143,6 +192,8 @@ class CompletionCandidate {
     this.cooccurrenceCount,
     this.score = 0,
     this.retrievalOrigins = const [],
+    this.chineseMatch,
+    this.semanticTag,
   });
 
   final String canonicalTag;
@@ -165,6 +216,10 @@ class CompletionCandidate {
 
   /// Local retrieval evidence; kept in memory, without persisting the query.
   final List<String> retrievalOrigins;
+  final ChineseNameMatch? chineseMatch;
+
+  /// Original semantic record identity, which may be a resolved legacy alias.
+  final String? semanticTag;
 
   String get stableId => canonicalTag.toLowerCase();
 
@@ -183,6 +238,8 @@ class CompletionCandidate {
     int? cooccurrenceCount,
     double? score,
     List<String>? retrievalOrigins,
+    ChineseNameMatch? chineseMatch,
+    String? semanticTag,
   }) {
     return CompletionCandidate(
       canonicalTag: canonicalTag,
@@ -199,6 +256,8 @@ class CompletionCandidate {
       cooccurrenceCount: cooccurrenceCount ?? this.cooccurrenceCount,
       score: score ?? this.score,
       retrievalOrigins: retrievalOrigins ?? this.retrievalOrigins,
+      chineseMatch: chineseMatch ?? this.chineseMatch,
+      semanticTag: semanticTag ?? this.semanticTag,
     );
   }
 }

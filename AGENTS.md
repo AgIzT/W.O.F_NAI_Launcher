@@ -26,7 +26,7 @@ NovelAI Flutter 桌面客户端。业务按 `lib/core/`、`lib/data/`、`lib/pre
 ## 仓库边界
 
 - 本工作区只运行此目录的自研启动器，源码保持 ASCII 路径。`临时存图/` 不移动、不改名、不合并。
-- 不直接 merge 或 cherry-pick 上游提交；先观察差异，再实现所需功能。应用内更新源为 `z15087716457-stack/W.O.F_NAI_Launcher`，保留原项目归属说明。
+- 本分支以上游 `z15087716457-stack/W.O.F_NAI_Launcher` 为基线，定制范围是 Plana 式补全与只读译名。跟进上游时先读取增量、在开发分支合入并解决行为交点，再验证定制回归；不以旧版文件整体覆盖上游，也不恢复自动切块／TranslationPill。保留上游历史和原项目归属说明；应用更新源在独立发布渠道确定前保持原配置。迁移与持续跟进见 [维护记录](docs/plana-migration-2026-11-02.md)。
 - 不提交 API token、账号数据、本地日志、构建产物或个人工作流文件；认证调试只记录类型、长度或脱敏前缀。
 - 涉及 README 时同步修改 `README.md` 与 `README.en-US.md`，保留互相切换链接；仓库约定以中文版为准。
 - 发布前检查 LFS 数据库、版本、CHANGELOG、release notes 和 Windows release build，具体要求见 [DEVELOPMENT.md](DEVELOPMENT.md)。

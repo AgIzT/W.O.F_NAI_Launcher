@@ -20,14 +20,12 @@ class PillInlineEdit {
   const PillInlineEdit({
     required this.start,
     required this.end,
-    this.temp,
-    this.translation,
+    required this.temp,
     this.enabled = true,
-  }) : assert((temp == null) != (translation == null));
+  });
   final int start;
   final int end;
-  final PillTempContent? temp;
-  final TranslationPill? translation;
+  final PillTempContent temp;
   final bool enabled;
 }
 
@@ -157,61 +155,6 @@ abstract final class PillDocumentEditor {
     return document.copyWith(text: text, instances: instances);
   }
 
-  /// 将一个翻译块的所有出现位置还原为普通原文，并移除其翻译实例。
-  static PillDocument unwrapTranslation(
-    PillDocument document,
-    String marker, {
-    required String source,
-  }) {
-    if (document.instances[marker]?.translation == null ||
-        !document.text.contains(marker)) {
-      return document;
-    }
-    final instance = document.instances[marker]!;
-    final plain = instance.enabled
-        ? stripMarkers(instance.temporary ? instance.tempProjection! : source)
-        : '';
-    final instances = Map<String, PillInstance>.of(document.instances)
-      ..remove(marker);
-    return document.copyWith(
-      text: document.text.replaceAll(marker, plain),
-      instances: instances,
-    );
-  }
-
-  /// 将文档内全部翻译块展开为其当前原文，保留普通文字及库块标记。
-  static PillDocument unwrapAllTranslations(PillDocument document) {
-    final translations = <String, TranslationPill>{
-      for (final entry in document.instances.entries)
-        if (entry.value.translation case final translation?)
-          entry.key: translation,
-    };
-    if (translations.isEmpty) return document;
-
-    final text = StringBuffer();
-    for (var i = 0; i < document.text.length; i++) {
-      final codeUnit = document.text.codeUnitAt(i);
-      final translation = translations[String.fromCharCode(codeUnit)];
-      if (translation == null) {
-        text.writeCharCode(codeUnit);
-      } else {
-        if (document.instances[String.fromCharCode(codeUnit)]!.enabled) {
-          final instance = document.instances[String.fromCharCode(codeUnit)]!;
-          text.write(
-            stripMarkers(
-              instance.temporary
-                  ? instance.tempProjection!
-                  : translation.source,
-            ),
-          );
-        }
-      }
-    }
-    final instances = Map<String, PillInstance>.of(document.instances)
-      ..removeWhere((marker, _) => translations.containsKey(marker));
-    return document.copyWith(text: text.toString(), instances: instances);
-  }
-
   /// Expand just the selected occurrence using the same projection as sending.
   static PillDocument expandOccurrence(
     PillDocument document,
@@ -305,10 +248,6 @@ abstract final class PillDocumentEditor {
       if (instance == null || !instance.enabled) continue;
       if (instance.temporary) {
         buffer.write(instance.tempProjection);
-        continue;
-      }
-      if (instance.translation case final translation?) {
-        buffer.write(translation.source);
         continue;
       }
       buffer.write(

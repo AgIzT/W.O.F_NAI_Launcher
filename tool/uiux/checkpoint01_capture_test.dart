@@ -63,7 +63,7 @@ void main() {
             : classes.contains('grad')
             ? PromptBlockAppearance.gradient
             : classes.contains('tr')
-            ? PromptBlockAppearance.translation
+            ? PromptBlockAppearance.classic
             : PromptBlockAppearance.classic;
         final rawColor = (entry['blockColor'] as String).replaceFirst('#', '');
         Widget pill = PromptPill(

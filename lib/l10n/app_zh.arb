@@ -3093,7 +3093,7 @@
   "promptBlockLibrary_sourceFile": "来源文件",
   "promptBlockLibrary_importedAt": "导入时间",
   "promptBlockPalette_tooltip": "积木",
-  "promptBlockPalette_emptyHint": "把常用的提示词块或翻译块拖进来收纳；用时点一下插到光标处，或直接拖进提示词框。",
+  "promptBlockPalette_emptyHint": "把常用提示词块拖进来收纳；用时点击插到光标处，或直接拖进提示词框。",
   "promptBlockPalette_remove": "从积木移除",
   "promptBlockPalette_clearAll": "清空积木",
   "promptBlockPalette_clearAllArmed": "再点一次确认清空",
@@ -3234,9 +3234,9 @@
   "@tips_studio_trick_5": {
     "description": "Button count = nSamples x imagesPerRequest; estimatedCost uses both."
   },
-  "tips_studio_trick_6": "在翻译块上按一下鼠标中键，原文和译文来回切换。AI 翻得再好，偶尔也值得偷看一眼原文，确认它没把 cat ears 翻成什么奇怪的东西。",
+  "tips_studio_trick_6": "标签译名显示在提示词下方，可随时开关；原文始终可以直接编辑。",
   "@tips_studio_trick_6": {
-    "description": "promptTranslation_guideMiddleText."
+    "description": "Prompt reading display tip."
   },
   "tips_studio_trick_7": "设置里的「限制生图频率」可以让两次生图之间强制冷却，再加一点随机抖动，节奏就没那么机械。适合挂着慢慢抽的夜晚，也适合管不住手的自己。",
   "@tips_studio_trick_7": {
@@ -4199,42 +4199,10 @@
   "toast_titleInfo": "提示",
   "toast_titleProgress": "正在处理",
   "tagExpansion_autoTranslateVisible": "自动翻译可见标签",
-  "translationEditor_title": "翻译块",
-  "translationEditor_source": "原文",
-  "translationEditor_sourcePrefix": "原",
-  "translationEditor_generation": "生图使用",
-  "translationEditor_editable": "可改写",
-  "translationEditor_modified": "被修改",
-  "translationEditor_edited": "已编辑",
-  "translationEditor_close": "关闭",
-  "translationEditor_save": "保存",
-  "translationEditor_delete": "删除整块",
-  "translationEditor_restore": "还原为原文文本",
-  "translationEditor_configure": "配置翻译模型",
-  "translationEditor_readingFieldTitle": "{language}阅读文本",
-  "@translationEditor_readingFieldTitle": {
-    "placeholders": {
-      "language": {}
-    }
-  },
-  "translationEditor_sourceWarning": "原文已修改，{language}待同步",
-  "@translationEditor_sourceWarning": {
-    "placeholders": {
-      "language": {}
-    }
-  },
-  "translationEditor_editHint": "译文已手工编辑；这是编辑记录，不触发原文修改提醒",
-  "translationLanguage_chinese": "中文",
-  "translationLanguage_english": "英语",
-  "translationLanguage_japanese": "日语",
-  "translationLanguage_korean": "韩语",
-  "translationLanguage_traditionalChinese": "繁体中文",
-  "modelTask_translateTitle": "原文 → 阅读语言",
-  "modelTask_promptReverseTitle": "阅读语言 → 原文",
+  "modelTask_translateTitle": "全文阅读翻译",
   "modelTask_tagTranslateTitle": "标签翻译与语义补充",
   "modelTask_wikiTranslateTitle": "百科正文翻译",
-  "modelTask_translateDescription": "翻译提示词与积木，保留权重、分组和标签语义。",
-  "modelTask_promptReverseDescription": "结合原文落实译文中的增删修改，结果填回原文供确认。",
+  "modelTask_translateDescription": "将完整提示词翻译为独立阅读对照，保留原文。",
   "modelTask_tagTranslateDescription": "翻译可见标签，补齐中文核心词、同义词和简释义；已有资料优先复用。",
   "modelTask_wikiTranslateDescription": "翻译百科正文、整理排版，并按语境选择可点击标签。",
   "modelTask_connectionTest": "模型连接测试",
@@ -4347,9 +4315,6 @@
   "modelRequest_fieldParameters": "生效参数",
   "modelRequest_redacted": "[已脱敏]",
   "modelRequest_emptyResponse": "模型返回了空内容。",
-  "modelService_testFieldsIncomplete": "测试返回的字段不完整。",
-  "modelService_testFieldsInvalid": "测试返回的字段不正确。",
-  "modelService_testGroupsInvalid": "测试返回的分组不正确。",
   "modelService_testSourceEmpty": "测试返回的原文为空。",
   "modelService_conversionCancelled": "转换已取消",
   "modelService_chooseInterfaceModel": "请先在「设置 → 模型与接口 → 功能接口」选择服务商和模型。",
@@ -4447,9 +4412,6 @@
   "modelSettings_reasoningHelp": "翻译通常不需要开启思考；考虑到接口使用结构化输出，建议选择该模型支持的最低思考档位。",
   "modelSettings_reasoningHelpLabel": "思考档位建议",
   "modelSettings_usePreset": "使用预设",
-  "modelSettings_outputLanguage": "输出语言",
-  "modelSettings_englishPrompt": "英文生成提示词",
-  "modelSettings_englishPromptHelp": "结合原文落实修改，输出英文生成提示词。",
   "modelSettings_targetLanguage": "目标语言",
   "modelSettings_effective": "当前生效",
   "modelSettings_noModelSelected": "尚未选择可用模型",
@@ -4465,7 +4427,6 @@
       "level": {}
     }
   },
-  "modelSettings_promptBlocksHint": "无需翻译时，也可将提示词拆分为模块，通过积木功能自由拼装。",
   "modelSettings_wikiFormatHint": "无需翻译时，也可整理排版并为相关标签添加链接。",
   "modelSettings_unsavedChanges": "有未保存的修改",
   "modelSettings_testPreset": "测试预设",
@@ -4730,73 +4691,6 @@
   "modelOverrides_valueTypes": "支持字符串、数字、布尔值、数组和对象",
   "modelOverrides_addBodyField": "添加请求体字段",
   "modelOverrides_addHeader": "添加请求头",
-  "promptTranslation_translating": "正在翻译",
-  "promptTranslation_needsModel": "翻译 · 先配置模型",
-  "promptTranslation_withRoute": "翻译 · {provider} / {model}",
-  "@promptTranslation_withRoute": {
-    "placeholders": {
-      "provider": {},
-      "model": {}
-    }
-  },
-  "promptTranslation_actions": "翻译操作",
-  "promptTranslation_promptChanged": "提示词已变化，未覆盖新编辑",
-  "promptTranslation_nothingToTranslate": "当前没有需要翻译的普通文字",
-  "promptTranslation_failed": "翻译失败：{error}",
-  "@promptTranslation_failed": {
-    "placeholders": {
-      "error": {}
-    }
-  },
-  "promptTranslation_setupTitle": "先配置翻译模型",
-  "promptTranslation_setupBody": "翻译需要明确选择服务商和模型。前往「设置 → 集成 → 模型与接口」，先添加服务商并取得模型列表，再在「提示词翻译」卡片中完成选择。",
-  "promptTranslation_later": "稍后",
-  "promptTranslation_openSettings": "前往设置",
-  "promptTranslation_toolTitle": "翻译",
-  "promptTranslation_noModel": "未配置模型",
-  "promptTranslation_configureModel": "配置翻译模型",
-  "promptTranslation_translateNew": "翻译新增内容",
-  "promptTranslation_undoRestore": "撤销原文还原，恢复翻译块",
-  "promptTranslation_restoreAll": "全部翻译块还原为原文文本",
-  "promptTranslation_tutorial": "操作教程",
-  "promptTranslation_guideBack": "返回操作",
-  "promptTranslation_guideMiddleTitle": "中键点块",
-  "promptTranslation_guideMiddleText": "切换原文与译文",
-  "promptTranslation_guideSourceTitle": "左键点原文",
-  "promptTranslation_guideSourceText": "定位光标，直接修改",
-  "promptTranslation_guideReadingTitle": "左键点译文",
-  "promptTranslation_guideReadingText": "打开块编辑窗",
-  "promptTranslation_guideCtrlTitle": "Ctrl + 点击 / 拖选",
-  "promptTranslation_guideCtrlText": "编辑窗内搜索标签 / 查关联",
-  "promptTranslation_guideConvertTitle": "↑ 中文转原文",
-  "promptTranslation_guideConvertText": "↓ 原文转中文，检查后保存",
-  "promptTranslation_guideRestoreTitle": "切换整组显示",
-  "promptTranslation_guideRestoreText": "在翻译菜单中切换全部原文 / 译文",
-  "promptTranslation_middleButton": "鼠标中键",
-  "promptTranslation_leftButton": "鼠标左键",
-  "promptTranslation_blockShowingOriginal": "翻译块，显示原文",
-  "promptTranslation_blockShowingReading": "翻译块，显示译文",
-  "promptTranslation_blockNeedsReview": "原文已修改 · 译文待更新",
-  "promptTranslation_badgeTooltip": "原文已修改，中文待同步",
-  "promptTranslation_sourceChanged": "原文已变化，请重新打开翻译块",
-  "promptTranslation_retranslateFailed": "重新翻译失败：{error}",
-  "@promptTranslation_retranslateFailed": {
-    "placeholders": {
-      "error": {}
-    }
-  },
-  "promptTranslation_draftChanged": "内容已修改，请重新转换；新草稿已保留",
-  "promptTranslation_convertFailed": "转换失败，草稿已保留：{error}",
-  "@promptTranslation_convertFailed": {
-    "placeholders": {
-      "error": {}
-    }
-  },
-  "promptTranslation_invalidResultFormat": "转换结果格式不正确，草稿已保留",
-  "promptTranslation_noValidText": "模型没有返回有效文字，草稿已保留",
-  "promptTranslation_invalidResultContent": "转换结果包含无效格式，草稿已保留",
-  "promptTranslation_incompleteStructure": "转换结果的权重或分组不完整，草稿已保留",
-  "promptTranslation_inputRequired": "请先输入需要转换的内容",
   "wiki_configureTagModel": "请先在「模型与接口」配置可用的标签翻译模型。",
   "blockOrganizer_replaceMoveBody": "目标中已有 {count} 个同源副本。替换后来源从块库隐藏；已插入提示词的实例仍可引用原块。",
   "@blockOrganizer_replaceMoveBody": {
@@ -4814,7 +4708,6 @@
   "blockAppearance_dots": "圆点",
   "blockAppearance_solid": "实心",
   "blockAppearance_gradient": "渐变",
-  "blockAppearance_translation": "翻译",
   "opusUsage_regularRemaining": "常规免费额度：{percent}%",
   "@opusUsage_regularRemaining": {
     "description": "Separate Opus quota pool; backup means already activated usage boosts, not inventory.",
@@ -5152,7 +5045,6 @@
   "imageMenu_editAndDerive": "编辑与派生",
   "imageMenu_more": "更多操作",
   "imageMenu_fileActions": "文件操作",
-  "imageMenu_saveToBlock": "存入积木",
   "settings_highAnlasCostEstimate": "预计消耗",
   "settings_highAnlasCostThresholdLabel": "提醒阈值",
   "settings_highAnlasCostQuestion": "是否继续本次生成？",
@@ -6874,7 +6766,6 @@
     }
   },
   "blocks_title": "块库",
-  "blocks_translationMark": "译",
   "blocks_add": "添加",
   "blocks_cancel": "取消",
   "blocks_close": "关闭",
@@ -6949,7 +6840,6 @@
   "blocks_lookDots": "圆点",
   "blocks_lookSolid": "实心",
   "blocks_lookGradient": "渐变",
-  "blocks_lookTranslation": "翻译",
   "blocks_hasParams": "附带参数",
   "blocks_hasNegative": "含负面",
   "blocks_hintClick": "点击插入",
@@ -7207,8 +7097,6 @@
   "blocks_details": "详情",
   "blocks_noSelection": "点一张卡片查看详情。双击直接编辑，Enter 插入到提示词。",
   "blocks_changeThumb": "更换 / 调整",
-  "blocks_reading": "翻译阅读",
-  "blocks_needsReview": "需复核",
   "blocks_applyToCurrent": "应用到当前",
   "blocks_noParams": "没有。插入时不会改动当前参数。",
   "blocks_paramModel": "模型",
@@ -8107,18 +7995,6 @@
   "gen_sdConvertSub": "粘贴 (tag:1.2) 时转成 NAI 权重",
   "gen_related": "共现推荐",
   "gen_relatedSub": "补全时推荐常一起出现的标签",
-  "gen_translating": "正在翻译…",
-  "gen_translateNeedsModel": "还没配翻译模型，点一下去设置",
-  "gen_translateWith": "翻译（{route}）",
-  "@gen_translateWith": {
-    "placeholders": {
-      "route": {}
-    }
-  },
-  "gen_translateNew": "翻译新增内容",
-  "gen_translateShowOriginal": "全部显示原文",
-  "gen_translateShowTranslated": "全部显示译文",
-  "gen_translateSettings": "翻译模型设置",
   "gen_qualityPreset": "质量词预设",
   "gen_ucPreset": "负面预设",
   "gen_presetNone": "无",
@@ -8932,17 +8808,65 @@
   "channel_motionSub": "很轻的动效，生成时自动暂停",
   "channel_toastTitle": "本次通道",
   "channel_batch": "{time} · {count} 张",
-  "@channel_batch": {"placeholders": {"time": {"type": "String"}, "count": {"type": "int"}}},
+  "@channel_batch": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "channel_batchNewest": "{time} · {count} 张 · 最新",
-  "@channel_batchNewest": {"placeholders": {"time": {"type": "String"}, "count": {"type": "int"}}},
+  "@channel_batchNewest": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "channel_batchPending": "生成中 · {count} 张",
-  "@channel_batchPending": {"placeholders": {"count": {"type": "int"}}},
+  "@channel_batchPending": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "channel_dayToday": "今天 · {date}",
-  "@channel_dayToday": {"placeholders": {"date": {"type": "String"}}},
+  "@channel_dayToday": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "channel_dayYesterday": "昨天 · {date}",
-  "@channel_dayYesterday": {"placeholders": {"date": {"type": "String"}}},
+  "@channel_dayYesterday": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "channel_monthDayWeek": "{month}月{day}日 {weekday}",
-  "@channel_monthDayWeek": {"placeholders": {"month": {"type": "int"}, "day": {"type": "int"}, "weekday": {"type": "String"}}},
+  "@channel_monthDayWeek": {
+    "placeholders": {
+      "month": {
+        "type": "int"
+      },
+      "day": {
+        "type": "int"
+      },
+      "weekday": {
+        "type": "String"
+      }
+    }
+  },
   "channel_weekday1": "周一",
   "channel_weekday2": "周二",
   "channel_weekday3": "周三",
@@ -8951,7 +8875,16 @@
   "channel_weekday6": "周六",
   "channel_weekday7": "周日",
   "channel_scrubWhen": "{day} {time}",
-  "@channel_scrubWhen": {"placeholders": {"day": {"type": "String"}, "time": {"type": "String"}}},
+  "@channel_scrubWhen": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "rag_title": "RAG 向量系统",
   "rag_description": "管理本地语义检索、模型与标签上下文推荐",
   "rag_enabled": "启用 RAG",
@@ -9102,8 +9035,23 @@
   "rag_runtimeVerify": "正在校验环境兼容性",
   "rag_runtimeElapsed": "此阶段已用 {seconds} 秒",
   "rag_useRuntime": "使用已有环境",
-  "@rag_downloadProgress": {"placeholders": {"done": {"type": "String"}, "total": {"type": "String"}}},
-  "@rag_runtimeElapsed": {"placeholders": {"seconds": {"type": "int"}}},
+  "@rag_downloadProgress": {
+    "placeholders": {
+      "done": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "@rag_runtimeElapsed": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
   "set_title": "设置",
   "set_search": "搜索设置",
   "set_searchResults": "搜索结果",
@@ -9801,21 +9749,44 @@
   "set_dcLatest": "已是最新",
   "set_dcUpdatesAvailable": "有可用更新",
   "set_dcLastChecked": "上次检查 {when}",
-  "@set_dcLastChecked": {"placeholders": {"when": {}}},
+  "@set_dcLastChecked": {
+    "placeholders": {
+      "when": {}
+    }
+  },
   "set_dcRefreshWiki": "刷新 Wiki",
   "set_dcRefreshWikiTip": "下载当前 Wiki 数据，更新此前未同步的已有正文；保留个人译文。",
   "set_dcChanged": "新增 {added} 条，更新 {updated} 条，已保存在本地",
-  "@set_dcChanged": {"placeholders": {"added": {}, "updated": {}}},
+  "@set_dcChanged": {
+    "placeholders": {
+      "added": {},
+      "updated": {}
+    }
+  },
   "set_dcRagSyncTip": "如已使用语义检索，请重启 Studio 后手动同步相应来源的索引。",
   "set_dcUpdateTags": "更新 Tag",
   "set_dcUpdateWiki": "更新 Wiki",
   "set_dcSources": "可用数据：Tag {tagDate} · Wiki {wikiDate}",
-  "@set_dcSources": {"placeholders": {"tagDate": {}, "wikiDate": {}}},
+  "@set_dcSources": {
+    "placeholders": {
+      "tagDate": {},
+      "wikiDate": {}
+    }
+  },
   "set_dcDownloading": "正在下载 {received} / {total}",
-  "@set_dcDownloading": {"placeholders": {"received": {}, "total": {}}},
+  "@set_dcDownloading": {
+    "placeholders": {
+      "received": {},
+      "total": {}
+    }
+  },
   "set_dcVerifying": "正在校验下载内容…",
   "set_dcImporting": "正在补充本地数据 · 已读取 {n} 条",
-  "@set_dcImporting": {"placeholders": {"n": {}}},
+  "@set_dcImporting": {
+    "placeholders": {
+      "n": {}
+    }
+  },
   "set_dcPublishing": "正在切换数据版本…",
   "set_dcUpdateFailed": "补充失败，已保留原数据。可重试。",
   "set_dcUpdateCancelled": "已取消，原数据保持可用。",
@@ -9910,7 +9881,6 @@
   },
   "set_mdDeleteBody": "用到它的功能会回落到其他可用服务商。",
   "set_mdTaskPrompt": "提示词翻译",
-  "set_mdTaskReverse": "提示词反推",
   "set_mdTaskTag": "标签翻译与语义补充",
   "set_mdTaskWiki": "百科翻译",
   "set_mdFeature": "功能",
@@ -10097,7 +10067,17 @@
   "set_rgOpening": "正在连接本地工作进程，读取已有索引。",
   "set_rgLoadingSaved": "正在载入已保存的检索索引。",
   "set_rgRestoring": "正在恢复检索索引 {done} / {total}，已有向量会直接复用。",
-  "@set_rgRestoring": {"description": "Actual local ANN recovery progress; existing embeddings are reused.", "placeholders": {"done": {"type": "String"}, "total": {"type": "String"}}},
+  "@set_rgRestoring": {
+    "description": "Actual local ANN recovery progress; existing embeddings are reused.",
+    "placeholders": {
+      "done": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
   "set_rgSaving": "正在保存恢复后的检索索引。",
   "set_rgReadingSources": "正在读取各来源的索引状态。",
   "set_rgLoadingTimeout": "索引载入长时间没有进展或已达到时间上限，请重试。已有数据保留。",
@@ -10500,9 +10480,18 @@
   "set_accBalanceUnread": "余额未读取",
   "set_agBase": "内置系统提示词",
   "set_agBaseGlobalState": "全局：{state}",
-  "@set_agBaseGlobalState": {"placeholders": {"state": {}}},
+  "@set_agBaseGlobalState": {
+    "placeholders": {
+      "state": {}
+    }
+  },
   "set_agBaseWsState": "工作区「{name}」：{state}",
-  "@set_agBaseWsState": {"placeholders": {"name": {}, "state": {}}},
+  "@set_agBaseWsState": {
+    "placeholders": {
+      "name": {},
+      "state": {}
+    }
+  },
   "set_agBaseBuiltin": "内置",
   "set_agBaseCustom": "已自定义",
   "set_agBaseInherit": "沿用全局",
@@ -10511,7 +10500,11 @@
   "set_agBaseCollapse": "收起",
   "set_agScopeGlobal": "全局",
   "set_agScopeWorkspace": "工作区 · {name}",
-  "@set_agScopeWorkspace": {"placeholders": {"name": {}}},
+  "@set_agScopeWorkspace": {
+    "placeholders": {
+      "name": {}
+    }
+  },
   "set_agBaseUseGlobalOn": "这个工作区沿用全局提示词；关掉才能单独编辑",
   "set_agBaseUseGlobalOff": "这个工作区使用单独的提示词；打开则改回沿用全局",
   "set_agBaseHint": "可用自定义内容替换内置系统提示词，拼在“内置提示词前”的内容之后；工具地图由应用追加。全局和工作区分开保存，已有聊天保持原样。",
@@ -10659,7 +10652,19 @@
   "ag_greetHint": "Agent 会先看草稿再动手；花 Anlas 前一定先问你。",
   "ag_draftEyebrow": "当前草稿",
   "ag_draftCounts": "角色 {characters} · {blocks} 个积木 · 参考图 {references}",
-  "@ag_draftCounts": {"placeholders": {"characters": {"type": "int"}, "blocks": {"type": "int"}, "references": {"type": "int"}}},
+  "@ag_draftCounts": {
+    "placeholders": {
+      "characters": {
+        "type": "int"
+      },
+      "blocks": {
+        "type": "int"
+      },
+      "references": {
+        "type": "int"
+      }
+    }
+  },
   "ag_taskReview": "检查草稿",
   "ag_taskReviewHint": "找冲突、冗余和模型不认的写法",
   "ag_taskReviewPrompt": "检查当前草稿和参数，找出冲突、冗余和当前模型不认的写法，先不要修改。",
@@ -10686,11 +10691,29 @@
   "ag_delete": "删除",
   "ag_deleteWorkspaceTitle": "删除工作区？",
   "ag_deleteWorkspaceBody": "工作区「{name}」和里面的全部对话会移进回收区，可以撤销。生成的图片仍保留在图库和历史中。",
-  "@ag_deleteWorkspaceBody": {"placeholders": {"name": {"type": "String"}}},
+  "@ag_deleteWorkspaceBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "ag_chatDeleted": "已删除「{title}」",
-  "@ag_chatDeleted": {"placeholders": {"title": {"type": "String"}}},
+  "@ag_chatDeleted": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
   "ag_workspaceDeleted": "已删除工作区「{name}」",
-  "@ag_workspaceDeleted": {"placeholders": {"name": {"type": "String"}}},
+  "@ag_workspaceDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "ag_chatsContent": "内容匹配",
   "ag_chatsSearching": "正在搜索对话内容…",
   "ag_imageVibe": "设为 Vibe",
@@ -10713,7 +10736,16 @@
   "ag_sloganExternal": "和外部工具对暗号…\n等外面回话…",
   "ag_foldDone": "已处理",
   "ag_foldTimes": "{label} {count} 次",
-  "@ag_foldTimes": {"placeholders": {"label": {"type": "String"}, "count": {"type": "int"}}},
+  "@ag_foldTimes": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_kindThink": "思考",
   "ag_kindRead": "读取",
   "ag_kindRun": "运行命令",
@@ -10723,7 +10755,13 @@
   "ag_kindExternal": "外部工具",
   "ag_kindAsk": "问你",
   "ag_limitTitle": "已达到单次任务步数上限（{count} 步）",
-  "@ag_limitTitle": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_limitTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_limitBody": "进度已保存，点“继续”接着做。上限可以在设置里调整。",
   "ag_limitContinue": "继续",
   "ag_limitAdjust": "调整上限",
@@ -10731,49 +10769,184 @@
   "ag_diffExpand": "展开全部",
   "ag_diffCollapse": "收起",
   "ag_readImages": "查看图片 · {count} 张",
-  "@ag_readImages": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_readImages": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_turnTook": "用时 {time}",
-  "@ag_turnTook": {"placeholders": {"time": {"type": "String"}}},
+  "@ag_turnTook": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "ag_turnAnlas": "{anlas} Anlas",
-  "@ag_turnAnlas": {"placeholders": {"anlas": {"type": "String"}}},
+  "@ag_turnAnlas": {
+    "placeholders": {
+      "anlas": {
+        "type": "String"
+      }
+    }
+  },
   "ag_turnChanges": "改动 {count} 处",
-  "@ag_turnChanges": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_turnChanges": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_turnTools": "工具 {count} 次",
-  "@ag_turnTools": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_turnTools": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_turnTokens": "输入 {input} · 输出 {output} token",
-  "@ag_turnTokens": {"placeholders": {"input": {"type": "String"}, "output": {"type": "String"}}},
+  "@ag_turnTokens": {
+    "placeholders": {
+      "input": {
+        "type": "String"
+      },
+      "output": {
+        "type": "String"
+      }
+    }
+  },
   "ag_settingsTitle": "应用设置",
   "ag_settingsGo": "去设置",
   "ag_tagCopied": "已复制 {tag}",
-  "@ag_tagCopied": {"placeholders": {"tag": {"type": "String"}}},
+  "@ag_tagCopied": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
   "ag_tagCount": "{count} 张作品",
-  "@ag_tagCount": {"placeholders": {"count": {"type": "String"}}},
+  "@ag_tagCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
   "ag_galleryFavorite": "已收藏 {count} 张",
-  "@ag_galleryFavorite": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_galleryFavorite": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_galleryUnfavorite": "已取消收藏 {count} 张",
-  "@ag_galleryUnfavorite": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_galleryUnfavorite": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_galleryTags": "已改标签 {count} 张",
-  "@ag_galleryTags": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_galleryTags": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_galleryMove": "已移动 {count} 张到「{target}」",
-  "@ag_galleryMove": {"placeholders": {"count": {"type": "int"}, "target": {"type": "String"}}},
+  "@ag_galleryMove": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
   "ag_galleryCopy": "已复制 {count} 张到「{target}」",
-  "@ag_galleryCopy": {"placeholders": {"count": {"type": "int"}, "target": {"type": "String"}}},
+  "@ag_galleryCopy": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
   "ag_galleryDelete": "已移到回收区 {count} 张",
-  "@ag_galleryDelete": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_galleryDelete": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_galleryRestore": "已恢复 {count} 张",
-  "@ag_galleryRestore": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_galleryRestore": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_galleryCollectionAdd": "已加入集合「{target}」{count} 张",
-  "@ag_galleryCollectionAdd": {"placeholders": {"count": {"type": "int"}, "target": {"type": "String"}}},
+  "@ag_galleryCollectionAdd": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
   "ag_galleryCollectionRemove": "已移出集合「{target}」{count} 张",
-  "@ag_galleryCollectionRemove": {"placeholders": {"count": {"type": "int"}, "target": {"type": "String"}}},
+  "@ag_galleryCollectionRemove": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
   "ag_galleryExport": "已导出 {count} 张",
-  "@ag_galleryExport": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_galleryExport": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_galleryMore": "+{count}",
-  "@ag_galleryMore": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_galleryMore": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_compacted": "之前的对话已压缩",
   "ag_compactedAuto": "上下文快满了，之前的对话已自动压缩",
   "ag_compactedTokens": "原 {tokens} token",
-  "@ag_compactedTokens": {"placeholders": {"tokens": {"type": "String"}}},
+  "@ag_compactedTokens": {
+    "placeholders": {
+      "tokens": {
+        "type": "String"
+      }
+    }
+  },
   "ag_compactedShow": "看摘要",
   "ag_compactedHide": "收起摘要",
   "ag_editResend": "发送",
@@ -10783,7 +10956,16 @@
   "set_agTrashSub": "删除的对话、工作区和 Skill 先放进回收区，可以恢复；彻底删除后不能找回。",
   "set_agTrashManage": "管理",
   "set_agTrashSummary": "{count} 项 · {size}",
-  "@set_agTrashSummary": {"placeholders": {"count": {"type": "int"}, "size": {"type": "String"}}},
+  "@set_agTrashSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "size": {
+        "type": "String"
+      }
+    }
+  },
   "set_agTrashEmpty": "回收区是空的",
   "set_agTrashAll": "全部",
   "set_agTrashChats": "对话",
@@ -10794,24 +10976,63 @@
   "set_agTrashPurgeAll": "清空回收区",
   "set_agTrashPurgeTitle": "彻底删除？",
   "set_agTrashPurgeBody": "「{name}」会从磁盘上删除，不能找回。",
-  "@set_agTrashPurgeBody": {"placeholders": {"name": {"type": "String"}}},
+  "@set_agTrashPurgeBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "set_agTrashPurgeAllBody": "回收区里的 {count} 项会从磁盘上删除，不能找回。",
-  "@set_agTrashPurgeAllBody": {"placeholders": {"count": {"type": "int"}}},
+  "@set_agTrashPurgeAllBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "set_agTrashRestored": "已恢复「{name}」",
-  "@set_agTrashRestored": {"placeholders": {"name": {"type": "String"}}},
+  "@set_agTrashRestored": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "set_agTrashPurged": "已彻底删除「{name}」",
-  "@set_agTrashPurged": {"placeholders": {"name": {"type": "String"}}},
+  "@set_agTrashPurged": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "set_agTrashNeedWorkspace": "所属工作区也在回收区里，先恢复工作区",
   "set_agTrashRestoreFailed": "恢复失败：原位置已有同名内容",
   "set_agTrashGoneWorkspace": "已删除的工作区",
   "set_agSkillRemoveBody": "「{name}」会移进回收区，之后可以在 Agent 设置的「回收区」里恢复或彻底删除。",
-  "@set_agSkillRemoveBody": {"placeholders": {"name": {"type": "String"}}},
+  "@set_agSkillRemoveBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "set_agSkillName": "名称",
   "set_agSkillNewHelp": "只用小写字母、数字和连字符，例如 watercolor-style。建好后会打开它的文件夹，编辑里面的 SKILL.md 即可。",
   "set_agSkillCreate": "创建",
   "set_agSkillAddConfirm": "添加",
   "set_agPromptStats": "{chars} 字符 · 约 {tokens} token",
-  "@set_agPromptStats": {"placeholders": {"chars": {"type": "String"}, "tokens": {"type": "String"}}},
+  "@set_agPromptStats": {
+    "placeholders": {
+      "chars": {
+        "type": "String"
+      },
+      "tokens": {
+        "type": "String"
+      }
+    }
+  },
   "set_agFinalLive": "当前会话实际发给模型的完整系统提示词。",
   "set_agBuiltinSub": "Studio 内置的基础提示词，随版本更新。",
   "set_agMcpEditTitle": "编辑 MCP 服务器",
@@ -10834,7 +11055,13 @@
   "ag_stepArguments": "参数",
   "ag_stepResult": "结果",
   "ag_stepsMore": "还有 {count} 步",
-  "@ag_stepsMore": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_stepsMore": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_tool_studio_context": "读取当前草稿",
   "ag_tool_image_read": "查看图片",
   "ag_tool_prompt_update": "改写提示词",
@@ -10922,40 +11149,112 @@
   "ag_diffLocked": "草稿已再次修改",
   "ag_diffUndo": "撤销",
   "ag_diffCounts": "+{added} −{removed}",
-  "@ag_diffCounts": {"placeholders": {"added": {"type": "int"}, "removed": {"type": "int"}}},
+  "@ag_diffCounts": {
+    "placeholders": {
+      "added": {
+        "type": "int"
+      },
+      "removed": {
+        "type": "int"
+      }
+    }
+  },
   "ag_outputs": "本次产物",
   "ag_anlasSpent": "已用 {anlas} Anlas",
-  "@ag_anlasSpent": {"placeholders": {"anlas": {"type": "String"}}},
+  "@ag_anlasSpent": {
+    "placeholders": {
+      "anlas": {
+        "type": "String"
+      }
+    }
+  },
   "ag_imageReveal": "在历史中显示",
   "ag_imageAttach": "附到输入框",
   "ag_imageZoom": "放大查看",
   "ag_askHint": "按 1–{count}",
-  "@ag_askHint": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_askHint": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_askOther": "其他想法…",
   "ag_askSubmit": "回答",
   "ag_askSkip": "跳过",
   "ag_approvalTitle": "需要你允许 · {tool}",
-  "@ag_approvalTitle": {"placeholders": {"tool": {"type": "String"}}},
+  "@ag_approvalTitle": {
+    "placeholders": {
+      "tool": {
+        "type": "String"
+      }
+    }
+  },
   "ag_gateTitle": "需要你确认 · {action}",
-  "@ag_gateTitle": {"placeholders": {"action": {"type": "String"}}},
+  "@ag_gateTitle": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
   "ag_gateText2img": "生成 {count} 张",
-  "@ag_gateText2img": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_gateText2img": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_gateImg2img": "图生图 {count} 张",
-  "@ag_gateImg2img": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_gateImg2img": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_gateInpaint": "重绘 {count} 张",
-  "@ag_gateInpaint": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_gateInpaint": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_gateVariations": "变体 {count} 张",
-  "@ag_gateVariations": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_gateVariations": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_gateEnhance": "增强",
   "ag_gateModelSize": "模型 · 尺寸",
   "ag_gateRequests": "请求",
   "ag_gateRequestsValue": "{requests} 次 × {batch} 张",
-  "@ag_gateRequestsValue": {"placeholders": {"requests": {"type": "int"}, "batch": {"type": "int"}}},
+  "@ag_gateRequestsValue": {
+    "placeholders": {
+      "requests": {
+        "type": "int"
+      },
+      "batch": {
+        "type": "int"
+      }
+    }
+  },
   "ag_gateUnit": "单价",
   "ag_gateEncoding": "参考图编码",
   "ag_gateAccount": "账号",
   "ag_gateTotal": "合计 · 余额 {balance}",
-  "@ag_gateTotal": {"placeholders": {"balance": {"type": "String"}}},
+  "@ag_gateTotal": {
+    "placeholders": {
+      "balance": {
+        "type": "String"
+      }
+    }
+  },
   "ag_gateTotalNoBalance": "合计",
   "ag_gateConfirm": "确认并生成",
   "ag_gateConfirmTool": "确认并执行",
@@ -10965,7 +11264,13 @@
   "ag_placeholder": "告诉 Agent 要做什么 · @ 引用 · / 技能",
   "ag_dropHint": "松开以附加到这条消息",
   "ag_importing": "正在添加 {count} 张图片…",
-  "@ag_importing": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_importing": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_attach": "添加图片",
   "ag_attachFile": "从文件选择…",
   "ag_attachCanvas": "附上画布当前图片",
@@ -11036,7 +11341,13 @@
   "ag_usageContext": "当前上下文 · 估算",
   "ag_usageUnknown": "等模型返回用量后显示",
   "ag_usageRemaining": "剩余 {tokens}",
-  "@ag_usageRemaining": {"placeholders": {"tokens": {"type": "String"}}},
+  "@ag_usageRemaining": {
+    "placeholders": {
+      "tokens": {
+        "type": "String"
+      }
+    }
+  },
   "ag_usageSession": "本聊天累计",
   "ag_usageInput": "输入",
   "ag_usageOutput": "输出",
@@ -11047,13 +11358,37 @@
   "ag_usageCost": "费用以服务商账单为准",
   "ag_usageCompact": "压缩上下文",
   "ag_shelfAll": "全部 {count}",
-  "@ag_shelfAll": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_shelfAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_shelfGenerated": "生成 {count}",
-  "@ag_shelfGenerated": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_shelfGenerated": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_shelfAttachments": "附件 {count}",
-  "@ag_shelfAttachments": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_shelfAttachments": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_shelfFiles": "文件 {count}",
-  "@ag_shelfFiles": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_shelfFiles": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_shelfFilesTitle": "文件",
   "ag_shelfHint": "点图放大 · 拖到画布",
   "ag_shelfEmpty": "这个聊天还没有产物",
@@ -11149,36 +11484,71 @@
   "mp_copyId": "复制模型 ID",
   "mp_removeModel": "移除模型",
   "mp_removeTitle": "移除模型“{id}”？",
-  "@mp_removeTitle": {"placeholders": {"id": {}}},
+  "@mp_removeTitle": {
+    "placeholders": {
+      "id": {}
+    }
+  },
   "mp_removeBody": "用到它的功能会回落到其他可用模型。",
   "mp_catalogId": "模型 ID",
   "mp_catalogCtx": "上下文",
   "mp_catalogPrice": "输入 / 输出 · 百万",
   "mp_catalogFooter": "匹配 {n} 个 · 共 {total} 个 · {when} 获取",
-  "@mp_catalogFooter": {"placeholders": {"n": {}, "total": {}, "when": {}}},
+  "@mp_catalogFooter": {
+    "placeholders": {
+      "n": {},
+      "total": {},
+      "when": {}
+    }
+  },
   "mp_catalogMore": "还有 {n} 个，输入筛选缩小范围",
-  "@mp_catalogMore": {"placeholders": {"n": {}}},
+  "@mp_catalogMore": {
+    "placeholders": {
+      "n": {}
+    }
+  },
   "mp_catalogIdle": "还没读取过目录",
   "mp_catalogIdleSub": "用已保存的地址和 Key 读取这个服务商提供的模型",
   "mp_catalogLoading": "正在读取模型目录…",
   "mp_catalogFailed": "目录不可用：{error}",
-  "@mp_catalogFailed": {"placeholders": {"error": {}}},
+  "@mp_catalogFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
   "mp_fetch": "获取列表",
   "mp_noMatch": "没有匹配的模型",
   "mp_picked": "已选 {n} 个",
-  "@mp_picked": {"placeholders": {"n": {}}},
+  "@mp_picked": {
+    "placeholders": {
+      "n": {}
+    }
+  },
   "mp_pickEmpty": "在左边勾选要添加的模型",
   "mp_pickHint": "能力、上下文和思考档位按本地目录预填，添加后可在右侧逐项调整。",
   "mp_addPicked": "添加 {n} 个模型",
-  "@mp_addPicked": {"placeholders": {"n": {}}},
+  "@mp_addPicked": {
+    "placeholders": {
+      "n": {}
+    }
+  },
   "mp_new": "新",
   "mp_unsaved": "{name} 有 {n} 项修改未保存",
-  "@mp_unsaved": {"placeholders": {"name": {}, "n": {}}},
+  "@mp_unsaved": {
+    "placeholders": {
+      "name": {},
+      "n": {}
+    }
+  },
   "mp_saving": "正在保存…",
   "mp_conflict": "配置已在别处修改：已合并最新值，确认后再保存",
   "mp_saveFailed": "保存失败，修改已保留",
   "mp_invalid": "有 {n} 处需要修正",
-  "@mp_invalid": {"placeholders": {"n": {}}},
+  "@mp_invalid": {
+    "placeholders": {
+      "n": {}
+    }
+  },
   "mp_leaveBody": "服务商配置还没保存，离开这一页会丢掉修改。",
   "mp_show": "显示",
   "mp_hide": "隐藏",
@@ -11209,39 +11579,129 @@
   "mp_errorRateLimit": "请求过于频繁",
   "ag_tool_prompt_set": "提示词组",
   "ag_psCount": "{count} {unit}",
-  "@ag_psCount": {"placeholders": {"count": {"type": "int"}, "unit": {"type": "String"}}},
+  "@ag_psCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
   "ag_psPosition": "第 {index} {unit} / 共 {count} {unit}",
-  "@ag_psPosition": {"placeholders": {"index": {"type": "int"}, "count": {"type": "int"}, "unit": {"type": "String"}}},
+  "@ag_psPosition": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
   "ag_psOverview": "总览全部",
   "ag_psSingle": "回到单项",
   "ag_psPrompt": "提示词",
   "ag_psShared": "共同设定",
   "ag_psThisItem": "这一{unit}",
-  "@ag_psThisItem": {"placeholders": {"unit": {"type": "String"}}},
+  "@ag_psThisItem": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
   "ag_psMain": "主提示词",
   "ag_psCharacter": "角色 {index}",
-  "@ag_psCharacter": {"placeholders": {"index": {"type": "int"}}},
+  "@ag_psCharacter": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
   "ag_psNegative": "负面",
   "ag_psImport": "导入画布",
   "ag_psImportTip": "写入主提示词、角色和负面；参数和参考图不变",
   "ag_psImported": "已把「{title}」写入提示词",
-  "@ag_psImported": {"placeholders": {"title": {"type": "String"}}},
+  "@ag_psImported": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
   "ag_psGenerate": "生成",
   "ag_psGenerating": "生成中",
   "ag_psRevision": "v{revision} · 已改 {count} 项",
-  "@ag_psRevision": {"placeholders": {"revision": {"type": "int"}, "count": {"type": "int"}}},
+  "@ag_psRevision": {
+    "placeholders": {
+      "revision": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_psSaveBlock": "存成积木",
   "ag_psSavedBlock": "已存成积木「{title}」· {count} 项",
-  "@ag_psSavedBlock": {"placeholders": {"title": {"type": "String"}, "count": {"type": "int"}}},
+  "@ag_psSavedBlock": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_psCopyItem": "复制这一{unit}的提示词",
-  "@ag_psCopyItem": {"placeholders": {"unit": {"type": "String"}}},
+  "@ag_psCopyItem": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
   "ag_psCopyAll": "复制全部",
   "ag_psEditItem": "让 Agent 修改这一{unit}",
-  "@ag_psEditItem": {"placeholders": {"unit": {"type": "String"}}},
+  "@ag_psEditItem": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
   "ag_psEditDraft": "修改「{title}」第 {index} {unit}（{item}）：",
-  "@ag_psEditDraft": {"placeholders": {"title": {"type": "String"}, "index": {"type": "int"}, "unit": {"type": "String"}, "item": {"type": "String"}}},
+  "@ag_psEditDraft": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "index": {
+        "type": "int"
+      },
+      "unit": {
+        "type": "String"
+      },
+      "item": {
+        "type": "String"
+      }
+    }
+  },
   "ag_psTooManyCharacters": "当前模型最多支持 {count} 个角色",
-  "@ag_psTooManyCharacters": {"placeholders": {"count": {"type": "int"}}},
+  "@ag_psTooManyCharacters": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "ag_psNoCharacters": "当前模型不支持角色提示词",
   "ag_psMissing": "这张卡的数据已不在",
   "startup_dataTitle": "无法准备应用数据",
@@ -11295,42 +11755,6 @@
   "ag_historySettings": "设置修改",
   "ag_historyGallery": "图库卡片",
   "ag_historyChanges": "修改摘要",
-  "gen_translateTapOriginal": "点按：显示原文",
-  "gen_translateTapTranslated": "点按：显示译文",
-  "gen_translateClearRestore": "清除翻译块并还原",
-  "gen_translateClearRestoreSub": "全部变回普通原文，可撤销",
-  "gen_translateCleared": "已清除翻译块并还原原文",
-  "gen_translateAdjust": "追加翻译调整",
-  "gen_translateAdjustSub": "接着这次翻译聊，重切、重译、合并块",
-  "gen_translateAdjustTitle": "翻译调整",
-  "gen_translateAdjustContext": "续接本次翻译 · {count} 块",
-  "@gen_translateAdjustContext": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "gen_translateAdjustSelected": "已选 {count} 块",
-  "@gen_translateAdjustSelected": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "gen_translateAdjustCollapse": "收起 / 展开",
-  "gen_translateAdjustIntro": "接着本次翻译调整。点击左侧翻译块添加引用，改块后可以撤销。",
-  "gen_translateAdjustSplit": "重新切块",
-  "gen_translateAdjustRetranslate": "重译选中",
-  "gen_translateAdjustMerge": "合并选中",
-  "gen_translateAdjustSplitTemplate": "读取当前块，按语义细分引用的块，保留精确原文。",
-  "gen_translateAdjustRetranslateTemplate": "读取当前块，重新翻译引用的块，不改原文。",
-  "gen_translateAdjustMergeTemplate": "读取当前块，按指定的原文顺序合并引用的块，无关块不动。",
-  "gen_translateAdjustMarkers": "请使用 translation_blocks_read 返回的 marker 列表。",
-  "gen_translateAdjustHint": "接着说要怎么调整…",
-  "gen_translateAdjustStartFailed": "无法启动翻译调整，请检查模型与 Agent 运行时。",
-  "gen_translateAdjustRunFailed": "调整已中止或失败，重试前请重新读取当前块。",
   "gen_repeatDragTotal": "{times} 次 · 共 {total} 张",
   "@gen_repeatDragTotal": {
     "placeholders": {
@@ -11345,10 +11769,6 @@
   "set_cvGroupBatches": "批量结果按批次分组",
   "set_cvGroupBatchesSub": "关闭后逐张显示，点历史缩略图可直接定位单张图片。适用于简洁查看器和无限画布。",
   "gen_groupBatches": "分组",
-  "gen_translateAdjustPickHint": "在左侧点块可引用",
-  "gen_translateAdjustClearRefs": "清除引用",
-  "gen_translateAdjustSplitInto": "{source} → {count} 块",
-  "gen_translateAdjustContextNote": "上下文：本次翻译的原文、切块和译文",
   "ag_historyStats": "{messages} 条发言 · {cards} 张卡片",
   "ag_historyKeySelect": "选择",
   "ag_historyKeyJump": "跳到对话",
@@ -11378,16 +11798,6 @@
   "gen_groupBatchesOff": "逐张显示 · 点击按批次分组",
   "blocks_presetCustom": "自定义",
   "blocks_presetHint": "应用附带参数时质量词和负面预设一并还原。换到别的模型时，档位按目标模型自动换算；Turbo 沿用现有处理。",
-  "@gen_translateAdjustSplitInto": {
-    "placeholders": {
-      "source": {
-        "type": "String"
-      },
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "@ag_historyStats": {
     "placeholders": {
       "messages": {
@@ -11523,9 +11933,6 @@
       }
     }
   },
-  "prompt_autocompleteTitle": "补全",
-  "prompt_autocompleteHint": "↑↓ 选择 · → 关联 · ← 返回 · Tab / 回车 补全 · Esc 关闭",
-  "prompt_autocompleteHintRelated": "↑↓ 选择 · ← 返回 · 回车 / 点击 追加 · Esc 关闭关联",
   "resourceWindow_pin": "窗口置顶",
   "resourceWindow_newWindow": "新开一个资源窗口",
   "resourceWindow_rowHeight": "行高",
@@ -11620,5 +12027,19 @@
   "set_agMcpTest": "测试连接",
   "set_agMcpJsonOne": "请一次导入一个 MCP 服务器。",
   "set_agMcpPending": "下轮生效",
-  "ag_tool_agent_manage": "管理 Agent"
+  "ag_tool_agent_manage": "管理 Agent",
+  "promptCompletion_all": "全部",
+  "promptCompletion_tags": "标签",
+  "promptCompletion_summary": "词库简释义",
+  "promptCompletion_synonyms": "中文同义词",
+  "promptReading_showReadings": "显示标签译名",
+  "promptReading_hideReadings": "隐藏标签译名",
+  "promptReading_displayHint": "在原文下方显示已有译名。",
+  "promptReading_completion": "输入时补全标签",
+  "promptReading_completionHint": "支持中英文搜索标签、角色和作品。",
+  "promptReading_fillMissing": "补齐可见标签与句子的缺失译名",
+  "promptReading_autoTranslateHint": "停笔约 0.8 秒后批量补译可见标签与句子，优先使用词库和缓存；临时网络故障会有限重试。需在「模型与接口」配置标签翻译模型。关闭后只显示已有译名。",
+  "modelSettings_promptReadingHint": "全文翻译仅供阅读，不修改提示词。",
+  "promptCompletion_works": "作品",
+  "promptCompletion_expand": "完整列表与 Wiki 预览（右键候选可直接预览）"
 }

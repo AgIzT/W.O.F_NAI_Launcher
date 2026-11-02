@@ -5677,7 +5677,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get promptBlockPalette_emptyHint =>
-      '자주 쓰는 프롬프트 블록이나 번역 블록을 여기에 보관하세요. 클릭하면 커서 위치에 삽입되고, 프롬프트 입력란으로 끌어 놓을 수도 있습니다.';
+      '자주 쓰는 프롬프트 블록을 여기로 드래그하세요. 클릭하여 커서 위치에 넣거나 프롬프트로 드래그할 수 있습니다.';
 
   @override
   String get promptBlockPalette_remove => '블록에서 제거';
@@ -5865,7 +5865,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get tips_studio_trick_6 =>
-      '번역 블록을 가운데 버튼으로 누르면 원문과 번역문이 번갈아 바뀌어요. AI 번역이 아무리 좋아도 가끔은 원문을 슬쩍 보고 cat ears가 이상한 말로 바뀌지 않았는지 확인해 보세요.';
+      '태그 번역은 프롬프트 아래에 표시됩니다. 언제든 표시를 전환할 수 있으며 원문은 직접 편집할 수 있습니다.';
 
   @override
   String get tips_studio_trick_7 =>
@@ -7406,74 +7406,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get tagExpansion_autoTranslateVisible => '보이는 태그 자동 번역';
 
   @override
-  String get translationEditor_title => '번역 블록';
-
-  @override
-  String get translationEditor_source => '원문';
-
-  @override
-  String get translationEditor_sourcePrefix => '원';
-
-  @override
-  String get translationEditor_generation => '이미지 생성용';
-
-  @override
-  String get translationEditor_editable => '편집 가능';
-
-  @override
-  String get translationEditor_modified => '수정됨';
-
-  @override
-  String get translationEditor_edited => '편집됨';
-
-  @override
-  String get translationEditor_close => '닫기';
-
-  @override
-  String get translationEditor_save => '저장';
-
-  @override
-  String get translationEditor_delete => '블록 삭제';
-
-  @override
-  String get translationEditor_restore => '원문 텍스트로 복원';
-
-  @override
-  String get translationEditor_configure => '번역 모델 설정';
-
-  @override
-  String translationEditor_readingFieldTitle(Object language) {
-    return '$language 읽기 텍스트';
-  }
-
-  @override
-  String translationEditor_sourceWarning(Object language) {
-    return '원문이 수정되었습니다. $language 동기화가 필요합니다';
-  }
-
-  @override
-  String get translationEditor_editHint => '번역을 직접 편집했습니다. 원문 검토 상태는 유지됩니다';
-
-  @override
-  String get translationLanguage_chinese => '중국어';
-
-  @override
-  String get translationLanguage_english => '영어';
-
-  @override
-  String get translationLanguage_japanese => '일본어';
-
-  @override
-  String get translationLanguage_korean => '한국어';
-
-  @override
-  String get translationLanguage_traditionalChinese => '중국어 번체';
-
-  @override
-  String get modelTask_translateTitle => '원문 → 읽기 언어';
-
-  @override
-  String get modelTask_promptReverseTitle => '읽기 언어 → 원문';
+  String get modelTask_translateTitle => '전체 읽기 번역';
 
   @override
   String get modelTask_tagTranslateTitle => '태그 번역 및 의미 보충';
@@ -7483,11 +7416,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get modelTask_translateDescription =>
-      '가중치, 그룹, 태그 의미를 유지하며 프롬프트와 블록을 번역합니다.';
-
-  @override
-  String get modelTask_promptReverseDescription =>
-      '번역문에서 추가, 삭제, 수정한 내용을 원문에 반영한 뒤 검토할 수 있도록 돌려줍니다.';
+      '전체 프롬프트를 별도 읽기 번역으로 제공하고 원문을 유지합니다.';
 
   @override
   String get modelTask_tagTranslateDescription =>
@@ -7824,15 +7753,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get modelRequest_emptyResponse => '모델이 빈 내용을 반환했습니다.';
 
   @override
-  String get modelService_testFieldsIncomplete => '테스트 응답에 필드가 빠져 있습니다.';
-
-  @override
-  String get modelService_testFieldsInvalid => '테스트 응답의 필드가 올바르지 않습니다.';
-
-  @override
-  String get modelService_testGroupsInvalid => '테스트 응답의 그룹이 올바르지 않습니다.';
-
-  @override
   String get modelService_testSourceEmpty => '테스트 응답의 원문이 비어 있습니다.';
 
   @override
@@ -8036,16 +7956,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get modelSettings_usePreset => '프리셋';
 
   @override
-  String get modelSettings_outputLanguage => '출력 언어';
-
-  @override
-  String get modelSettings_englishPrompt => '영어 생성 프롬프트';
-
-  @override
-  String get modelSettings_englishPromptHelp =>
-      '원문을 기준으로 수정 내용을 반영해 영어 생성 프롬프트를 출력합니다.';
-
-  @override
   String get modelSettings_targetLanguage => '대상 언어';
 
   @override
@@ -8063,10 +7973,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String modelSettings_reasoningSummaryModel(Object level) {
     return '사고: $level(모델 따름)';
   }
-
-  @override
-  String get modelSettings_promptBlocksHint =>
-      '번역이 필요 없을 때는 프롬프트를 블록으로 나눠 블록 기능으로 자유롭게 배치할 수도 있습니다.';
 
   @override
   String get modelSettings_wikiFormatHint =>
@@ -8615,158 +8521,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get modelOverrides_addHeader => '헤더 추가';
 
   @override
-  String get promptTranslation_translating => '번역 중';
-
-  @override
-  String get promptTranslation_needsModel => '번역 · 먼저 모델을 설정하세요';
-
-  @override
-  String promptTranslation_withRoute(Object provider, Object model) {
-    return '번역 · $provider / $model';
-  }
-
-  @override
-  String get promptTranslation_actions => '번역 작업';
-
-  @override
-  String get promptTranslation_promptChanged => '프롬프트가 바뀌어 새 편집 내용을 덮어쓰지 않았습니다';
-
-  @override
-  String get promptTranslation_nothingToTranslate => '번역할 일반 텍스트가 없습니다';
-
-  @override
-  String promptTranslation_failed(Object error) {
-    return '번역하지 못했습니다: $error';
-  }
-
-  @override
-  String get promptTranslation_setupTitle => '먼저 번역 모델을 설정하세요';
-
-  @override
-  String get promptTranslation_setupBody =>
-      '번역하려면 서비스와 모델을 명시적으로 선택해야 합니다. 설정 → 연동 → 모델 및 API에서 서비스를 추가하고 모델 목록을 가져온 뒤, 프롬프트 번역에 쓸 모델을 고르세요.';
-
-  @override
-  String get promptTranslation_later => '나중에';
-
-  @override
-  String get promptTranslation_openSettings => '설정 열기';
-
-  @override
-  String get promptTranslation_toolTitle => '번역';
-
-  @override
-  String get promptTranslation_noModel => '설정된 모델 없음';
-
-  @override
-  String get promptTranslation_configureModel => '번역 모델 설정';
-
-  @override
-  String get promptTranslation_translateNew => '새 내용 번역';
-
-  @override
-  String get promptTranslation_undoRestore => '복원을 취소하고 번역 블록 되돌리기';
-
-  @override
-  String get promptTranslation_restoreAll => '모든 번역 블록을 원문 텍스트로 복원';
-
-  @override
-  String get promptTranslation_tutorial => '사용 방법';
-
-  @override
-  String get promptTranslation_guideBack => '작업으로 돌아가기';
-
-  @override
-  String get promptTranslation_guideMiddleTitle => '블록 가운데 버튼 클릭';
-
-  @override
-  String get promptTranslation_guideMiddleText => '원문과 번역문 전환';
-
-  @override
-  String get promptTranslation_guideSourceTitle => '원문 왼쪽 클릭';
-
-  @override
-  String get promptTranslation_guideSourceText => '커서를 놓고 바로 편집';
-
-  @override
-  String get promptTranslation_guideReadingTitle => '번역문 왼쪽 클릭';
-
-  @override
-  String get promptTranslation_guideReadingText => '블록 편집기 열기';
-
-  @override
-  String get promptTranslation_guideCtrlTitle => 'Ctrl + 클릭 / 드래그 선택';
-
-  @override
-  String get promptTranslation_guideCtrlText => '편집기에서 태그 검색 / 관련 태그 찾기';
-
-  @override
-  String get promptTranslation_guideConvertTitle => '↑ 번역문을 원문으로';
-
-  @override
-  String get promptTranslation_guideConvertText => '↓ 원문을 번역문으로, 저장 전에 검토';
-
-  @override
-  String get promptTranslation_guideRestoreTitle => '그룹 전체 표시 전환';
-
-  @override
-  String get promptTranslation_guideRestoreText => '번역 메뉴에서 원문 / 번역을 모두 전환';
-
-  @override
-  String get promptTranslation_middleButton => '마우스 가운데 버튼';
-
-  @override
-  String get promptTranslation_leftButton => '마우스 왼쪽 버튼';
-
-  @override
-  String get promptTranslation_blockShowingOriginal => '번역 블록, 원문 표시 중';
-
-  @override
-  String get promptTranslation_blockShowingReading => '번역 블록, 번역문 표시 중';
-
-  @override
-  String get promptTranslation_blockNeedsReview => '원문 변경됨 · 번역 업데이트 필요';
-
-  @override
-  String get promptTranslation_badgeTooltip => '원문이 바뀌었습니다. 번역을 동기화해야 합니다';
-
-  @override
-  String get promptTranslation_sourceChanged => '원문이 바뀌었습니다. 번역 블록을 다시 여세요';
-
-  @override
-  String promptTranslation_retranslateFailed(Object error) {
-    return '다시 번역하지 못했습니다: $error';
-  }
-
-  @override
-  String get promptTranslation_draftChanged =>
-      '내용이 바뀌었습니다. 다시 변환하세요. 새 초안은 유지됩니다.';
-
-  @override
-  String promptTranslation_convertFailed(Object error) {
-    return '변환하지 못했습니다. 초안은 유지됩니다: $error';
-  }
-
-  @override
-  String get promptTranslation_invalidResultFormat =>
-      '변환 결과 형식이 올바르지 않습니다. 초안은 유지됩니다';
-
-  @override
-  String get promptTranslation_noValidText =>
-      '모델이 유효한 텍스트를 반환하지 않았습니다. 초안은 유지됩니다';
-
-  @override
-  String get promptTranslation_invalidResultContent =>
-      '변환 결과에 잘못된 서식이 있습니다. 초안은 유지됩니다';
-
-  @override
-  String get promptTranslation_incompleteStructure =>
-      '변환 결과의 가중치나 그룹이 완전하지 않습니다. 초안은 유지됩니다';
-
-  @override
-  String get promptTranslation_inputRequired => '먼저 변환할 내용을 입력하세요';
-
-  @override
   String get wiki_configureTagModel => '먼저 모델 및 API에서 사용할 태그 번역 모델을 설정하세요.';
 
   @override
@@ -8805,9 +8559,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get blockAppearance_gradient => '그라데이션';
-
-  @override
-  String get blockAppearance_translation => '번역';
 
   @override
   String opusUsage_regularRemaining(Object percent) {
@@ -9293,9 +9044,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get imageMenu_fileActions => '파일 작업';
-
-  @override
-  String get imageMenu_saveToBlock => '블록에 저장';
 
   @override
   String get settings_highAnlasCostEstimate => '예상 사용량';
@@ -12261,9 +12009,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get blocks_title => '블록 라이브러리';
 
   @override
-  String get blocks_translationMark => '번';
-
-  @override
   String get blocks_add => '추가';
 
   @override
@@ -12419,9 +12164,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get blocks_lookGradient => '그라데이션';
-
-  @override
-  String get blocks_lookTranslation => '번역';
 
   @override
   String get blocks_hasParams => '설정 포함';
@@ -12972,12 +12714,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get blocks_changeThumb => '변경 / 조정';
-
-  @override
-  String get blocks_reading => '번역 읽기';
-
-  @override
-  String get blocks_needsReview => '검토 필요';
 
   @override
   String get blocks_applyToCurrent => '지금 적용';
@@ -14527,29 +14263,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get gen_relatedSub => '자주 함께 쓰는 태그 추천';
-
-  @override
-  String get gen_translating => '번역 중…';
-
-  @override
-  String get gen_translateNeedsModel => '번역 모델이 없습니다. 클릭하여 설정';
-
-  @override
-  String gen_translateWith(Object route) {
-    return '번역 ($route)';
-  }
-
-  @override
-  String get gen_translateNew => '새 내용 번역';
-
-  @override
-  String get gen_translateShowOriginal => '모두 원문 보기';
-
-  @override
-  String get gen_translateShowTranslated => '모두 번역문 보기';
-
-  @override
-  String get gen_translateSettings => '번역 모델 설정';
 
   @override
   String get gen_qualityPreset => '품질 태그';
@@ -18205,9 +17918,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get set_mdTaskPrompt => '프롬프트 번역';
 
   @override
-  String get set_mdTaskReverse => '프롬프트 역추론';
-
-  @override
   String get set_mdTaskTag => '태그 번역 및 의미 보충';
 
   @override
@@ -21463,83 +21173,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get ag_historyChanges => '변경 요약';
 
   @override
-  String get gen_translateTapOriginal => '클릭: 원문 표시';
-
-  @override
-  String get gen_translateTapTranslated => '클릭: 번역문 표시';
-
-  @override
-  String get gen_translateClearRestore => '번역 블록 해제 및 원문 복원';
-
-  @override
-  String get gen_translateClearRestoreSub => '일반 원문으로 복원하며 실행 취소 가능';
-
-  @override
-  String get gen_translateCleared => '번역 블록을 원문으로 복원했습니다';
-
-  @override
-  String get gen_translateAdjust => '추가 번역 조정';
-
-  @override
-  String get gen_translateAdjustSub => '이번 번역을 이어서 분할, 재번역, 병합';
-
-  @override
-  String get gen_translateAdjustTitle => '번역 조정';
-
-  @override
-  String gen_translateAdjustContext(int count) {
-    return '이번 번역 이어가기 · $count개 블록';
-  }
-
-  @override
-  String gen_translateAdjustSelected(int count) {
-    return '$count개 블록 선택됨';
-  }
-
-  @override
-  String get gen_translateAdjustCollapse => '접기 / 펼치기';
-
-  @override
-  String get gen_translateAdjustIntro =>
-      '이번 번역을 이어갑니다. 왼쪽 블록을 클릭해 참조하세요. 변경은 실행 취소할 수 있습니다.';
-
-  @override
-  String get gen_translateAdjustSplit => '다시 분할';
-
-  @override
-  String get gen_translateAdjustRetranslate => '선택 재번역';
-
-  @override
-  String get gen_translateAdjustMerge => '선택 병합';
-
-  @override
-  String get gen_translateAdjustSplitTemplate =>
-      '현재 블록을 읽고 참조 블록을 의미 단위로 나누세요. 정확한 원문을 보존하세요.';
-
-  @override
-  String get gen_translateAdjustRetranslateTemplate =>
-      '현재 블록을 읽고 원문을 바꾸지 않고 참조 블록을 다시 번역하세요.';
-
-  @override
-  String get gen_translateAdjustMergeTemplate =>
-      '현재 블록을 읽고 참조 블록을 지정한 원문 순서로 병합하세요. 관련 없는 블록은 유지하세요.';
-
-  @override
-  String get gen_translateAdjustMarkers =>
-      'translation_blocks_read의 marker 목록을 사용하세요.';
-
-  @override
-  String get gen_translateAdjustHint => '번역 블록 조정 방법 입력…';
-
-  @override
-  String get gen_translateAdjustStartFailed =>
-      '조정을 시작할 수 없습니다. 모델과 Agent 런타임을 확인하세요.';
-
-  @override
-  String get gen_translateAdjustRunFailed =>
-      '조정이 중단되었거나 실패했습니다. 다시 시도하기 전에 블록을 읽으세요.';
-
-  @override
   String gen_repeatDragTotal(int times, int total) {
     return '$times회 · 총 $total장';
   }
@@ -21553,20 +21186,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get gen_groupBatches => '그룹';
-
-  @override
-  String get gen_translateAdjustPickHint => '왼쪽 블록을 클릭해 참조';
-
-  @override
-  String get gen_translateAdjustClearRefs => '참조 지우기';
-
-  @override
-  String gen_translateAdjustSplitInto(String source, int count) {
-    return '$source → $count개 블록';
-  }
-
-  @override
-  String get gen_translateAdjustContextNote => '컨텍스트: 이번 번역의 원문, 블록, 번역문';
 
   @override
   String ag_historyStats(int messages, int cards) {
@@ -21842,17 +21461,6 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get prompt_autocompleteTitle => '자동 완성';
-
-  @override
-  String get prompt_autocompleteHint =>
-      '↑↓ 선택 · → 연관 · ← 돌아가기 · Tab / Enter 완성 · Esc 닫기';
-
-  @override
-  String get prompt_autocompleteHintRelated =>
-      '↑↓ 선택 · ← 돌아가기 · Enter / 클릭 추가 · Esc 연관 닫기';
-
-  @override
   String get resourceWindow_pin => '항상 위에';
 
   @override
@@ -22005,4 +21613,47 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get ag_tool_agent_manage => 'Agent 관리';
+
+  @override
+  String get promptCompletion_all => '전체';
+
+  @override
+  String get promptCompletion_tags => '태그';
+
+  @override
+  String get promptCompletion_summary => '사전 요약';
+
+  @override
+  String get promptCompletion_synonyms => '중국어 동의어';
+
+  @override
+  String get promptReading_showReadings => '태그 번역 표시';
+
+  @override
+  String get promptReading_hideReadings => '태그 번역 숨기기';
+
+  @override
+  String get promptReading_displayHint => '원문 아래에 사용 가능한 번역을 표시합니다.';
+
+  @override
+  String get promptReading_completion => '입력 중 태그 자동 완성';
+
+  @override
+  String get promptReading_completionHint => '중국어와 영어로 태그, 캐릭터, 작품을 검색합니다.';
+
+  @override
+  String get promptReading_fillMissing => '표시된 태그와 문장의 누락된 번역 채우기';
+
+  @override
+  String get promptReading_autoTranslateHint =>
+      '입력을 약 0.8초 멈추면 사전과 캐시에 없는 표시된 태그와 문장을 일괄 번역합니다. 일시적인 네트워크 오류는 제한된 횟수로 재시도합니다. 모델 및 API에서 태그 번역 모델을 설정하세요. 끄면 기존 번역만 표시합니다.';
+
+  @override
+  String get modelSettings_promptReadingHint => '전체 번역은 읽기용이며 프롬프트를 변경하지 않습니다.';
+
+  @override
+  String get promptCompletion_works => '작품';
+
+  @override
+  String get promptCompletion_expand => '전체 목록 및 Wiki 미리보기 (후보를 우클릭하면 바로 미리보기)';
 }

@@ -4,24 +4,13 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/autocomplete/autocomplete_settings.dart';
-import '../../../../core/autocomplete/prompt_autocomplete_controller.dart';
-import '../../../../core/tag_expansion/tag_expansion_providers.dart';
 import '../../../../core/utils/localization_extension.dart';
-import '../../../providers/workspace_text_settings_provider.dart';
 import '../../common/workspace_text_scale_scope.dart';
-import '../prompt_autocomplete_binding.dart';
-import '../../../../core/utils/prompt_input_normalization.dart';
-import '../../../prompt_assistant/providers/prompt_assistant_config_provider.dart';
-import '../../../prompt_assistant/services/prompt_assistant_service.dart';
-import '../../../screens/settings/sections/prompt_assistant_settings_section.dart';
 import '../../../../data/models/character/character_prompt.dart';
 import '../../../../data/models/prompt_block/pill_document.dart';
 import '../../../../data/models/prompt_block/prompt_block.dart';
 import '../../../providers/pill_workspace_provider.dart';
 import '../../common/text_editing_shortcuts.dart';
-import '../../../providers/prompt_translation_provider.dart';
-import '../../../providers/translation_adjustment_provider.dart';
 import '../../../providers/prompt_block_library_provider.dart';
 import '../blocks/prompt_block_colors.dart';
 import '../blocks/prompt_block_drag_data.dart';
@@ -34,7 +23,6 @@ import '../../../wiring/blocks_mapping.dart';
 import '../../../wiring/blocks_actions.dart';
 import '../../../utils/prompt_block_instance_display.dart';
 import 'prompt_pill.dart';
-import 'translation_pill_view.dart';
 
 /// 药丸块编辑器：单个完整输入框 + 内联药丸。
 ///
@@ -64,13 +52,9 @@ class PromptPillEditor extends ConsumerStatefulWidget {
     this.onChanged,
     this.onComfyuiImport,
     this.beginComfyuiImport,
-    this.autocomplete,
-    this.autocompleteBuilder,
   });
 
   /// Optional externally owned controller and visual adapter. No focus transfer.
-  final PromptAutocompleteController? autocomplete;
-  final PromptAutocompleteBuilder? autocompleteBuilder;
   final UnifiedPromptConfig config;
 
   /// 药丸工作区 lane（P3）：每个输入框一个独立 scope，
@@ -112,7 +96,6 @@ class _PromptPillEditorState extends ConsumerState<PromptPillEditor> {
   late final FocusNode _focusNode;
   final GlobalKey _fieldAreaKey = GlobalKey();
 
-  PromptAutocompleteController? _ownedAutocomplete;
   TextEditingShortcutsState? _undoRouter;
   bool _applyingExternal = false;
   int _lastValidOffset = 0;
@@ -125,7 +108,6 @@ class _PromptPillEditorState extends ConsumerState<PromptPillEditor> {
   UiPopoverAnchor? _instanceCardAnchor;
   String? _instanceCardMarker;
   int _instanceCardOccurrence = 0;
-  TranslationPillEditHandle? _translationEditor;
 
   @override
   void initState() {
@@ -180,15 +162,11 @@ class _PromptPillEditorState extends ConsumerState<PromptPillEditor> {
       _undoRouter?.forgetPrompt(context);
     }
     if (oldWidget.pillScope != widget.pillScope) {
-      _ownedAutocomplete?.dismiss();
-      widget.autocomplete?.dismiss();
       ref
           .read(pillWorkspaceProvider(oldWidget.pillScope).notifier)
           .closeTypingGroup();
       _undoRouter?.forgetPrompt(context);
       _dismissInstanceCard(refresh: false);
-      _translationEditor?.dismiss();
-      _translationEditor = null;
       final workspace = ref.read(_workspace);
       _applyingExternal = true;
       _controller.value = TextEditingValue(
@@ -242,10 +220,8 @@ class _PromptPillEditorState extends ConsumerState<PromptPillEditor> {
 
   @override
   void dispose() {
-    _ownedAutocomplete?.dispose();
     _undoRouter?.forgetPrompt(context);
     _dismissInstanceCard(refresh: false);
-    _translationEditor?.dismiss();
     _controller
       ..removeListener(_handleControllerChanged)
       ..dispose();
@@ -303,36 +279,11 @@ class _PromptPillEditorState extends ConsumerState<PromptPillEditor> {
 
   @override
   Widget build(BuildContext context) {
-    ref.watch(translationReferencesProvider);
     // 块库就绪/内容变化 → 重算投影（块内容经 resolver 实时解析进投影）
     ref.listen(promptBlockLibraryNotifierProvider, (_, __) {
       ref.read(_workspace.notifier).refreshProjection();
     });
 
-    final autocompleteEnabled =
-        !widget.config.readOnly && ref.watch(promptAutocompleteEnabledProvider);
-    if (autocompleteEnabled && widget.autocomplete == null) {
-      _ownedAutocomplete ??= PromptAutocompleteController.local(
-        service: ref.read(localTagExpansionServiceProvider),
-        enabled: true,
-      );
-    }
-    _ownedAutocomplete?.enabled = autocompleteEnabled;
-    final autocomplete = autocompleteEnabled
-        ? widget.autocomplete ?? _ownedAutocomplete
-        : null;
-    final autocompleteBuilder =
-        widget.autocompleteBuilder ??
-        (autocomplete == null
-            ? null
-            : ref.watch(promptAutocompleteBuilderProvider));
-    final autoInsertComma = autocomplete == null
-        ? true
-        : ref.watch(
-            autocompleteSettingsProvider.select(
-              (value) => value.autoInsertComma,
-            ),
-          );
     final workspace = ref.watch(_workspace);
     final library = ref.watch(promptBlockLibraryNotifierProvider).valueOrNull;
 
@@ -358,76 +309,64 @@ class _PromptPillEditorState extends ConsumerState<PromptPillEditor> {
     );
 
     return WorkspaceTextScaleScope(
-      child: PromptAutocompleteBinding(
-        autocomplete: autocomplete,
-        controller: _controller,
-        focusNode: _focusNode,
-        locale: Localizations.localeOf(context).toLanguageTag(),
-        autoInsertComma: autoInsertComma,
-        builder: autocompleteBuilder,
-        onAccept: (value) {
-          ref.read(_workspace.notifier).closeTypingGroup();
-          _controller.value = value;
-        },
-        child: UiPopover(
-          anchor: _instanceCardAnchor,
+      child: UiPopover(
+        anchor: _instanceCardAnchor,
+        onDismiss: _dismissInstanceCard,
+        builder: (_) => BlockInstanceWiring(
+          scope: widget.pillScope,
+          marker: _instanceCardMarker!,
+          occurrence: _instanceCardOccurrence,
           onDismiss: _dismissInstanceCard,
-          builder: (_) => BlockInstanceWiring(
-            scope: widget.pillScope,
-            marker: _instanceCardMarker!,
-            occurrence: _instanceCardOccurrence,
-            onDismiss: _dismissInstanceCard,
-            allowEvolutionToggle: widget.allowEvolutionToggle,
-          ),
-          child: DragTarget<PromptBlockDragData>(
-            onWillAcceptWithDetails: (_) => true,
-            onAcceptWithDetails: (details) =>
-                _handleDrop(details.data, details.offset),
-            builder: (context, candidateData, rejectedData) {
-              final highlighted = candidateData.isNotEmpty;
-              return AnimatedContainer(
-                duration: const Duration(milliseconds: 120),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  border: highlighted
-                      ? Border.all(color: Theme.of(context).colorScheme.primary)
-                      : null,
+          allowEvolutionToggle: widget.allowEvolutionToggle,
+        ),
+        child: DragTarget<PromptBlockDragData>(
+          onWillAcceptWithDetails: (_) => true,
+          onAcceptWithDetails: (details) =>
+              _handleDrop(details.data, details.offset),
+          builder: (context, candidateData, rejectedData) {
+            final highlighted = candidateData.isNotEmpty;
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 120),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                border: highlighted
+                    ? Border.all(color: Theme.of(context).colorScheme.primary)
+                    : null,
+              ),
+              child: KeyedSubtree(
+                key: _fieldAreaKey,
+                child: UnifiedPromptInput(
+                  textStyle: widget.textStyle,
+                  controller: _controller,
+                  pillScope: widget.pillScope,
+                  focusNode: _focusNode,
+                  onUserEdit: (value) => ref
+                      .read(_workspace.notifier)
+                      .setText(
+                        value.text,
+                        userEdit: true,
+                        composing:
+                            value.composing.isValid &&
+                            !value.composing.isCollapsed,
+                      ),
+                  onUndo: () => _restoreHistory(redo: false),
+                  onRedo: () => _restoreHistory(redo: true),
+                  // A source field inside a WidgetSpan owns its own caret.
+                  showCursor: _focusNode.hasPrimaryFocus ? null : false,
+                  config: effectiveConfig,
+                  decoration: widget.decoration,
+                  beginComfyuiImport: widget.beginComfyuiImport,
+                  onComfyuiImport: widget.onComfyuiImport == null
+                      ? null
+                      : _handleComfyuiImport,
+                  maxLines: widget.maxLines ?? (widget.compact ? 2 : null),
+                  minLines: widget.minLines ?? (widget.compact ? 1 : 2),
+                  expands: false,
+                  fitContent: true,
                 ),
-                child: KeyedSubtree(
-                  key: _fieldAreaKey,
-                  child: UnifiedPromptInput(
-                    textStyle: widget.textStyle,
-                    controller: _controller,
-                    pillScope: widget.pillScope,
-                    focusNode: _focusNode,
-                    onUserEdit: (value) => ref
-                        .read(_workspace.notifier)
-                        .setText(
-                          value.text,
-                          userEdit: true,
-                          composing:
-                              value.composing.isValid &&
-                              !value.composing.isCollapsed,
-                        ),
-                    onUndo: () => _restoreHistory(redo: false),
-                    onRedo: () => _restoreHistory(redo: true),
-                    // A source field inside a WidgetSpan owns its own caret.
-                    showCursor: _focusNode.hasPrimaryFocus ? null : false,
-                    config: effectiveConfig,
-                    decoration: widget.decoration,
-                    beginComfyuiImport: widget.beginComfyuiImport,
-                    onComfyuiImport: widget.onComfyuiImport == null
-                        ? null
-                        : _handleComfyuiImport,
-                    maxLines: widget.maxLines ?? (widget.compact ? 2 : null),
-                    minLines: widget.minLines ?? (widget.compact ? 1 : 2),
-                    expands: false,
-                    fitContent: true,
-                  ),
-                ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
       ),
     );
@@ -459,7 +398,6 @@ class _PromptPillEditorState extends ConsumerState<PromptPillEditor> {
           block?.color ?? '',
           block?.iconName ?? '',
           block?.appearance ?? '',
-          instance.translation,
           instance.temp,
           block == null,
         ),
@@ -467,7 +405,6 @@ class _PromptPillEditorState extends ConsumerState<PromptPillEditor> {
     });
     parts.add(library == null);
     parts.add(_instanceCardMarker ?? '');
-    parts.add(ref.read(translationReferencesProvider));
     return Object.hashAll(parts);
   }
 
@@ -494,118 +431,6 @@ class _PromptPillEditorState extends ConsumerState<PromptPillEditor> {
             ),
           ),
         ),
-      );
-    }
-
-    if (!instance.temporary && instance.translation != null) {
-      final translation = instance.translation!;
-      Widget draggable(Widget child) => Draggable<PromptBlockDragData>(
-        data: PromptBlockDragData(
-          blockId: instance.blockId,
-          translation: translation,
-          instanceMarker: PillInstanceDragRef(
-            marker: marker,
-            occurrence: occurrence,
-            scope: widget.pillScope,
-          ),
-        ),
-        rootOverlay: true,
-        dragAnchorStrategy: pointerDragAnchorStrategy,
-        feedback: Material(
-          color: Colors.transparent,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 300),
-            child: TranslationPillView(
-              pill: translation,
-              highlightEnabled: widget.config.enableSyntaxHighlight,
-              numericEmphasisEnabled: widget.config.numericEmphasisEnabled,
-              autoFormat: widget.config.enableAutoFormat,
-              onToggle: () {},
-              onEdit: (_) {},
-            ),
-          ),
-        ),
-        childWhenDragging: Opacity(opacity: .35, child: child),
-        child: child,
-      );
-      final pill = TranslationPillView(
-        key: ValueKey('translation-pill-$marker-$occurrence'),
-        pill: translation,
-        highlightEnabled: widget.config.enableSyntaxHighlight,
-        numericEmphasisEnabled: widget.config.numericEmphasisEnabled,
-        autoFormat: widget.config.enableAutoFormat,
-        onToggle: () => ref
-            .read(_workspace.notifier)
-            .updateTranslation(
-              marker,
-              translation.copyWith(showOriginal: !translation.showOriginal),
-            ),
-        onEdit: (position) => _editTranslation(marker, translation, position),
-        onSourceChanged: (source) {
-          final current = ref
-              .read(_workspace)
-              .document
-              .instances[marker]
-              ?.translation;
-          if (current == null || current.source == source) return;
-          ref
-              .read(_workspace.notifier)
-              .updateTranslation(
-                marker,
-                current.copyWith(
-                  source: source,
-                  marks: const [],
-                  needsReview: true,
-                ),
-              );
-        },
-        sourceHandleBuilder: (handle) => MouseRegion(
-          cursor: SystemMouseCursors.grab,
-          child: draggable(handle),
-        ),
-      );
-      final references = ref.read(translationReferencesProvider);
-      final key = TranslationReferences.key(widget.pillScope, marker);
-      final adjusting = references.includesScope(widget.pillScope);
-      final selected = references.selected.contains(key);
-      final changed = references.changed.contains(key);
-      Widget content = translation.showOriginal ? pill : draggable(pill);
-      if (adjusting) {
-        content = GestureDetector(
-          key: ValueKey('translation-reference-$key'),
-          behavior: HitTestBehavior.opaque,
-          onTap: () {
-            final current = ref.read(translationReferencesProvider);
-            final selection = {...current.selected};
-            if (!selection.remove(key)) selection.add(key);
-            ref
-                .read(translationReferencesProvider.notifier)
-                .state = TranslationReferences(
-              negative: current.negative,
-              selected: selection,
-              changed: current.changed,
-            );
-          },
-          child: DecoratedBox(
-            position: DecorationPosition.foreground,
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: changed
-                    ? Colors.green
-                    : selected
-                    ? Colors.blue
-                    : Colors.transparent,
-                width: 1.5,
-              ),
-              borderRadius: BorderRadius.circular(5),
-            ),
-            child: AbsorbPointer(child: content),
-          ),
-        );
-      }
-      return WidgetSpan(
-        alignment: PlaceholderAlignment.middle,
-        child: _withPillGap(content),
       );
     }
 
@@ -729,84 +554,6 @@ class _PromptPillEditorState extends ConsumerState<PromptPillEditor> {
     Padding(padding: const EdgeInsets.symmetric(horizontal: 1), child: child),
   );
 
-  Future<void> _editTranslation(
-    String marker,
-    TranslationPill initial,
-    Offset position,
-  ) async {
-    _dismissInstanceCard();
-    _translationEditor?.dismiss();
-    final coordinator = ref.read(promptTranslationCoordinatorProvider);
-    final service = ref.read(promptAssistantServiceProvider);
-    final editor = showTranslationPillEditor(
-      context: context,
-      initial: widget.config.enableAutoFormat
-          ? initial.copyWith(
-              source: PromptInputNormalization.normalize(
-                initial.source,
-                autoFormat: true,
-                sdAutoConvert: false,
-              ).text,
-            )
-          : initial,
-      globalPosition: position,
-      enableTagExpansion: true,
-      highlightEnabled: widget.config.enableSyntaxHighlight,
-      numericEmphasisEnabled: widget.config.numericEmphasisEnabled,
-      annotations: ref.read(promptTranslationAnnotationProvider),
-      converter: (request, sessionId) =>
-          coordinator.convertDraft(request, sessionId: sessionId),
-      cancelConversion: (sessionId) {
-        coordinator.cancelDraft(sessionId);
-        service.cancelCurrentTask(sessionId: sessionId);
-      },
-      isModelConfigured: () =>
-          ref.read(promptAssistantConfigProvider).promptTranslationRoute !=
-          null,
-      onConfigure: () => showModelManagementDialog(context),
-    );
-    _translationEditor = editor;
-    final result = await editor.result;
-    if (identical(_translationEditor, editor)) _translationEditor = null;
-    if (!mounted ||
-        ref.read(_workspace).document.instances[marker]?.translation !=
-            initial) {
-      return;
-    }
-    if (result == 'delete') {
-      ref.read(_workspace.notifier).removeMarker(marker);
-    } else if (result is TranslationPillPlainText) {
-      ref
-          .read(_workspace.notifier)
-          .unwrapTranslation(marker, source: result.source);
-    } else if (result == 'retranslate') {
-      try {
-        final updated = await ref
-            .read(promptTranslationCoordinatorProvider)
-            .retranslateSingle(widget.pillScope, marker);
-        if (mounted && !updated) {
-          ScaffoldMessenger.maybeOf(context)?.showSnackBar(
-            SnackBar(
-              content: Text(context.l10n.promptTranslation_sourceChanged),
-            ),
-          );
-        }
-      } catch (error) {
-        if (mounted) {
-          ScaffoldMessenger.maybeOf(context)?.showSnackBar(
-            SnackBar(
-              content: Text(
-                context.l10n.promptTranslation_retranslateFailed('$error'),
-              ),
-            ),
-          );
-        }
-      }
-    } else if (result is TranslationPill) {
-      ref.read(_workspace.notifier).updateTranslation(marker, result);
-    }
-  }
-
   // ==================== 拖放 ====================
 
   void _handleDrop(PromptBlockDragData data, Offset globalPosition) {
@@ -815,42 +562,6 @@ class _PromptPillEditorState extends ConsumerState<PromptPillEditor> {
     final sameLane =
         dragRef != null &&
         (dragRef.scope == null || dragRef.scope == widget.pillScope);
-    if (data.translation case final translation?) {
-      if (sameLane &&
-          ref.read(_workspace).document.instances.containsKey(dragRef.marker)) {
-        ref
-            .read(_workspace.notifier)
-            .moveMarker(
-              marker: dragRef.marker,
-              occurrence: dragRef.occurrence,
-              newOffset: offset,
-            );
-      } else if (data.blockId.isNotEmpty) {
-        final scope = widget.pillScope;
-        BlocksActions(
-          ref,
-          context,
-          () => mounted && widget.pillScope == scope,
-        ).insert(
-          [data.blockId],
-          at: (scope: scope, caret: offset),
-          onInserted: _placeCaretAfter,
-        );
-      } else {
-        ref
-            .read(_workspace.notifier)
-            .insertTranslationAt(
-              offset: offset,
-              source: translation.source,
-              zh: translation.zh,
-              marks: translation.marks,
-              needsReview: translation.needsReview,
-              languageCode: translation.languageCode,
-              translationEdited: translation.translationEdited,
-            );
-      }
-      return;
-    }
     if (!sameLane) {
       final scope = widget.pillScope;
       BlocksActions(

@@ -13,7 +13,6 @@ import 'package:nai_launcher/l10n/app_localizations.dart';
 import 'package:nai_launcher/presentation/widgets/common/wiki_retranslate_button.dart';
 import 'package:nai_launcher/presentation/themes/app_theme.dart';
 import 'package:nai_launcher/presentation/widgets/common/translation_icon.dart';
-import 'package:nai_launcher/presentation/widgets/common/translation_modified_badge.dart';
 
 import '../../../helpers/studio_capture_fonts.dart';
 
@@ -337,7 +336,6 @@ Future<void> _captureMotion(WidgetTester tester) async {
                 children: [
                   TranslationIcon(size: 18, color: Colors.grey, busy: busy),
                   TranslationIcon(size: 64, color: Colors.blue, busy: busy),
-                  const TranslationModifiedBadge(),
                 ],
               ),
             ),

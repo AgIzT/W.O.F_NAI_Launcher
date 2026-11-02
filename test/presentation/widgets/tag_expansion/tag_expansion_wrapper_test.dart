@@ -452,11 +452,11 @@ void main() {
         controller,
         focusNode,
         _Source([
-          _tag('first_tag'),
-          _tag('second_tag'),
-          _tag('third_tag'),
-          _tag('fourth_tag'),
-          _tag('fifth_tag'),
+          _tag('first_tag', postCount: 500),
+          _tag('second_tag', postCount: 400),
+          _tag('third_tag', postCount: 300),
+          _tag('fourth_tag', postCount: 200),
+          _tag('fifth_tag', postCount: 100),
         ]),
       );
       await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
@@ -678,7 +678,7 @@ void main() {
         focusNode,
         _Source([
           _tag(longName, postCount: 1234567),
-          _tag('short_tag'),
+          _tag('short_tag', postCount: 200),
           _tag('next_row'),
         ]),
       );

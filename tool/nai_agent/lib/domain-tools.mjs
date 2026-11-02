@@ -17,15 +17,8 @@ const blockGenerationSettings = Type.Object({
   ucCustomBlockId: Type.Optional(Type.Union([Type.String(), Type.Null()])),
 }, {additionalProperties:false});
 const blockChanges = Type.Object({generationSettings:Type.Optional(Type.Union([blockGenerationSettings, Type.Null()]))}, {additionalProperties:true});
-const blockTranslation = Type.Object({
-  source:Type.Optional(Type.String({minLength:1,maxLength:100000})),
-  zh:Type.Optional(Type.String({minLength:1,maxLength:100000})),
-  language_code:Type.Optional(E(['zh','zh-TW','en','ja','ko'])),
-}, {additionalProperties:false});
 const blockInstance = Type.Object({
   content: Type.Optional(Type.String({maxLength:100000})),
-  translations: Type.Optional(Type.Array(blockTranslation,{maxItems:64})),
-  negative_translations: Type.Optional(Type.Array(blockTranslation,{maxItems:64})),
   negative_content: Type.Optional(Type.String({maxLength:100000})),
   title: Type.Optional(Type.String({minLength:1,maxLength:40})),
   color: Type.Optional(Type.String({pattern:'^#(?:[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$'})),
@@ -38,7 +31,7 @@ const blockAnchor = Type.Object({text:Type.String({minLength:1}),
   occurrence:Type.Optional(Type.Integer({minimum:0})),
   mode:E(['before','after','replace']),
 }, {additionalProperties:false});
-const blockInlineKind = E(['temporary','translation']);
+const blockInlineKind = E(['temporary']);
 const promptSetIcon = E(promptSetIcons);
 const promptSetPositions = Type.Optional(Type.Array(Type.Union([Type.Null(), Type.Object({
   x:Type.Number({minimum:0,maximum:1}), y:Type.Number({minimum:0,maximum:1})
@@ -111,7 +104,7 @@ export const domainTools = [
     }),
   },
   { name: 'block_manage',
-    description: 'Manage the prompt block library and inline instances. Temporary and translation instances need no library entry; translations keep source for generation and zh for reading. instance_convert wraps existing text without changing generation text. Writes use expected_version, expected_library_version or expected_draft_version from the corresponding read. Action fields, positioning and merge/split workflows: skills/nai-studio/references/blocks.md.',
+    description: 'Manage the prompt block library and inline instances. Temporary instances need no library entry. Read-only translations are rendered by the editor and never stored in block instances. instance_convert wraps existing text without changing generation text. Writes use expected_version, expected_library_version or expected_draft_version from the corresponding read. Action fields, positioning and merge/split workflows: skills/nai-studio/references/blocks.md.',
     parameters: Type.Object({
       action: E(['create', 'update', 'delete', 'insert', 'instance_create', 'instance_convert', 'instance_update', 'instance_unwrap', 'instance_delete', 'instance_promote', 'folder_create', 'folder_update', 'folder_move', 'folder_delete', 'folder_reorder', 'block_reorder', 'collection_create', 'collection_update', 'collection_move', 'collection_delete', 'collection_reorder', 'collection_add', 'collection_remove']),
       id: Type.Optional(Type.String()), expected_version: Type.Optional(Type.String()),
@@ -121,11 +114,11 @@ export const domainTools = [
       scope: Type.Optional(Type.String()), marker: Type.Optional(Type.String()),
       offset: Type.Optional(Type.Integer({minimum: 0})), occurrence: Type.Optional(Type.Integer({minimum: 0})),
       anchor: Type.Optional(blockAnchor), kind: Type.Optional(blockInlineKind),
-      instance: Type.Optional(blockInstance), translation: Type.Optional(blockTranslation),
+      instance: Type.Optional(blockInstance),
       segments: Type.Optional(Type.Array(Type.Object({anchor: blockAnchor, kind: blockInlineKind,
-        instance: Type.Optional(blockInstance), translation: Type.Optional(blockTranslation)}, {additionalProperties: false}), {minItems: 1, maxItems: 64})),
+        instance: Type.Optional(blockInstance)}, {additionalProperties: false}), {minItems: 1, maxItems: 64})),
       changes: Type.Optional(blockChanges),
-    }),
+    }, {additionalProperties:false}),
   },
   { name: 'settings_read',
     description: 'Read public preferences (the Settings import/export allowlist). keys selects fields; version covers all. null means native default.',

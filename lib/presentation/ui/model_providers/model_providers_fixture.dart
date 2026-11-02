@@ -238,7 +238,7 @@ abstract final class ProvidersFixture {
       ),
       'deepseek-v4-pro': ProviderModelInfo(
         detail: 'DeepSeek V4 Pro',
-        usedFor: {SettingsModelTask.promptReverse},
+        usedFor: {SettingsModelTask.promptTranslate},
       ),
     },
   );

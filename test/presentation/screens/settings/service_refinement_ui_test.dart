@@ -206,7 +206,7 @@ void main() {
       expect(find.text('Studio 默认 · 百科正文翻译'), findsNothing);
       await harness.capture(tester, 'refinement-presets');
       await harness.tapVisible(tester, find.byKey(const Key('preset-create')));
-      expect(find.byType(PopupMenuItem<LauncherInterface>), findsNWidgets(4));
+      expect(find.byType(PopupMenuItem<LauncherInterface>), findsNWidgets(3));
       await harness.capture(tester, 'refinement-preset-menu');
       final wiki = find.widgetWithText(
         PopupMenuItem<LauncherInterface>,

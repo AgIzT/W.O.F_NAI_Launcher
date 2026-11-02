@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import { listenFetchTestServer } from './fixture-http.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -107,7 +108,7 @@ test('list-skills reports the same resolution settings show, without a session',
   const { spawn } = await import('node:child_process');
   const dir = await root(), global = join(dir, 'global');
   await skill(global, 'listed');
-  const child = spawn(process.execPath, [new URL('../list-skills.mjs', import.meta.url).pathname.replace(/^\/(\w:)/, '$1')]);
+  const child = spawn(process.execPath, [fileURLToPath(new URL('../list-skills.mjs', import.meta.url))]);
   let out = '';
   child.stdout.on('data', chunk => { out += chunk; });
   child.stdin.end(JSON.stringify({ globalDirectory: global, modes: { 'global/listed': 'manual' } }) + '\n');

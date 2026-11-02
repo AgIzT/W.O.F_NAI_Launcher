@@ -11,8 +11,8 @@ import 'ui_extra_icons.dart';
 import 'ui_lib_nav.dart';
 import 'ui_text.dart';
 
-/// 块的外观（存储值见 `PromptBlock.appearance`：classic / stripes / dots / solid / gradient / translation）。
-enum BlockAppearance { classic, stripes, dots, solid, gradient, translation }
+/// Visual presets for user-created library blocks.
+enum BlockAppearance { classic, stripes, dots, solid, gradient }
 
 /// 药丸右端的状态角标：随机（骰子）、顺序（→|）、已锁定（锁）、遗传块（DNA，画风探索页）。
 enum UiBlockBadge { none, random, sequential, locked, evolution }
@@ -43,7 +43,6 @@ class UiBlockPill extends StatelessWidget {
     this.focused = false,
     this.large = false,
     this.count,
-    this.translationMark = '译',
   });
 
   /// Agent 改过、已与块库断开的临时块：琥珀 / 墨色 −45° 警示斜纹 + 末尾实心琥珀扳手（原型 `.pl.tmp`）。
@@ -84,7 +83,6 @@ class UiBlockPill extends StatelessWidget {
   final String? count;
 
   /// 翻译外观前面的“译”字（调用方传本地化文案）。
-  final String translationMark;
 
   /// 正文色和块色按 72%（深色 62%）混出的药丸文字色。
   static Color inkOf(UiColors c, Color color) =>
@@ -111,7 +109,6 @@ class UiBlockPill extends StatelessWidget {
     final dashed = disabled || missing || invalid;
     final look = (missing || invalid) ? BlockAppearance.classic : this.look;
     final solid = look == BlockAppearance.solid && !disabled;
-    final tr = look == BlockAppearance.translation && !disabled;
 
     final Color ink;
     final Color iconInk;
@@ -121,9 +118,6 @@ class UiBlockPill extends StatelessWidget {
     } else if (solid) {
       ink = onSolid(base);
       iconInk = ink;
-    } else if (tr) {
-      ink = c.ink;
-      iconInk = c.muted;
     } else {
       ink = inkOf(c, base);
       iconInk = base;
@@ -132,8 +126,6 @@ class UiBlockPill extends StatelessWidget {
     final hazardOn = temporary && !disabled && !missing && !invalid;
     final borderColor = hazardOn
         ? (c.dark ? const Color(0xFFA87D00) : const Color(0xFFD9A200))
-        : tr
-        ? c.line
         : (solid ? base : base.withValues(alpha: .45));
     final fillAlpha = c.dark ? .15 : .08;
     final Color? fill = disabled || hazardOn
@@ -143,22 +135,11 @@ class UiBlockPill extends StatelessWidget {
         : switch (look) {
             BlockAppearance.classic => base.withValues(alpha: fillAlpha),
             BlockAppearance.solid => base,
-            BlockAppearance.translation => c.control,
             BlockAppearance.dots => base.withValues(alpha: .05),
             BlockAppearance.stripes || BlockAppearance.gradient => null,
           };
 
-    final Widget lead = tr
-        ? Text(
-            translationMark,
-            style: UiText.sans(
-              10,
-              weight: FontWeight.w700,
-              color: iconInk,
-              height: 1,
-            ),
-          )
-        : missing
+    final Widget lead = missing
         ? UiGlyph(UiGlyphs.alert, size: glyph, strokeWidth: 2, color: iconInk)
         : invalid
         ? UiGlyph(UiGlyphs.help, size: glyph, strokeWidth: 2, color: iconInk)
@@ -186,7 +167,7 @@ class UiBlockPill extends StatelessWidget {
             style:
                 UiText.sans(
                   font,
-                  weight: tr ? FontWeight.w500 : FontWeight.w600,
+                  weight: FontWeight.w600,
                   color: ink,
                   height: 1,
                 ).copyWith(

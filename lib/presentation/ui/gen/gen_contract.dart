@@ -321,39 +321,15 @@ enum GenPromptTool {
   related,
 }
 
-/// 翻译按钮（`promptTranslationCoordinator`）。
+/// Visibility of the read-only tag annotations.
 @immutable
 class GenTranslate with _GenValue {
-  const GenTranslate({
-    this.busy = false,
-    this.showing = false,
-    this.hasTranslations = false,
-    this.canAdjust = false,
-    this.route,
-  });
+  const GenTranslate({this.showing = false});
 
-  /// 正在翻译：图标转圈、按钮不可点。
-  final bool busy;
-
-  /// 当前这一面有译文正在显示（再点一下 = 全部显示原文）。
+  /// Toggling annotations never changes prompt text.
   final bool showing;
-
-  /// 存在翻译块，不受当前显示原文还是译文影响。
-  final bool hasTranslations;
-
-  /// 本次翻译的请求/回复上下文仍可续接。
-  final bool canAdjust;
-
-  /// “DeepSeek · deepseek-chat”这类线路名；null = 没配翻译模型（点了先引导去设置）。
-  final String? route;
   @override
-  List<Object?> get _values => [
-    busy,
-    showing,
-    hasTranslations,
-    canAdjust,
-    route,
-  ];
+  List<Object?> get _values => [showing];
 }
 
 @immutable
@@ -1448,7 +1424,6 @@ class GenSlots {
     this.historyDrag,
     this.toolSheet,
     this.emptyCanvas,
-    this.translationGuide,
     this.agentToggle,
     this.viewerControls,
     this.historyCaptionInset = true,
@@ -1459,10 +1434,6 @@ class GenSlots {
 
   /// 品牌欢迎页与随机小贴士由现有组件提供。
   final WidgetBuilder? emptyCanvas;
-
-  /// 教程显示在翻译浮层内；回调返回操作菜单。
-  final Widget Function(BuildContext context, VoidCallback onBack)?
-  translationGuide;
 
   /// 仅应用启用 Agent 集成时提供。
   final Widget? agentToggle;
@@ -1515,11 +1486,7 @@ class GenActions {
     required this.onPromptTool,
     required this.onOpenPalette,
     this.onOpenResourceWindow,
-    required this.onTranslate,
     required this.onToggleTranslation,
-    required this.onTranslationSettings,
-    this.onClearTranslations,
-    this.onTranslationAdjust,
     required this.onOpenBridge,
     required this.onAddCharacter,
     required this.onClearCharacters,
@@ -1616,11 +1583,7 @@ class GenActions {
     onPromptTool: (tool, value) => log('onPromptTool($tool, $value)'),
     onOpenPalette: (_) => log('onOpenPalette'),
     onOpenResourceWindow: (kind) => log('onOpenResourceWindow($kind)'),
-    onTranslate: () => log('onTranslate'),
     onToggleTranslation: () => log('onToggleTranslation'),
-    onTranslationSettings: () => log('onTranslationSettings'),
-    onClearTranslations: () => log('onClearTranslations'),
-    onTranslationAdjust: (_) => log('onTranslationAdjust'),
     onOpenBridge: (_) => log('onOpenBridge'),
     onAddCharacter: (v) => log('onAddCharacter($v)'),
     onClearCharacters: () => log('onClearCharacters'),
@@ -1720,11 +1683,7 @@ class GenActions {
         onPromptTool: onPromptTool,
         onOpenPalette: onOpenPalette,
         onOpenResourceWindow: onOpenResourceWindow,
-        onTranslate: onTranslate,
         onToggleTranslation: onToggleTranslation,
-        onTranslationSettings: onTranslationSettings,
-        onClearTranslations: onClearTranslations,
-        onTranslationAdjust: onTranslationAdjust,
         onOpenBridge: onOpenBridge,
         onAddCharacter: onAddCharacter,
         onClearCharacters: onClearCharacters,
@@ -1835,16 +1794,8 @@ class GenActions {
   /// Resource opener contract only; header visuals are owned by the main agent.
   final ValueChanged<FloatingResourceKind>? onOpenResourceWindow;
 
-  /// 翻译当前这一面（`coordinator.translate`）。
-  final VoidCallback onTranslate;
-
-  /// 显示原文 / 译文（`coordinator.toggleAll`）。
+  /// Toggle read-only tag annotations without changing the prompt.
   final VoidCallback onToggleTranslation;
-
-  /// 去设置里配翻译模型。
-  final VoidCallback onTranslationSettings;
-  final VoidCallback? onClearTranslations;
-  final GenAnchorCallback? onTranslationAdjust;
 
   /// 桥接图标（弹现有桥接面板）。
   final GenAnchorCallback onOpenBridge;

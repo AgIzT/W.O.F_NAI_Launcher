@@ -173,7 +173,6 @@ abstract final class SettingsFormat {
     final l = context.l10n;
     return switch (t) {
       SettingsModelTask.promptTranslate => l.set_mdTaskPrompt,
-      SettingsModelTask.promptReverse => l.set_mdTaskReverse,
       SettingsModelTask.tagTranslate => l.set_mdTaskTag,
       SettingsModelTask.wikiTranslate => l.set_mdTaskWiki,
     };

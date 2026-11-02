@@ -6,7 +6,6 @@ import '../../../../core/utils/localization_extension.dart';
 
 IconData interfaceIcon(LauncherInterface task) => switch (task) {
   LauncherInterface.translate => Icons.south,
-  LauncherInterface.promptReverse => Icons.north,
   LauncherInterface.tagTranslate => Icons.label_outline,
   LauncherInterface.wikiTranslate => Icons.menu_book_outlined,
 };

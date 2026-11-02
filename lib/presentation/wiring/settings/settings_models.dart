@@ -27,13 +27,11 @@ LauncherInterface? settingsHistoryTask(String title) => LauncherInterface.values
 
 LauncherInterface settingsTask(SettingsModelTask task) => switch (task) {
   SettingsModelTask.promptTranslate => LauncherInterface.translate,
-  SettingsModelTask.promptReverse => LauncherInterface.promptReverse,
   SettingsModelTask.tagTranslate => LauncherInterface.tagTranslate,
   SettingsModelTask.wikiTranslate => LauncherInterface.wikiTranslate,
 };
 SettingsModelTask settingsTaskKind(LauncherInterface task) => switch (task) {
   LauncherInterface.translate => SettingsModelTask.promptTranslate,
-  LauncherInterface.promptReverse => SettingsModelTask.promptReverse,
   LauncherInterface.tagTranslate => SettingsModelTask.tagTranslate,
   LauncherInterface.wikiTranslate => SettingsModelTask.wikiTranslate,
 };

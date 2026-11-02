@@ -1124,7 +1124,6 @@ class ModelConfig {
 enum LauncherInterface {
   /// 提示词翻译接口。
   translate,
-  promptReverse,
 
   /// 词库标签翻译接口（自动补全的 LLM 翻译消费）。
   tagTranslate,
@@ -1312,8 +1311,6 @@ class PromptAssistantConfigState {
   InterfaceSlotConfig interfaceFor(LauncherInterface interface) {
     return interfaces[interface] ??
         switch (interface) {
-          LauncherInterface.promptReverse =>
-            interfaces[LauncherInterface.translate],
           LauncherInterface.wikiTranslate =>
             interfaces[LauncherInterface.tagTranslate],
           _ => null,
@@ -1421,6 +1418,9 @@ class PromptAssistantConfigState {
         if (json['presets'] is List)
           for (final preset in json['presets'] as List)
             if (preset is Map<String, dynamic> &&
+                LauncherInterface.values.any(
+                  (task) => task.name == preset['task'],
+                ) &&
                 !(preset['id'] as String? ?? '').startsWith('builtin:'))
               TaskPresetConfig.fromJson(preset),
       ],

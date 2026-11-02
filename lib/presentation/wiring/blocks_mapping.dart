@@ -119,8 +119,6 @@ BlockData blockDataOf(
   sourcePath: b.sourcePath,
   importedAt: b.importedAt?.toLocal(),
   sourceState: sourceState,
-  reading: b.readingTranslationZh,
-  readingNeedsReview: b.readingTranslationNeedsReview,
 );
 
 List<BlocksFolder> blockFoldersOf(

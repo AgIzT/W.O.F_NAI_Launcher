@@ -207,10 +207,7 @@ void main() {
             data: {
               'choices': [
                 {
-                  'message': {
-                    'content':
-                        '{"fields":[{"id":"sample","groups":[{"ids":["sample-1"],"zh":"蓝眼睛女孩"}]}]}',
-                  },
+                  'message': {'content': '{"text":"蓝眼睛女孩"}'},
                 },
               ],
             },

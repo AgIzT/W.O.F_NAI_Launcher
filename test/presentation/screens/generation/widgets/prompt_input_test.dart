@@ -25,7 +25,7 @@ import 'package:nai_launcher/presentation/providers/prompt_block_library_provide
 import 'package:nai_launcher/presentation/providers/pill_workspace_provider.dart';
 import 'package:nai_launcher/presentation/ui/kit/ui_block_pill.dart';
 import 'package:nai_launcher/presentation/providers/prompt_token_counter_provider.dart';
-import 'package:nai_launcher/presentation/providers/prompt_translation_provider.dart';
+import 'package:nai_launcher/presentation/providers/prompt_reading_preferences_provider.dart';
 import 'package:nai_launcher/presentation/prompt_assistant/models/prompt_assistant_models.dart';
 import 'package:nai_launcher/presentation/prompt_assistant/providers/prompt_assistant_config_provider.dart';
 import 'package:nai_launcher/presentation/screens/generation/widgets/prompt_input.dart';
@@ -35,7 +35,6 @@ import 'package:nai_launcher/data/models/prompt_block/prompt_block.dart';
 import 'package:nai_launcher/presentation/themes/app_theme.dart';
 
 import '../../../../helpers/studio_capture_fonts.dart';
-import 'package:nai_launcher/core/utils/app_language.dart';
 
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
@@ -441,415 +440,7 @@ void main() {
     expect(usesRichPromptTypeTooltip(TargetPlatform.windows), isFalse);
   });
 
-  testWidgets('未配置翻译模型时显示设置引导，不发送翻译请求', (tester) async {
-    final captureBoundary = GlobalKey();
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          kritaBridgeNotifierProvider.overrideWith(
-            (ref) => KritaBridgeNotifier(),
-          ),
-          promptAssistantConfigProvider.overrideWith(
-            _TestPromptAssistantConfigNotifier.new,
-          ),
-          promptBlockLibraryNotifierProvider.overrideWith(
-            _EmptyPromptBlockLibraryNotifier.new,
-          ),
-          localStorageServiceProvider.overrideWith(
-            (ref) => _TestLocalStorageService(),
-          ),
-          characterPromptNotifierProvider.overrideWith(
-            _TestCharacterPromptNotifier.new,
-          ),
-          promptTokenUsageProvider(
-            PromptTokenCountTarget.positive,
-          ).overrideWith(
-            (ref) async => const PromptTokenUsage(usedTokens: 0, limit: 512),
-          ),
-          promptTokenUsageProvider(
-            PromptTokenCountTarget.negative,
-          ).overrideWith(
-            (ref) async => const PromptTokenUsage(usedTokens: 0, limit: 512),
-          ),
-        ],
-        child: MaterialApp(
-          theme: Platform.environment['CAPTURE_TRANSLATION_MENU'] == '1'
-              ? AppTheme.getTheme(
-                  AppStyle.geist,
-                  Platform.environment['STUDIO_APPEARANCE'] == 'dark'
-                      ? Brightness.dark
-                      : Brightness.light,
-                )
-              : null,
-          builder: (_, child) =>
-              RepaintBoundary(key: captureBoundary, child: child!),
-          locale: const Locale('zh'),
-          supportedLocales: AppLocalizations.supportedLocales,
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          home: const Scaffold(
-            body: SizedBox(width: 960, height: 420, child: PromptInputWidget()),
-          ),
-        ),
-      ),
-    );
-    await tester.pump();
-    await tester.tap(find.byKey(const Key('prompt-translation-toggle')));
-    await tester.pumpAndSettle();
-
-    expect(find.text('先配置翻译模型'), findsOneWidget);
-    expect(find.text('前往设置'), findsOneWidget);
-    await tester.tap(find.text('稍后'));
-    await tester.pumpAndSettle();
-    final control = tester.widget<Container>(
-      find.byKey(const Key('prompt-translation-control')),
-    );
-    expect((control.decoration! as BoxDecoration).border, isNotNull);
-    expect(
-      tester.getSize(find.byKey(const Key('prompt-translation-control'))),
-      const Size(44, 24),
-    );
-    expect(
-      find.descendant(
-        of: find.byKey(const Key('prompt-translation-control')),
-        matching: find.byKey(const Key('prompt-translation-toggle')),
-      ),
-      findsOneWidget,
-    );
-    expect(
-      find.descendant(
-        of: find.byKey(const Key('prompt-translation-control')),
-        matching: find.byKey(const Key('prompt-translation-actions')),
-      ),
-      findsOneWidget,
-    );
-    await tester.tap(find.byKey(const Key('prompt-translation-actions')));
-    await tester.pumpAndSettle();
-    expect(find.text('未配置模型'), findsOneWidget);
-    expect(find.byIcon(Icons.settings_outlined), findsOneWidget);
-    expect(find.text('翻译新增内容'), findsNothing);
-    expect(find.byTooltip('翻译新增内容'), findsOneWidget);
-    expect(find.byKey(const Key('prompt-translation-undo')), findsNothing);
-    expect(find.byTooltip('撤销上次翻译'), findsNothing);
-    expect(
-      find.byKey(const Key('prompt-translation-plain-text')),
-      findsOneWidget,
-    );
-    expect(find.byIcon(Icons.delete_outline), findsNothing);
-    expect(
-      find.descendant(
-        of: find.byKey(const Key('prompt-translation-add')),
-        matching: find.byIcon(Icons.add),
-      ),
-      findsOneWidget,
-    );
-    final menu = tester.widget<PopupMenuButton<String>>(
-      find.byKey(const Key('prompt-translation-actions')),
-    );
-    expect(menu.constraints!.maxWidth, 176);
-    expect(menu.menuPadding, EdgeInsets.zero);
-    expect(
-      tester.getSize(find.byKey(const Key('prompt-translation-menu'))),
-      const Size(176, 126),
-    );
-    expect(
-      tester
-          .getSize(find.byKey(const Key('prompt-translation-configure')))
-          .height,
-      lessThanOrEqualTo(40),
-    );
-    expect(
-      tester.getSize(find.byKey(const Key('prompt-translation-add'))).height,
-      lessThanOrEqualTo(40),
-    );
-    expect(
-      tester.getSize(find.byKey(const Key('prompt-translation-plain-text'))),
-      const Size(74, 40),
-    );
-    expect(
-      tester.getSize(find.byKey(const Key('prompt-translation-add'))),
-      const Size(74, 40),
-    );
-    expect(find.text('操作教程'), findsOneWidget);
-    await _captureTranslationMenu(tester, captureBoundary, 'menu');
-    await tester.tap(find.byKey(const Key('prompt-translation-tutorial')));
-    await tester.pumpAndSettle();
-    expect(find.byKey(const Key('prompt-translation-guide')), findsOneWidget);
-    expect(find.byKey(const Key('prompt-translation-add')), findsNothing);
-    expect(tester.takeException(), isNull);
-    await _captureTranslationMenu(tester, captureBoundary, 'guide');
-    await tester.tap(find.byKey(const Key('translation-guide-back')));
-    await tester.pumpAndSettle();
-    expect(find.byKey(const Key('prompt-translation-add')), findsOneWidget);
-    await tester.tap(find.byKey(const Key('prompt-translation-add')));
-    await tester.pumpAndSettle();
-    expect(find.text('先配置翻译模型'), findsOneWidget);
-    await tester.tap(find.text('稍后'));
-    await tester.pumpAndSettle();
-    expect(find.byKey(const Key('prompt-translation-menu')), findsOneWidget);
-    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
-    await tester.pumpAndSettle();
-
-    final container = ProviderScope.containerOf(
-      tester.element(find.byType(PromptInputWidget)),
-    );
-    final positive = container.read(
-      pillWorkspaceProvider(PillScopes.main).notifier,
-    );
-    final negative = container.read(
-      pillWorkspaceProvider(PillScopes.negative).notifier,
-    );
-    positive.replaceWithPlainText('before, after');
-    positive.insertTranslationAt(offset: 8, source: 'blue eyes', zh: '蓝眼睛');
-    negative.insertTranslationAt(offset: 0, source: 'bad hands', zh: '坏手');
-    final before = container
-        .read(pillWorkspaceProvider(PillScopes.main))
-        .document;
-    final config =
-        container.read(promptAssistantConfigProvider.notifier)
-            as _TestPromptAssistantConfigNotifier;
-    config.selectModelForTest('deepseek-flash');
-    await tester.pump();
-
-    await tester.tap(find.byKey(const Key('prompt-translation-actions')));
-    await tester.pumpAndSettle();
-    expect(find.text('deepseek-flash'), findsOneWidget);
-    expect(find.byTooltip('DS / deepseek-flash'), findsOneWidget);
-    expect(
-      tester
-          .widget<IconButton>(
-            find.byKey(const Key('prompt-translation-plain-text')),
-          )
-          .onPressed,
-      isNotNull,
-    );
-    expect(find.text('A'), findsOneWidget);
-    await _captureTranslationMenu(tester, captureBoundary, 'blocks');
-    await tester.tap(find.byKey(const Key('prompt-translation-plain-text')));
-    await tester.pumpAndSettle();
-    expect(
-      container.read(pillWorkspaceProvider(PillScopes.main)).document.text,
-      'before, blue eyesafter',
-    );
-    expect(
-      container.read(pillWorkspaceProvider(PillScopes.main)).document.instances,
-      isEmpty,
-    );
-    expect(
-      container
-          .read(pillWorkspaceProvider(PillScopes.negative))
-          .document
-          .instances
-          .length,
-      1,
-    );
-    expect(find.byKey(const Key('prompt-translation-menu')), findsOneWidget);
-    final restoreButton = tester.widget<IconButton>(
-      find.byKey(const Key('prompt-translation-plain-text')),
-    );
-    expect(restoreButton.tooltip, '撤销原文还原，恢复翻译块');
-    expect((restoreButton.icon as Icon).icon, Icons.undo);
-    expect(restoreButton.onPressed, isNotNull);
-    await _captureTranslationMenu(tester, captureBoundary, 'original');
-    config.selectModelForTest(
-      'a-very-long-model-name-that-must-fit-in-this-popover',
-    );
-    await tester.pumpAndSettle();
-    final modelText = tester.widget<Text>(
-      find.byKey(const Key('prompt-translation-model')),
-    );
-    expect(modelText.maxLines, 1);
-    expect(modelText.overflow, TextOverflow.ellipsis);
-    expect(tester.takeException(), isNull);
-    await tester.tap(find.byKey(const Key('prompt-translation-plain-text')));
-    await tester.pumpAndSettle();
-    expect(
-      container.read(pillWorkspaceProvider(PillScopes.main)).document,
-      before,
-    );
-    expect(find.byKey(const Key('prompt-translation-menu')), findsOneWidget);
-    expect(find.text('A'), findsOneWidget);
-
-    container.read(promptTranslationBusyProvider.notifier).state = true;
-    await tester.pump();
-    expect(
-      tester
-          .widget<IconButton>(find.byKey(const Key('prompt-translation-add')))
-          .onPressed,
-      isNull,
-    );
-    expect(
-      tester
-          .widget<IconButton>(
-            find.byKey(const Key('prompt-translation-plain-text')),
-          )
-          .onPressed,
-      isNull,
-    );
-    container.read(promptTranslationBusyProvider.notifier).state = false;
-    await tester.pump();
-    expect(
-      tester
-          .widget<IconButton>(find.byKey(const Key('prompt-translation-add')))
-          .onPressed,
-      isNotNull,
-    );
-    await tester.tap(find.byKey(const Key('prompt-translation-plain-text')));
-    await tester.pumpAndSettle();
-    positive.replaceWithPlainText('new edit');
-    await tester.pumpAndSettle();
-    expect(find.text('A'), findsOneWidget);
-    expect(
-      tester
-          .widget<IconButton>(
-            find.byKey(const Key('prompt-translation-plain-text')),
-          )
-          .onPressed,
-      isNull,
-    );
-    // 菜单外的箭头命中弹层屏障，关闭菜单而不再次打开。
-    await tester.tapAt(
-      tester.getCenter(find.byKey(const Key('prompt-translation-actions'))),
-    );
-    await tester.pumpAndSettle();
-    expect(find.byKey(const Key('prompt-translation-menu')), findsNothing);
-    expect(
-      container.read(pillWorkspaceProvider(PillScopes.main)).document.text,
-      'new edit',
-    );
-    await tester.tap(find.byKey(const Key('prompt-translation-actions')));
-    await tester.pumpAndSettle();
-    expect(find.byKey(const Key('prompt-translation-menu')), findsOneWidget);
-    await tester.tapAt(const Offset(10, 450));
-    await tester.pumpAndSettle();
-    expect(find.byKey(const Key('prompt-translation-menu')), findsNothing);
-    positive.replaceWithPlainText('before, after');
-    positive.insertTranslationAt(offset: 8, source: 'blue eyes', zh: '蓝眼睛');
-    positive.showAllTranslations(original: true);
-    await tester.pumpAndSettle();
-    final sourceInput = find.byKey(const Key('translation-pill-source-input'));
-    await tester.tap(sourceInput);
-    await tester.enterText(sourceInput, 'green eyes,\nsoft lighting');
-    await tester.pump();
-    await tester.pump();
-    final inlineEditable = tester.state<EditableTextState>(
-      find.descendant(of: sourceInput, matching: find.byType(EditableText)),
-    );
-    expect(
-      inlineEditable.renderEditable
-          .getLocalRectForCaret(const TextPosition(offset: 25))
-          .top,
-      closeTo(
-        inlineEditable.renderEditable
-            .getLocalRectForCaret(const TextPosition(offset: 12))
-            .top,
-        0.5,
-      ),
-    );
-    expect(find.byIcon(Icons.build_outlined), findsOneWidget);
-    expect(
-      container
-          .read(pillWorkspaceProvider(PillScopes.main))
-          .document
-          .instances
-          .values
-          .single
-          .translation!
-          .source,
-      'green eyes,\nsoft lighting',
-    );
-    await _captureTranslationMenu(tester, captureBoundary, 'inline-source');
-    await tester.tap(find.byKey(const Key('prompt-translation-toggle')));
-    await tester.pumpAndSettle();
-    expect(sourceInput, findsNothing);
-    expect(find.text('蓝眼睛'), findsOneWidget);
-    expect(find.byIcon(Icons.build_outlined), findsOneWidget);
-    await _captureTranslationMenu(tester, captureBoundary, 'inline-reading');
-    expect(tester.takeException(), isNull);
-  });
-
-  for (final code in ['en', 'ja', 'zh_TW', 'ko']) {
-    testWidgets('translation menu and guide follow the $code interface', (
-      tester,
-    ) async {
-      // Real fonts keep the translated menu measurements representative.
-      await tester.runAsync(loadStudioCaptureFonts);
-      final locale = AppLanguage.fromStorage(code).locale;
-      final l10n = lookupAppLocalizations(locale);
-      final captureBoundary = GlobalKey();
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            kritaBridgeNotifierProvider.overrideWith(
-              (ref) => KritaBridgeNotifier(),
-            ),
-            promptAssistantConfigProvider.overrideWith(
-              _TestPromptAssistantConfigNotifier.new,
-            ),
-            promptBlockLibraryNotifierProvider.overrideWith(
-              _EmptyPromptBlockLibraryNotifier.new,
-            ),
-            localStorageServiceProvider.overrideWith(
-              (ref) => _TestLocalStorageService(),
-            ),
-            characterPromptNotifierProvider.overrideWith(
-              _TestCharacterPromptNotifier.new,
-            ),
-            promptTokenUsageProvider(
-              PromptTokenCountTarget.positive,
-            ).overrideWith(
-              (ref) async => const PromptTokenUsage(usedTokens: 0, limit: 512),
-            ),
-            promptTokenUsageProvider(
-              PromptTokenCountTarget.negative,
-            ).overrideWith(
-              (ref) async => const PromptTokenUsage(usedTokens: 0, limit: 512),
-            ),
-          ],
-          child: MaterialApp(
-            theme: AppTheme.getTheme(AppStyle.geist, Brightness.light),
-            builder: (_, child) =>
-                RepaintBoundary(key: captureBoundary, child: child!),
-            locale: locale,
-            supportedLocales: AppLocalizations.supportedLocales,
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            home: const Scaffold(
-              body: SizedBox(
-                width: 960,
-                height: 420,
-                child: PromptInputWidget(),
-              ),
-            ),
-          ),
-        ),
-      );
-      await tester.pump();
-      await tester.tap(find.byKey(const Key('prompt-translation-toggle')));
-      await tester.pumpAndSettle();
-      expect(find.text(l10n.promptTranslation_setupTitle), findsOneWidget);
-      await tester.tap(find.text(l10n.promptTranslation_later));
-      await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('prompt-translation-actions')));
-      await tester.pumpAndSettle();
-      expect(find.text(l10n.promptTranslation_noModel), findsOneWidget);
-      expect(
-        find.byTooltip(l10n.promptTranslation_translateNew),
-        findsOneWidget,
-      );
-      expect(find.text(l10n.promptTranslation_tutorial), findsOneWidget);
-      expect(tester.takeException(), isNull);
-      await _captureTranslationMenu(tester, captureBoundary, '$code-menu');
-      await tester.tap(find.byKey(const Key('prompt-translation-tutorial')));
-      await tester.pumpAndSettle();
-      expect(
-        find.text(l10n.promptTranslation_guideMiddleTitle),
-        findsOneWidget,
-      );
-      expect(tester.takeException(), isNull);
-      await _captureTranslationMenu(tester, captureBoundary, '$code-guide');
-    });
-  }
-
-  testWidgets('冷启动时切换到负面提示词不会抛出异常', (tester) async {
+  testWidgets('阅读开关保留普通提示词，冷启动可切到负面提示词', (tester) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
@@ -888,6 +479,34 @@ void main() {
 
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 50));
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(PromptInputWidget)),
+    );
+    container
+        .read(generationParamsNotifierProvider.notifier)
+        .updatePromptImmediately('blue eyes, {red hair}');
+    await tester.pump();
+    final before = container.read(generationParamsNotifierProvider);
+    final document = container
+        .read(pillWorkspaceProvider(PillScopes.main))
+        .document;
+    expect(document.instances, isEmpty);
+    expect(
+      container.read(promptReadingPreferencesProvider).showReadings,
+      isTrue,
+    );
+    await tester.tap(find.byKey(const Key('prompt-translation-toggle')));
+    await tester.pump();
+    expect(
+      container.read(promptReadingPreferencesProvider).showReadings,
+      isFalse,
+    );
+    expect(container.read(generationParamsNotifierProvider), before);
+    expect(
+      container.read(pillWorkspaceProvider(PillScopes.main)).document,
+      document,
+    );
 
     // 官网式卡内页签：负面 = Undesired Content
     await tester.tap(find.text('Undesired Content').first);
@@ -1429,43 +1048,6 @@ void main() {
   });
 }
 
-Future<void> _captureTranslationMenu(
-  WidgetTester tester,
-  GlobalKey boundary,
-  String state,
-) async {
-  if (Platform.environment['CAPTURE_TRANSLATION_MENU'] != '1') return;
-  final previousShadows = debugDisableShadows;
-  try {
-    debugDisableShadows = false;
-    for (final render
-        in tester.allRenderObjects.whereType<RenderPhysicalShape>()) {
-      render.markNeedsPaint();
-    }
-    await tester.pump();
-    await tester.runAsync(() async {
-      final render =
-          boundary.currentContext!.findRenderObject()! as RenderRepaintBoundary;
-      final image = await render.toImage(pixelRatio: 1.5);
-      final png = await image.toByteData(format: ui.ImageByteFormat.png);
-      image.dispose();
-      final appearance = Platform.environment['STUDIO_APPEARANCE'] ?? 'light';
-      final file = File(
-        '.dart_tool/translation-toggle-captures/$appearance-$state.png',
-      );
-      await file.parent.create(recursive: true);
-      await file.writeAsBytes(png!.buffer.asUint8List());
-    });
-  } finally {
-    debugDisableShadows = previousShadows;
-    for (final render
-        in tester.allRenderObjects.whereType<RenderPhysicalShape>()) {
-      render.markNeedsPaint();
-    }
-    await tester.pump();
-  }
-}
-
 class _TestPromptAssistantConfigNotifier extends PromptAssistantConfigNotifier {
   _TestPromptAssistantConfigNotifier(super.ref);
 
@@ -1493,6 +1075,8 @@ class _TestPromptAssistantConfigNotifier extends PromptAssistantConfigNotifier {
 }
 
 class _TestLocalStorageService extends LocalStorageService {
+  @override
+  T? getSetting<T>(String key, {T? defaultValue}) => defaultValue;
   @override
   Future<void> setSetting<T>(String key, T value) async {}
   _TestLocalStorageService({this.enablePromptWeightScroll = true});

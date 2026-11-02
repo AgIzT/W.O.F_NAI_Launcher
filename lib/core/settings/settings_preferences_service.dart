@@ -34,7 +34,7 @@ class SettingsPreferencesService {
       StorageKeys.notificationSoundEnabled,
     ],
     PreferenceGroup.input: [
-      StorageKeys.promptAutocompleteEnabled,
+      StorageKeys.enableAutocomplete,
       StorageKeys.enablePromptWeightScroll,
       StorageKeys.promptWeightScrollModifier,
       StorageKeys.tagExpansionResultLimit,

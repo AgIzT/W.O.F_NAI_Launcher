@@ -5,6 +5,7 @@ import '../../../core/utils/weight_tier.dart';
 import '../../../core/utils/pill_document_editor.dart';
 import '../../../core/utils/localization_extension.dart';
 import '../../ui/kit/ui_colors.dart';
+import 'reading/prompt_reading_spacing.dart';
 
 /// 药丸 span 构建器：把文本中的块标记字符渲染为内联 widget。
 ///
@@ -19,7 +20,8 @@ typedef PillSpanBuilder =
 
 /// NAI 语法高亮控制器
 /// 继承 TextEditingController，重写 buildTextSpan 实现语法着色
-class NaiSyntaxController extends TextEditingController {
+class NaiSyntaxController extends TextEditingController
+    with PromptReadingSpacingHost {
   /// Optional explicit editor metrics; the default keeps existing 1.35 rendering.
   final double? lineHeight;
   bool _highlightEnabled;
@@ -110,12 +112,16 @@ class NaiSyntaxController extends TextEditingController {
   }
 
   @override
+  void onReadingSpacingChanged() => clearCache();
+
+  @override
   TextSpan buildTextSpan({
     required BuildContext context,
     TextStyle? style,
     required bool withComposing,
   }) {
     final baseStyle = style ?? const TextStyle();
+    final scaler = MediaQuery.textScalerOf(context);
 
     // Material TextField paints the Windows caret below text, so opaque syntax
     // backgrounds hide it. TextField does not expose this EditableText option
@@ -136,6 +142,8 @@ class NaiSyntaxController extends TextEditingController {
     if (_cachedText != text ||
         _cachedColorSignature != colors.cacheSignature ||
         _cachedBaseStyle != baseStyle ||
+        _cachedScaler != scaler ||
+        _cachedReadingRevision != readingRevision ||
         _cachedFinalSpans == null) {
       // 官网的竖线提示独立于“高亮强调”开关，搜索高亮也需要继续叠加。
       final spans = _parseAndHighlight(
@@ -144,7 +152,11 @@ class NaiSyntaxController extends TextEditingController {
         colors,
         includeEmphasis: highlightEnabled,
       );
-      final resolvedSpans = _applySearchHighlights(spans, baseStyle, colors);
+      final resolvedSpans = applyReadingSpacing(
+        _applySearchHighlights(spans, baseStyle, colors),
+        baseStyle,
+        scaler,
+      );
 
       final builder = pillBuilder;
       _cachedFinalSpans = builder == null || !_containsPillMarker(text)
@@ -153,6 +165,8 @@ class NaiSyntaxController extends TextEditingController {
       _cachedText = text;
       _cachedColorSignature = colors.cacheSignature;
       _cachedBaseStyle = baseStyle;
+      _cachedScaler = scaler;
+      _cachedReadingRevision = readingRevision;
     }
 
     final finalSpans = _cachedFinalSpans!;
@@ -206,6 +220,8 @@ class NaiSyntaxController extends TextEditingController {
   /// 药丸拼接后的 span 缓存（与 [_cachedSpans] 同生命周期）。
   List<InlineSpan>? _cachedFinalSpans;
   TextStyle? _cachedBaseStyle;
+  TextScaler? _cachedScaler;
+  int? _cachedReadingRevision;
 
   bool _containsPillMarker(String value) {
     for (var i = 0; i < value.length; i++) {
@@ -667,7 +683,9 @@ class NaiSyntaxColors {
     _SpanDecoration decoration, {
     double? lineHeight,
   }) {
-    var style = baseStyle.copyWith(height: lineHeight ?? 1.35);
+    var style = baseStyle.copyWith(
+      height: baseStyle.height ?? lineHeight ?? 1.35,
+    );
     final mark = decoration.background;
     if (mark != null) {
       style = style.copyWith(

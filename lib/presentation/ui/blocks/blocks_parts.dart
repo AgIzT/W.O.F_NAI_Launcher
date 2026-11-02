@@ -46,7 +46,6 @@ class BlockPill extends StatelessWidget {
     badge: badge,
     open: open,
     disabled: disabled,
-    translationMark: context.l10n.blocks_translationMark,
   );
 }
 

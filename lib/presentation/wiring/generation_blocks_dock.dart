@@ -68,8 +68,6 @@ BlockData generationBlockData(
   updatedAt: block.updatedAt.toLocal(),
   sourcePath: block.sourcePath,
   importedAt: block.importedAt?.toLocal(),
-  reading: block.readingTranslationZh,
-  readingNeedsReview: block.readingTranslationNeedsReview,
 );
 
 class BlocksDockWiring extends ConsumerStatefulWidget {

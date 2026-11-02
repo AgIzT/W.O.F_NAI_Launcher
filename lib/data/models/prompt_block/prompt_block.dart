@@ -76,19 +76,6 @@ class PromptBlock with _$PromptBlock {
     /// 供 Prompt 展开的完整纯文本正文。
     required String content,
 
-    /// Optional reading text; the legacy Zh key is retained for old libraries.
-    @JsonKey(includeIfNull: false) String? readingTranslationZh,
-
-    /// Visual tag annotations; never part of [content] or generation text.
-    @JsonKey(includeIfNull: false)
-    List<Map<String, dynamic>>? readingTranslationMarks,
-
-    /// Source changed after the last Chinese reading was reviewed.
-    @Default(false) bool readingTranslationNeedsReview,
-
-    @Default('zh') String readingTranslationLanguageCode,
-    @Default(false) bool readingTranslationEdited,
-
     /// 与正面内容同属一个块；旧块缺键时为空。
     @Default('') String negativeContent,
 
@@ -172,11 +159,6 @@ class PromptBlock with _$PromptBlock {
     String? folderId,
     String color = '#FF607D8B',
     String appearance = 'classic',
-    String? readingTranslationZh,
-    List<Map<String, dynamic>>? readingTranslationMarks,
-    bool readingTranslationNeedsReview = false,
-    String readingTranslationLanguageCode = 'zh',
-    bool readingTranslationEdited = false,
     String? iconName,
     String? thumbnail,
     double thumbnailOffsetX = 0.0,
@@ -210,11 +192,6 @@ class PromptBlock with _$PromptBlock {
       lineageId: lineageId,
       title: title.trim(),
       content: content,
-      readingTranslationZh: readingTranslationZh,
-      readingTranslationMarks: readingTranslationMarks,
-      readingTranslationNeedsReview: readingTranslationNeedsReview,
-      readingTranslationLanguageCode: readingTranslationLanguageCode,
-      readingTranslationEdited: readingTranslationEdited,
       folderId: folderId,
       color: color,
       appearance: appearance,

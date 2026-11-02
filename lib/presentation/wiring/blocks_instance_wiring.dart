@@ -150,9 +150,7 @@ class BlockInstanceWiring extends ConsumerWidget {
           standalone: standalone,
           tempContent: instance.temp?.content,
           tempNegativeContent: instance.temp?.negativeContent,
-          tempTranslations: instance.temp?.translations ?? const [],
-          tempNegativeTranslations:
-              instance.temp?.negativeTranslations ?? const [],
+
           originalContent: instance.temp?.originalContent,
           originalNegativeContent: instance.temp?.originalNegativeContent,
           editedAt: instance.temp?.editedAt,

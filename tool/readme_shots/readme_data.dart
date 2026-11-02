@@ -241,7 +241,7 @@ class ReadmeData {
           GenPreviewSection(label: tr('负面', 'Negative'), text: negative),
         ],
         tools: const GenPromptTools(palettePinned: true),
-        translate: const GenTranslate(route: 'Sample · Local preview'),
+        translate: const GenTranslate(showing: true),
       ),
       characters: const GenCharactersData(
         list: [GenCharacter(id: 'c1', positiveTokens: GenTokens(22, 512))],
