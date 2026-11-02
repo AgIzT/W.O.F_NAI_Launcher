@@ -47,7 +47,7 @@ Pi 本地回归在 `tool/nai_agent/` 执行 `npm test`，使用本地合成服�
 
 遵循 `analysis_options.yaml` 和 Dart formatter；复用 core / data / presentation 现有 service、provider 和 widget。生成工具的语法支持以锁定依赖和实际诊断为准，不根据旧 SDK 记录推定能力。
 
-可写标签框复用 `TagExpansionWrapper`：Ctrl+单击 / Ctrl+拖选显式查标签，按原输入框语义提交。`UnifiedPromptInput` 另接 `PromptCompletionWrapper` 提供中英文输入补全，打开显式搜索时暂停补全；译名由 `PromptReadingLayer` 按真实文字几何绘制，不进入原文、撤销栈或生成参数；译名过宽时经 `PromptReadingSpacingHost`（`NaiSyntaxController` 已混入）给逗号加字距推开后一个词，只影响排版。不像标签的自然语言句段由 `PromptTokenParser.phraseRanges` 切出，经 `AutoTagTranslationController.observePhrases` 攒批调用 `translatePromptPhrases`（标签翻译路由），缓存键带 `phrase:` 前缀。空格查询设置 `splitOnSpaces: true`。本地图库、在线 AI TAG 搜索、块管理、黑名单与批量元数据框沿用各自提交路径。中文输入不再依赖已退役的 ffdkj 词库。
+可写标签框复用 `TagExpansionWrapper`：Ctrl+单击 / Ctrl+拖选显式查标签，按原输入框语义提交。`UnifiedPromptInput` 另接 `PromptCompletionWrapper` 提供中英文输入补全，打开显式搜索时暂停补全；译名由 `PromptReadingLayer` 按真实文字几何绘制，不进入原文、撤销栈或生成参数；译名过宽时经 `PromptReadingSpacingHost`（`NaiSyntaxController` 已混入）给逗号加字距推开后一个词，只影响排版。不像标签的自然语言句段由 `PromptTokenParser.phraseRanges` 切出，经 `AutoTagTranslationController.observePhrases` 与标签名称共用 `translatePromptReadings` 批量队列（标签翻译路由），句子缓存键带 `phrase:` 前缀。实际文本编辑、输入法组词和可见片段变化会按输入框重置 800ms 停顿；词库与缓存读取不等待。模型请求串行，每批最多 8 项／2,400 字符，批间至少 300ms；发出前丢弃过期片段。临时网络故障最多再试两次（30／60 秒），429 至少等待 90 秒并遵循 Retry-After（上限 300 秒）；鉴权、配置和无效模型响应不自动重试。空格查询设置 `splitOnSpaces: true`。本地图库、在线 AI TAG 搜索、块管理、黑名单与批量元数据框沿用各自提交路径。中文输入不再依赖已退役的 ffdkj 词库。
 
 ## 测试规范
 

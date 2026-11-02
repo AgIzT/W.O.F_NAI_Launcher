@@ -90,23 +90,23 @@ void _respond(
     () => assistant.cancelCurrentTask(sessionId: any(named: 'sessionId')),
   ).thenAnswer((_) async {});
   when(
-    () => assistant.translateVisibleTag(
-      tag: any(named: 'tag'),
-      wikiBody: any(named: 'wikiBody'),
-      includeWikiTranslation: any(named: 'includeWikiTranslation'),
-      existingNameZh: any(named: 'existingNameZh'),
-      category: any(named: 'category'),
-      aliases: any(named: 'aliases'),
-      postCount: any(named: 'postCount'),
-      relatedTo: any(named: 'relatedTo'),
-      glossary: any(named: 'glossary'),
+    () => assistant.translatePromptReadings(
+      any(),
       sessionId: any(named: 'sessionId'),
+      canonicalTags: any(named: 'canonicalTags'),
     ),
-  ).thenAnswer(handler);
+  ).thenAnswer((call) async {
+    final result = await handler(call);
+    return {
+      for (final tag in call.positionalArguments.first as List<String>)
+        tag: result.nameZh,
+    };
+  });
 }
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  setUpAll(() => registerFallbackValue(<String>[]));
   late Directory folder;
   late _Cache cache;
   late _Assistant assistant;
@@ -130,7 +130,6 @@ void main() {
     when(() => assistant.translateRouteFingerprint()).thenAnswer((_) => route);
     _respond(assistant, (call) async {
       calls++;
-      expect(call.namedArguments[#includeWikiTranslation], false);
       return const VisibleTagTranslationResult(nameZh: '新译名');
     });
     controller = AutoTagTranslationController(

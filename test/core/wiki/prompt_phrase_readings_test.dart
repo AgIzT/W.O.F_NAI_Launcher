@@ -65,9 +65,10 @@ void main() {
       () => assistant.cancelCurrentTask(sessionId: any(named: 'sessionId')),
     ).thenAnswer((_) async {});
     when(
-      () => assistant.translatePromptPhrases(
+      () => assistant.translatePromptReadings(
         any(),
         sessionId: any(named: 'sessionId'),
+        canonicalTags: any(named: 'canonicalTags'),
       ),
     ).thenAnswer((call) {
       final phrases = call.positionalArguments.first as List<String>;
@@ -88,7 +89,7 @@ void main() {
       tag: 'phrase:${AutoTagTranslationController.phraseKey(_sitting)}',
       route: route,
       promptVersion:
-          PromptAssistantService.promptPhraseTranslationPromptVersion,
+          PromptAssistantService.promptReadingTranslationPromptVersion,
       wikiHash: '',
       nameZh: '一个女孩在日落时分坐在公园长椅上',
     );

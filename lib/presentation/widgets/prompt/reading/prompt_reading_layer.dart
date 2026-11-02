@@ -116,6 +116,10 @@ class PromptReadingLayerState extends ConsumerState<PromptReadingLayer> {
   void _changed() {
     final value = widget.controller.value;
     if (value.text == _text && value.composing == _composing) return;
+    _readings?.deferPromptReadings(
+      surface: _surface,
+      composing: value.composing.isValid && !value.composing.isCollapsed,
+    );
     setState(_readText);
   }
 
@@ -247,6 +251,10 @@ class PromptReadingLayerState extends ConsumerState<PromptReadingLayer> {
       widget.controller.addListener(_changed);
       _attachSpacing(widget.controller);
       _readText();
+      _readings?.deferPromptReadings(
+        surface: _surface,
+        composing: _composing.isValid && !_composing.isCollapsed,
+      );
     }
     if (!widget.enabled && oldWidget.enabled) _updateVisible({}, {});
   }
@@ -276,7 +284,14 @@ class PromptReadingLayerState extends ConsumerState<PromptReadingLayer> {
 
   @override
   Widget build(BuildContext context) {
+    final previousReadings = _readings;
     _readings = ref.watch(autoTagTranslationProvider);
+    if (previousReadings != _readings) {
+      _readings!.deferPromptReadings(
+        surface: _surface,
+        composing: _composing.isValid && !_composing.isCollapsed,
+      );
+    }
     _scheduleSpacingCheck();
     final ancestorOffsets = <ViewportOffset>[];
     context.visitAncestorElements((element) {

@@ -76,6 +76,7 @@ class _PromptCompletionWrapperState
 
   /// Editor text when [_preview] opened; any later edit closes the preview.
   String? _previewText;
+  TextEditingValue? _readingEditorValue;
   _Placement? _placement;
   bool _expandedShown = false;
   bool _visibleScheduled = false, _placementScheduled = false;
@@ -191,6 +192,16 @@ class _PromptCompletionWrapperState
   }
 
   void _changed() {
+    final value = widget.controller.value;
+    final previous = _readingEditorValue;
+    _readingEditorValue = value;
+    if (value.text != previous?.text ||
+        value.composing != previous?.composing) {
+      _translations?.deferPromptReadings(
+        surface: _surface,
+        composing: value.composing.isValid && !value.composing.isCollapsed,
+      );
+    }
     if (!_session.isOpen) {
       _removeOverlay();
       return;

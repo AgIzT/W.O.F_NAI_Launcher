@@ -32,6 +32,12 @@ class _Readings extends AutoTagTranslationController {
   final names = <String, String>{};
   final surfaces = <String, Set<String>>{};
   final requests = <String>[];
+  final deferrals = <bool>[];
+  @override
+  void deferPromptReadings({
+    required String surface,
+    required bool composing,
+  }) => deferrals.add(composing);
   Set<String> get visible => {for (final tags in surfaces.values) ...tags};
   @override
   String? nameFor(String tag) => names[tag];
@@ -237,6 +243,39 @@ Future<void> _expectLastReadingPainted(
 
 void main() {
   setUpAll(loadStudioCaptureFonts);
+
+  testWidgets('only source edits and IME transitions defer model readings', (
+    tester,
+  ) async {
+    final readings = _Readings();
+    final controller = NaiSyntaxController(text: 'long hair');
+    addTearDown(controller.dispose);
+    await tester.pumpWidget(
+      _app(
+        readings,
+        Center(child: SizedBox(width: 500, child: _field(controller))),
+      ),
+    );
+    await tester.pumpAndSettle();
+    readings.deferrals.clear();
+    final original = controller.value;
+    controller.selection = const TextSelection.collapsed(offset: 3);
+    readings.reveal({'long_hair': '长发'});
+    await tester.pumpAndSettle();
+    expect(readings.deferrals, isEmpty);
+    controller.value = const TextEditingValue(
+      text: 'long hairs',
+      selection: TextSelection.collapsed(offset: 10),
+      composing: TextRange(start: 5, end: 10),
+    );
+    await tester.pump();
+    expect(readings.deferrals, [true]);
+    controller.value = controller.value.copyWith(composing: TextRange.empty);
+    await tester.pumpAndSettle();
+    expect(readings.deferrals, [true, false]);
+    expect(original.text, 'long hair');
+    expect(controller.text, 'long hairs');
+  });
 
   testWidgets(
     'names arrive without changing text, selection, composing or undo',

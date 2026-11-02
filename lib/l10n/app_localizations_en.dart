@@ -21821,7 +21821,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get promptReading_autoTranslateHint =>
-      'Visible tags and natural-language sentences in prompts are translated automatically once a tag translation model is set in Models & APIs. When off, only local dictionary and cached readings are shown.';
+      'After a 0.8-second typing pause, batch-translate visible tags and sentences missing from the dictionary and cache. Temporary network failures receive limited retries. Set a tag translation model in Models & APIs. When off, show available readings only.';
 
   @override
   String get modelSettings_promptReadingHint =>

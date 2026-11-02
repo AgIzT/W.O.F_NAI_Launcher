@@ -20857,7 +20857,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get promptReading_autoTranslateHint =>
-      '提示词中可见的标签和自然语言句子会自动翻译，需先在「模型与接口」配置标签翻译模型；关闭时只显示本地词库和缓存里的译名。';
+      '停笔约 0.8 秒后批量补译可见标签与句子，优先使用词库和缓存；临时网络故障会有限重试。需在「模型与接口」配置标签翻译模型。关闭后只显示已有译名。';
 
   @override
   String get modelSettings_promptReadingHint => '全文翻译仅供阅读，不修改提示词。';
@@ -41722,7 +41722,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get promptReading_autoTranslateHint =>
-      '提示詞中可見的標籤和自然語言句子會自動翻譯，需先在「模型與介面」配置標籤翻譯模型；關閉時只顯示本地詞庫和快取裡的譯名。';
+      '停筆約 0.8 秒後批次補譯可見標籤與句子，優先使用詞庫和快取；臨時網路故障會有限重試。需在「模型與介面」配置標籤翻譯模型。關閉後只顯示已有譯名。';
 
   @override
   String get modelSettings_promptReadingHint => '全文翻譯僅供閱讀，不修改提示詞。';

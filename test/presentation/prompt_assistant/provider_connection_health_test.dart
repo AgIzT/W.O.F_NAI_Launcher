@@ -216,6 +216,82 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   setUpAll(ModelCatalogRepository.load);
 
+  for (final status in [401, 429, 503]) {
+    test(
+      'request failures retain bounded retry hints for HTTP $status',
+      () async {
+        final adapter = _OfflineAdapter(
+          (_, __) => ResponseBody.fromString(
+            '{"error":{"message":"synthetic failure"}}',
+            status,
+            headers: {
+              Headers.contentTypeHeader: ['application/json'],
+              'retry-after': ['120'],
+            },
+          ),
+        );
+        final client = _client(adapter, _health(_Memory()));
+        await expectLater(
+          client
+              .complete(
+                request: _request(
+                  'failure-$status',
+                  provider: _provider.copyWith(retryAttempts: 0),
+                ),
+              )
+              .toList(),
+          throwsA(
+            isA<PromptAssistantRequestFailure>()
+                .having((e) => e.statusCode, 'status', status)
+                .having((e) => e.retryable, 'retryable', status != 401)
+                .having(
+                  (e) => e.retryAfter,
+                  'retry delay',
+                  const Duration(seconds: 120),
+                ),
+          ),
+        );
+        expect(adapter.requests, hasLength(1));
+      },
+    );
+  }
+
+  for (final type in [
+    DioExceptionType.connectionTimeout,
+    DioExceptionType.connectionError,
+    DioExceptionType.cancel,
+  ]) {
+    test(
+      'request failures distinguish $type from permanent failures',
+      () async {
+        final client = _client(
+          _OfflineAdapter(
+            (options, _) =>
+                throw DioException(requestOptions: options, type: type),
+          ),
+          _health(_Memory()),
+        );
+        await expectLater(
+          client
+              .complete(
+                request: _request(
+                  'network-${type.name}',
+                  provider: _provider.copyWith(retryAttempts: 0),
+                ),
+              )
+              .toList(),
+          throwsA(
+            isA<PromptAssistantRequestFailure>().having(
+              (e) => e.retryable,
+              'retryable',
+              type != DioExceptionType.cancel,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   for (final protocol in [
     ProviderProtocol.openaiChatCompletions,
     ProviderProtocol.openaiResponses,

@@ -6,6 +6,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:nai_launcher/core/storage/local_storage_service.dart';
 import 'package:nai_launcher/core/storage/secure_storage_service.dart';
+import 'package:nai_launcher/core/wiki/tag_translation_glossary.dart';
+import 'package:nai_launcher/core/wiki/tag_wiki_repository.dart';
+import 'package:nai_launcher/core/wiki/visible_tag_translation_cache.dart';
 import 'package:nai_launcher/presentation/prompt_assistant/models/prompt_assistant_models.dart';
 import 'package:nai_launcher/presentation/prompt_assistant/models/prompt_task_definitions.dart';
 import 'package:nai_launcher/presentation/prompt_assistant/providers/model_request_history_provider.dart';
@@ -17,6 +20,24 @@ import 'package:nai_launcher/presentation/prompt_assistant/services/provider_ada
 class _Dio extends Mock implements Dio {
   @override
   final Interceptors interceptors = Interceptors();
+}
+
+class _Wiki extends Mock implements TagWikiRepository {}
+
+class _Cache extends Mock implements VisibleTagTranslationCache {}
+
+class _Glossary extends TagTranslationGlossary {
+  _Glossary() : super(wiki: _Wiki(), cache: _Cache());
+  final tags = <String>[];
+  @override
+  Future<Map<String, Map<String, String>>> termsFor(
+    Iterable<String> names,
+  ) async {
+    tags.addAll(names);
+    return {
+      for (final tag in names) tag: {'definition': 'Blue colored eyes.'},
+    };
+  }
 }
 
 class _Local extends LocalStorageService {
@@ -76,6 +97,58 @@ Response<dynamic> _response({String text = 'OK', int status = 200}) =>
     );
 
 void main() {
+  test(
+    'batched readings share the configured language and local tag glossary',
+    () async {
+      final api = _CaptureApi()
+        ..output = '{"blue_eyes":"青い目","A cat sits.":"猫が座る。"}';
+      final glossary = _Glossary();
+      final container = ProviderContainer(
+        overrides: [
+          localStorageServiceProvider.overrideWithValue(_Local()),
+          secureStorageServiceProvider.overrideWithValue(_Secrets()),
+          tagTranslationGlossaryProvider.overrideWithValue(glossary),
+          promptAssistantServiceProvider.overrideWith(
+            (ref) => PromptAssistantService(ref: ref, apiClient: api),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      final config = container.read(promptAssistantConfigProvider.notifier);
+      await config.upsertProvider(_provider);
+      await config.replaceProviderModels(_provider.id, [_model]);
+      await config.saveInterface(
+        LauncherInterface.tagTranslate,
+        const InterfaceSlotConfig(
+          providerId: 'service',
+          model: 'model',
+          targetLanguage: 'ja',
+        ),
+      );
+      expect(
+        await container
+            .read(promptAssistantServiceProvider)
+            .translatePromptReadings(
+              ['blue_eyes', 'A cat sits.'],
+              sessionId: 'batch',
+              canonicalTags: ['blue_eyes'],
+            ),
+        {'blue_eyes': '青い目', 'A cat sits.': '猫が座る。'},
+      );
+      expect(glossary.tags, ['blue_eyes']);
+      final request = api.requests.single;
+      final payload =
+          jsonDecode((request.userParts.single as PromptAssistantTextPart).text)
+              as Map;
+      expect(payload['fragments'], ['blue_eyes', 'A cat sits.']);
+      expect(payload['target_language'], 'ja');
+      expect(payload['glossary'], {
+        'blue_eyes': {'definition': 'Blue colored eyes.'},
+      });
+      expect(request.systemPrompt, contains('Danbooru tags'));
+    },
+  );
+
   test(
     'whole prompt readings use plain source and a text-only output contract',
     () async {

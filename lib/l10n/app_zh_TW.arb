@@ -11746,7 +11746,7 @@
   "promptReading_completion": "輸入時補全標籤",
   "promptReading_completionHint": "支援中英文搜尋標籤、角色和作品。",
   "promptReading_fillMissing": "補齊可見標籤與句子的缺失譯名",
-  "promptReading_autoTranslateHint": "提示詞中可見的標籤和自然語言句子會自動翻譯，需先在「模型與介面」配置標籤翻譯模型；關閉時只顯示本地詞庫和快取裡的譯名。",
+  "promptReading_autoTranslateHint": "停筆約 0.8 秒後批次補譯可見標籤與句子，優先使用詞庫和快取；臨時網路故障會有限重試。需在「模型與介面」配置標籤翻譯模型。關閉後只顯示已有譯名。",
   "modelSettings_promptReadingHint": "全文翻譯僅供閱讀，不修改提示詞。",
   "promptCompletion_works": "作品",
   "promptCompletion_expand": "完整列表與 Wiki 預覽（右鍵候選可直接預覽）"

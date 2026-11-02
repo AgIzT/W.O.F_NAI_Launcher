@@ -30,6 +30,12 @@ class _Settings extends AutocompleteSettingsNotifier {
 
 class _Readings extends ChangeNotifier implements AutoTagTranslationController {
   final surfaces = <String, Set<String>>{};
+  final deferrals = <bool>[];
+  @override
+  void deferPromptReadings({
+    required String surface,
+    required bool composing,
+  }) => deferrals.add(composing);
   @override
   void observeNames({required String surface, required Iterable<String> tags}) {
     surfaces[surface] = tags.toSet();
@@ -158,6 +164,26 @@ Future<void> typeAndSettle(WidgetTester tester, String text) async {
 }
 
 void main() {
+  testWidgets(
+    'typing defers translations even when candidate rows stay unchanged',
+    (tester) async {
+      final editor = TextEditingController(), focus = FocusNode();
+      addTearDown(editor.dispose);
+      addTearDown(focus.dispose);
+      await pumpEditor(tester, editor, focus, (_) async => [tag('long_hair')]);
+      await typeAndSettle(tester, 'lo');
+      final readings =
+          ProviderScope.containerOf(
+                tester.element(find.byKey(const Key('editor'))),
+              ).read(autoTagTranslationProvider)
+              as _Readings;
+      readings.deferrals.clear();
+      await typeAndSettle(tester, 'lon');
+      expect(find.text('long hair'), findsOneWidget);
+      expect(readings.deferrals, [false]);
+    },
+  );
+
   for (final height in [600.0, 180.0]) {
     testWidgets(
       'expanded completion fits ${height}px with empty and failed queries',
