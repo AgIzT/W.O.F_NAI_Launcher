@@ -10,6 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:nai_launcher/data/models/gallery/local_image_record.dart';
 import 'package:nai_launcher/data/models/gallery/nai_image_metadata.dart';
 import 'package:nai_launcher/data/services/gallery/gallery_filter_service.dart';
+import 'package:nai_launcher/data/services/gallery/gallery_view_mode.dart';
 import 'package:nai_launcher/data/services/gallery/unified_gallery_service.dart';
 import 'package:nai_launcher/data/services/thumbnail_service.dart';
 import 'package:nai_launcher/l10n/app_localizations.dart';
@@ -67,8 +68,12 @@ void main() {
   late ProviderContainer container;
   final opened = <int>[];
   final contextMenus = <String>[];
+  final deletionCandidates = <String>[];
 
-  Future<void> pumpView(WidgetTester tester) async {
+  Future<void> pumpView(
+    WidgetTester tester, {
+    GalleryViewMode mode = GalleryViewMode.justified,
+  }) async {
     tester.view.physicalSize = const Size(1000, 700);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -76,6 +81,7 @@ void main() {
     service = FakeLocalGalleryService(records);
     opened.clear();
     contextMenus.clear();
+    deletionCandidates.clear();
     container = ProviderContainer(
       overrides: [
         galleryServiceProvider.overrideWith(
@@ -88,6 +94,7 @@ void main() {
     );
     await container.read(localGalleryNotifierProvider.notifier).initialize();
     container.read(localGalleryNotifierProvider.notifier).setColumnWidth(160);
+    container.read(localGalleryNotifierProvider.notifier).setViewMode(mode);
 
     await tester.pumpWidget(
       UncontrolledProviderScope(
@@ -103,6 +110,11 @@ void main() {
               onUseImage: (_) async {},
               onFavoriteMenu: (_, __) {},
               onClearFilters: () {},
+              onDeleteRequested: () => deletionCandidates.addAll(
+                container
+                    .read(localGallerySelectionNotifierProvider)
+                    .selectedIds,
+              ),
             ),
           ),
         ),
@@ -173,32 +185,41 @@ void main() {
     await dispose(tester);
   });
 
-  testWidgets('Ctrl+tap starts multi-select with the focused image', (
-    tester,
-  ) async {
-    await pumpView(tester);
+  for (final mode in GalleryViewMode.values) {
+    testWidgets('Ctrl+tap selects only the clicked image then toggles: $mode', (
+      tester,
+    ) async {
+      await pumpView(tester, mode: mode);
 
-    await tester.tap(card(0));
-    await tester.pump(const Duration(milliseconds: 400));
-    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
-    await tester.tap(card(3));
-    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
-    await tester.pump();
+      await tester.tap(card(0));
+      await tester.pump(const Duration(milliseconds: 400));
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+      await tester.tap(card(3));
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+      await tester.pump();
 
-    expect(selection().isActive, isTrue);
-    expect(selection().selectedIds, {records[0].path, records[3].path});
+      expect(selection().isActive, isTrue);
+      expect(selection().selectedIds, {records[3].path});
+      await tester.sendKeyEvent(LogicalKeyboardKey.delete);
+      expect(deletionCandidates, [records[3].path]);
 
-    // 多选中普通单击切换选择
-    await tester.pump(const Duration(milliseconds: 400));
-    await tester.tap(card(0));
-    await tester.pump();
-    expect(selection().selectedIds, {records[3].path});
+      // 多选中普通单击切换选择
+      await tester.pump(const Duration(milliseconds: 400));
+      await tester.tap(card(0));
+      await tester.pump();
+      expect(selection().selectedIds, {records[0].path, records[3].path});
 
-    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
-    await tester.pump();
-    expect(selection().isActive, isFalse);
-    await dispose(tester);
-  });
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pump();
+      expect(selection().isActive, isFalse);
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+      await tester.tap(card(2));
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+      await tester.pump();
+      expect(selection().selectedIds, {records[2].path});
+      await dispose(tester);
+    });
+  }
 
   testWidgets('Shift+tap selects the range from the focused image', (
     tester,
