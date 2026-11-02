@@ -7,6 +7,24 @@ import 'package:nai_launcher/data/models/version/version_info.dart';
 import 'package:nai_launcher/l10n/app_localizations.dart';
 import 'package:nai_launcher/presentation/providers/update_provider.dart';
 import 'package:nai_launcher/presentation/widgets/common/update_check_dialog.dart';
+// ignore: depend_on_referenced_packages
+import 'package:url_launcher_platform_interface/link.dart';
+// ignore: depend_on_referenced_packages
+import 'package:url_launcher_platform_interface/url_launcher_platform_interface.dart';
+
+class _RecordingLauncher extends UrlLauncherPlatform {
+  final opened = <String>[];
+  @override
+  LinkDelegate? get linkDelegate => null;
+  @override
+  Future<bool> canLaunch(String url) async => true;
+  @override
+  Future<bool> launchUrl(String url, LaunchOptions options) async {
+    expect(options.mode, PreferredLaunchMode.externalApplication);
+    opened.add(url);
+    return true;
+  }
+}
 
 class _DialogUpdateNotifier extends UpdateStateNotifier {
   _DialogUpdateNotifier(this.initialState);
@@ -18,6 +36,62 @@ class _DialogUpdateNotifier extends UpdateStateNotifier {
 }
 
 void main() {
+  for (final hasReleasePage in [true, false]) {
+    testWidgets(
+      'manual download uses release page with asset fallback: $hasReleasePage',
+      (tester) async {
+        final previousLauncher = UrlLauncherPlatform.instance;
+        final launcher = _RecordingLauncher();
+        UrlLauncherPlatform.instance = launcher;
+        addTearDown(() => UrlLauncherPlatform.instance = previousLauncher);
+        final state = UpdateState(
+          status: UpdateStatus.available,
+          versionInfo: VersionInfo(
+            version: '9.0.0',
+            currentVersion: '1.0.0',
+            downloadUrl: 'https://example.invalid/package.zip',
+            htmlUrl: hasReleasePage ? 'https://example.invalid/release' : null,
+          ),
+        );
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              updateStateNotifierProvider.overrideWith(
+                () => _DialogUpdateNotifier(state),
+              ),
+              updateTaskBusyProvider.overrideWithValue(false),
+            ],
+            child: MaterialApp(
+              locale: const Locale('en'),
+              supportedLocales: AppLocalizations.supportedLocales,
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              home: Builder(
+                builder: (context) => Scaffold(
+                  body: TextButton(
+                    onPressed: () => showDialog<void>(
+                      context: context,
+                      builder: (_) => const UpdateCheckDialog(),
+                    ),
+                    child: const Text('open-update'),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.tap(find.text('open-update'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byType(FilledButton));
+        await tester.pumpAndSettle();
+        expect(launcher.opened, [
+          hasReleasePage
+              ? 'https://example.invalid/release'
+              : 'https://example.invalid/package.zip',
+        ]);
+      },
+    );
+  }
+
   testWidgets(
     'update dialog uses Preview labels and retains raw comparison versions',
     (tester) async {

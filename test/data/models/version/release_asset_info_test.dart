@@ -3,6 +3,30 @@ import 'package:nai_launcher/data/models/version/release_asset_info.dart';
 
 void main() {
   group('ReleaseAssetInfo', () {
+    test('retains and normalizes GitHub SHA-256 digests', () {
+      final asset = ReleaseAssetInfo.fromGitHubAsset({
+        'digest': 'sha256:${'ABCDEF01' * 8}',
+      });
+      expect(asset.sha256, 'abcdef01' * 8);
+    });
+
+    for (final digest in [
+      null,
+      7,
+      '',
+      'sha256:abc',
+      'sha1:${'a' * 64}',
+      'sha256:${'x' * 64}',
+      'sha256:${'a' * 65}',
+    ]) {
+      test('ignores malformed or unsupported digest: $digest', () {
+        expect(
+          ReleaseAssetInfo.fromGitHubAsset({'digest': digest}).sha256,
+          isNull,
+        );
+      });
+    }
+
     test('detects Windows installer asset', () {
       final asset = ReleaseAssetInfo.fromGitHubAsset({
         'name': 'NAI_Launcher_Windows_1.0.0-beta13+16_Setup.exe',

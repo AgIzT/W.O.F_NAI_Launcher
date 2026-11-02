@@ -61,12 +61,17 @@ class ReleaseAssetInfo {
     final downloadUrl = asset['browser_download_url'] as String? ?? '';
     final size = (asset['size'] as num?)?.toInt();
     final type = inferType(fileName: fileName);
+    final digest = asset['digest'];
+    final checksum = digest is String
+        ? RegExp(r'^sha256:([0-9a-fA-F]{64})$').firstMatch(digest)
+        : null;
 
     return ReleaseAssetInfo(
       type: type,
       platform: inferPlatform(type),
       fileName: fileName,
       downloadUrl: downloadUrl,
+      sha256: checksum?.group(1)?.toLowerCase(),
       size: size,
       label: defaultLabel(type),
       description: defaultDescription(type),

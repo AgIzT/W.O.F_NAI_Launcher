@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -43,6 +44,59 @@ void main() {
       );
       expect(UpdateInstallerService.equalsSha256(hash, 'bad'), isFalse);
     });
+
+    for (final failLaunch in [false, true]) {
+      test(
+        'launch precedes shutdown; launch failure keeps app open: $failLaunch',
+        () async {
+          final package = File('${tempDir.path}/fixture.zip');
+          await package.writeAsString('synthetic package');
+          final hash = await UpdateInstallerService.calculateSha256(package);
+          final update = DownloadedUpdate(
+            file: package,
+            version: '9.0.0',
+            asset: ReleaseAssetInfo(
+              type: ReleaseAssetType.windowsPortable,
+              platform: 'windows',
+              fileName: 'fixture.zip',
+              downloadUrl: 'https://example.invalid/fixture.zip',
+              sha256: hash,
+            ),
+          );
+          final calls = <String>[];
+          final service = UpdateInstallerService(
+            dio: Dio(),
+            installationService: _SupportedInstallationService(),
+            updateDirectory: Directory("${tempDir.path}/中文 path's"),
+            shutdownHandler: (_) async {
+              calls.add('shutdown');
+            },
+            scriptLauncher: (path) async {
+              final bytes = await File(path).readAsBytes();
+              expect(bytes.take(3), [0xef, 0xbb, 0xbf]);
+              expect(
+                utf8.decode(bytes.skip(3).toList()),
+                contains("中文 path''s"),
+              );
+              calls.add('launch');
+              if (failLaunch) throw const ProcessException('fixture', []);
+            },
+          );
+          if (failLaunch) {
+            await expectLater(
+              service.installAndRestart(update),
+              throwsA(isA<UpdateInstallException>()),
+            );
+            expect(calls, ['launch']);
+          } else {
+            await service.installAndRestart(update);
+            expect(calls, ['launch', 'shutdown']);
+          }
+          expect(await package.exists(), isTrue);
+        },
+        skip: !Platform.isWindows,
+      );
+    }
 
     test(
       'resumes a part file with Range and restores pending metadata',
