@@ -176,7 +176,9 @@ void main() {
       final history = Directory(
         '${workspace.agentDirectory.path}/prompt-history',
       );
-      expect(await history.list().where((file) => file is File).length, 2);
+      // A synchronous listing closes its directory handle before tearDown
+      // deletes the temp folder; Windows rejects deleting an open directory.
+      expect(history.listSync().whereType<File>(), hasLength(2));
       expect(container.exists(naiAgentControllerProvider), isFalse);
     },
   );

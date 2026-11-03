@@ -37,6 +37,8 @@ $sdk = (Resolve-Path '../../sdk/flutter-3.47.7').Path
 
 Pi 本地回归在 `tool/nai_agent/` 执行 `npm test`，使用本地合成服务，不请求真实模型或 NAI。`NAI_AGENT_COMPOSER_CAPTURES` 指定 widget 实绘输出目录；紧凑面板测试覆盖五种语言、320/380/460px、深浅色及六种状态。运行中状态有持续进度动画，使用定时 `pump` 而非 `pumpAndSettle`。截图仅作组件／合成数据证据，不代表已安装版本。
 
+启动真实 Pi 主机的 Flutter 测试（如 `studio_host_integration_test`、`workspace_controller_test`、`questions_test`）依赖未入库的 `tool/nai_agent/node_modules`：新检出或新工作树先在 `tool/nai_agent/` 执行 `npm ci`，并把 `NAI_AGENT_NODE` 设为本机 Node 可执行文件。未设置时，部分测试回退到 `PATH` 中的 `node`，部分沿用上游机器的 `E:/node/node.exe`，会以 `ProcessException` 或 “Pi host closed” 失败；这是环境缺失，不是功能回归。
+
 ## 当前 Glass 包交付
 
 本机桌面实际使用 `E:/A.I/NovelAI/nai-launcher-src/build/windows-glass-preview/runner/Release/`，不是标准 Release 或 Debug 目录。完整交付状态以该源码根 `.dart_tool/glass-rollout-delivery.json` 与安装文件为准；当前有效源码位置从工作区接手说明读取。

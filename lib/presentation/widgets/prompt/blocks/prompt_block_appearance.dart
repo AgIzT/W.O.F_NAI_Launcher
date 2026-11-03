@@ -52,8 +52,13 @@ class PromptBlockPatternPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (appearance == PromptBlockAppearance.classic ||
-        appearance == PromptBlockAppearance.solid ||
+    // Retired or unknown appearances render as classic, like their label and
+    // fill, instead of falling through to the stripes below.
+    if (!const {
+          PromptBlockAppearance.stripes,
+          PromptBlockAppearance.dots,
+          PromptBlockAppearance.gradient,
+        }.contains(appearance) ||
         size.isEmpty) {
       return;
     }
