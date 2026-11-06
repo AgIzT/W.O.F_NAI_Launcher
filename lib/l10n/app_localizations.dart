@@ -2124,6 +2124,12 @@ abstract class AppLocalizations {
   /// **'ORIGINAL'**
   String get generation_variationOriginal;
 
+  /// No description provided for @generation_requestCostInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'This request exceeds the supported limits. Reduce the image size or steps.'**
+  String get generation_requestCostInvalid;
+
   /// No description provided for @generation_variationSizeUnsupported.
   ///
   /// In en, this message translates to:
@@ -9227,6 +9233,18 @@ abstract class AppLocalizations {
   /// **'v{version} has been downloaded and verified. Installing will close the app and restart it automatically.'**
   String updateDownloadedHint(Object version);
 
+  /// No description provided for @updateMacReveal.
+  ///
+  /// In en, this message translates to:
+  /// **'Show in Finder'**
+  String get updateMacReveal;
+
+  /// No description provided for @updateMacReplaceHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Quit this app, then use Finder to replace it with the extracted app.'**
+  String get updateMacReplaceHint;
+
   /// No description provided for @updateInstallAndRestart.
   ///
   /// In en, this message translates to:
@@ -15554,6 +15572,18 @@ abstract class AppLocalizations {
   /// **'Failed to check for updates'**
   String get update_errorCheckFailed;
 
+  /// No description provided for @update_errorRateLimited.
+  ///
+  /// In en, this message translates to:
+  /// **'GitHub request limit reached. Please try again later.'**
+  String get update_errorRateLimited;
+
+  /// No description provided for @update_retryAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again after {time} (local time).'**
+  String update_retryAt(String time);
+
   /// No description provided for @update_errorCheckUnknown.
   ///
   /// In en, this message translates to:
@@ -16111,6 +16141,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Character handling'**
   String get imageUse_characterMode;
+
+  /// No description provided for @imageUse_featureRecorded.
+  ///
+  /// In en, this message translates to:
+  /// **'The source image used {feature}.'**
+  String imageUse_featureRecorded(String feature);
+
+  /// No description provided for @imageUse_referenceAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The source image used {feature}. Import its reference material with “References”.'**
+  String imageUse_referenceAvailable(String feature);
+
+  /// No description provided for @imageUse_referenceUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The source image used {feature}. Only the usage record remains; no importable reference material is attached.'**
+  String imageUse_referenceUnavailable(String feature);
 
   /// No description provided for @imageMenu_details.
   ///
@@ -25853,12 +25901,6 @@ abstract class AppLocalizations {
   /// **'Each vibe beyond {free} costs +{each} Anlas · +{total} this time'**
   String gen_vibeExtraCost(Object free, Object each, Object total);
 
-  /// No description provided for @gen_recent.
-  ///
-  /// In en, this message translates to:
-  /// **'Recent'**
-  String get gen_recent;
-
   /// No description provided for @gen_encoded.
   ///
   /// In en, this message translates to:
@@ -28594,12 +28636,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add MCP server'**
   String get naiAgent_mcpAdd;
-
-  /// No description provided for @naiAgent_mcpName.
-  ///
-  /// In en, this message translates to:
-  /// **'Server name'**
-  String get naiAgent_mcpName;
 
   /// No description provided for @naiAgent_mcpConfig.
   ///
@@ -33025,7 +33061,7 @@ abstract class AppLocalizations {
   /// No description provided for @set_rgPythonSub.
   ///
   /// In en, this message translates to:
-  /// **'Uses the standalone runtime by default; you can pick an existing python.exe.'**
+  /// **'You can select an existing local Python interpreter.'**
   String get set_rgPythonSub;
 
   /// No description provided for @set_rgPythonAuto.
@@ -34155,6 +34191,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Up to date'**
   String get set_abLatest;
+
+  /// No description provided for @set_abUnchecked.
+  ///
+  /// In en, this message translates to:
+  /// **'Not checked'**
+  String get set_abUnchecked;
+
+  /// No description provided for @set_abSkipped.
+  ///
+  /// In en, this message translates to:
+  /// **'Update skipped'**
+  String get set_abSkipped;
 
   /// No description provided for @set_abChecking.
   ///
@@ -36820,6 +36868,18 @@ abstract class AppLocalizations {
   /// **'Global instructions'**
   String get ag_memoryGlobal;
 
+  /// No description provided for @ag_memoryChatPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat pre-instructions'**
+  String get ag_memoryChatPrefix;
+
+  /// No description provided for @ag_memoryChatPrefixHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Applies only to this chat, before the built-in system prompt.'**
+  String get ag_memoryChatPrefixHint;
+
   /// No description provided for @ag_memoryWorkspace.
   ///
   /// In en, this message translates to:
@@ -38661,6 +38721,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Local command'**
   String get set_agMcpStdio;
+
+  /// No description provided for @set_agMcpDisplayName.
+  ///
+  /// In en, this message translates to:
+  /// **'Display name (optional)'**
+  String get set_agMcpDisplayName;
+
+  /// No description provided for @set_agMcpDisplayNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Shown in the interface; tool names stay unchanged.'**
+  String get set_agMcpDisplayNameHint;
+
+  /// No description provided for @set_agMcpIdentifier.
+  ///
+  /// In en, this message translates to:
+  /// **'Tool identifier'**
+  String get set_agMcpIdentifier;
 
   /// No description provided for @set_agMcpAddress.
   ///

@@ -642,6 +642,30 @@ void main() {
       expect(r.last('onSamplerChanged'), 'onSamplerChanged(k_euler)');
     });
 
+    testWidgets('无种子时参数条与抽屉仍可固定，解除后可以再次固定', (t) async {
+      final random = GenFixture.view().copyWith(params: const GenParamsData());
+      await pump(t, random);
+      await tapKey(t, 'gen-param-seed');
+      expect(r.last('onSeedPinned'), 'onSeedPinned(true)');
+
+      r.calls.clear();
+      await tapKey(t, 'gen-params-toggle');
+      await tapKey(t, 'gen-seed-lock');
+      expect(r.last('onSeedPinned'), 'onSeedPinned(true)');
+
+      await pump(
+        t,
+        random.copyWith(
+          params: const GenParamsData(seed: 4278418688, seedPinned: true),
+        ),
+      );
+      await tapKey(t, 'gen-param-seed');
+      expect(r.last('onSeedPinned'), 'onSeedPinned(false)');
+      await pump(t, random);
+      await tapKey(t, 'gen-param-seed');
+      expect(r.last('onSeedPinned'), 'onSeedPinned(true)');
+    });
+
     testWidgets('参数抽屉：展开、点遮罩收起', (t) async {
       await pump(t);
       await tapKey(t, 'gen-params-toggle');
@@ -871,10 +895,10 @@ void main() {
   });
 
   group('历史', () {
-    testWidgets('单击切批，300ms 内再点开大图', (t) async {
+    testWidgets('单击定位封面图，300ms 内再点开同一张大图', (t) async {
       await pump(t);
       await tapKey(t, 'gen-batch-tile-b2');
-      expect(r.last('onFocusBatch'), 'onFocusBatch(b2)');
+      expect(r.last('onFocusTile'), 'onFocusTile(i2)');
       await t.tap(find.byKey(const Key('gen-batch-tile-b2')));
       await t.pumpAndSettle();
       expect(r.last('onOpenViewer'), 'onOpenViewer(i2)');
@@ -892,6 +916,7 @@ void main() {
       await tapKey(t, 'gen-batch-tile-b1');
       await tapKey(t, 'gen-batch-tile-b2');
       expect(r.called('onFocusBatch'), isFalse);
+      expect(r.called('onFocusTile'), isFalse);
       expect(find.text('已选 3 张'), findsOneWidget);
       await tapKey(t, 'gen-history-save-selected');
       expect(r.last('onSaveImages'), 'onSaveImages([i1, i2, i3])');

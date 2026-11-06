@@ -1,7 +1,7 @@
 {
   "upstream_repository": "z15087716457-stack/W.O.F_NAI_Launcher",
-  "upstream_base": "49e8ed3100fbfa5896fb8467a8b9f72dae522956",
-  "reviewed_through": "49e8ed3100fbfa5896fb8467a8b9f72dae522956",
+  "upstream_base": "d754612dd226cb763a1012a23625223bfde5b946",
+  "reviewed_through": "d754612dd226cb763a1012a23625223bfde5b946",
   "source_repository": "AgIzT/W.O.F_NAI_Launcher",
   "source_stable_commit": "fa3bc8ae2649d61ae0a4459890e8b5764a577137",
   "feature_source_commit": "62f920820bdcbdd6dc5bf2b00f7bd88d1f7d7be8",
@@ -20,6 +20,80 @@
   ],
   "local_fix_to_preserve": "Embed character captions before local upscaling plain request images",
   "validation": {
+    "date": "2026-11-06",
+    "target_upstream": "d754612dd226cb763a1012a23625223bfde5b946",
+    "flutter": "3.47.7",
+    "dart": "3.13.5",
+    "flutter_full": {
+      "failed": 0,
+      "success": true,
+      "passed": 10112,
+      "skipped": 6,
+      "log": "build/upstream-merge-2026-11-06/flutter-full.jsonl",
+      "suites": 941
+    },
+    "skip_reasons": [
+      {
+        "name": "Finder-launched helpers find the bundled npm before system tools",
+        "reason": null
+      },
+      {
+        "name": "cached official RTX component runs through the service with exact size and alpha",
+        "reason": "Opt in with RUN_ADVANCED_UPSCALE_AUDIT=1; requires an RTX GPU and the cached SDK archive"
+      },
+      {
+        "name": "official optional models install from the verified archive and run natively",
+        "reason": "Opt in with RUN_LOCAL_UPSCALE_AUDIT=1; requires Vulkan and the cached official model archive"
+      },
+      {
+        "name": "real bundled native worker produces exact fractional targets, keeps alpha, and exits",
+        "reason": "Opt in with RUN_LOCAL_UPSCALE_AUDIT=1; requires a working Vulkan GPU"
+      },
+      {
+        "name": "cancellation kills a real child even when it races with process creation",
+        "reason": "Opt in with RUN_LOCAL_UPSCALE_AUDIT=1; requires a working Vulkan GPU"
+      },
+      {
+        "name": "AI TAG production config/detail/images/favorites live smoke",
+        "reason": "Opt in with --dart-define=LIVE_AI_TAG=true; public reads only"
+      }
+    ],
+    "node": {
+      "passed": 132,
+      "skipped": 0,
+      "failed": 0,
+      "log": "build/upstream-merge-2026-11-06/node-tests.log"
+    },
+    "rag_python": {
+      "failed": 0,
+      "passed": 144,
+      "skipped": 3,
+      "log": "build/upstream-merge-2026-11-06/rag-python-final-312.log",
+      "python": "3.12.14",
+      "total": 147
+    },
+    "release_payload": {
+      "passed": 3,
+      "failed": 0
+    },
+    "analyzer": {
+      "log": "build/upstream-merge-2026-11-06/analyze-final.log",
+      "success": true
+    },
+    "windows_release": {
+      "temporary_cmake_patch_restored": true,
+      "version": "2.2.6+83",
+      "identity_validation": "passed",
+      "success": true,
+      "log": "build/upstream-merge-2026-11-06/windows-release.log"
+    },
+    "macos_native_validation": false,
+    "bundled_databases": "passed",
+    "lfs_fsck": "passed",
+    "app_launched": false,
+    "installation_performed": false
+  },
+  "migration_validation": {
     "date": "2026-11-02",
     "flutter": "3.47.7",
     "dart": "3.13.5",
@@ -96,5 +170,15 @@
     "lfs_fsck": "passed",
     "installation_performed": false,
     "app_launched": false
-  }
+  },
+  "initial_upstream_base": "49e8ed3100fbfa5896fb8467a8b9f72dae522956",
+  "upstream_integrations": [
+    {
+      "date": "2026-11-06",
+      "from_commit": "9fe268da449b87487a3f0b5e8dace177c68c5ec4",
+      "upstream_target": "d754612dd226cb763a1012a23625223bfde5b946",
+      "upstream_commits": 36,
+      "report": "docs/upstream-merge-2026-11-06.md"
+    }
+  ]
 }

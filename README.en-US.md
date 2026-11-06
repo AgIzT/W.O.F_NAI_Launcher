@@ -29,16 +29,17 @@ W.O.F NAI Studio is a third-party NovelAI desktop client for Windows. It does mo
 
 ## Download
 
-Get the latest version from [Releases](https://github.com/z15087716457-stack/W.O.F_NAI_Launcher/releases/latest). Choose one:
+Get the package for your operating system from [Releases](https://github.com/z15087716457-stack/W.O.F_NAI_Launcher/releases/latest).
 
 | File | Who it's for |
 | --- | --- |
 | `WOF_NAI_Studio_Windows_<version>_Setup.exe` | **The choice for most people.** Installs to your user directory without administrator rights, with Start menu and desktop shortcuts. |
 | `WOF_NAI_Studio_Windows_<version>_Portable.zip` | For keeping the app in a folder of your choice, on a USB drive, or taking it between computers. Extract it and run `nai_launcher.exe`. |
+| `WOF_NAI_Studio_macOS_<version>_Portable.zip` | When listed in the release, extract and use it on Apple silicon or Intel Macs running macOS 13.5 or later. |
 
-Both versions support in-app updates. Your settings, gallery database and Agent data live in `user-data/` and `agent-data/` beside the program. Updates and uninstallation leave them intact.
+Both Windows packages support in-app updates. Settings, the gallery database and Agent data live in `user-data/` and `agent-data/` beside the program. On Mac, data lives in your Application Support directory. The app downloads and verifies updates, then opens Finder for you to replace the app.
 
-> **Upgrading an older Portable to 2.2.4:** Exit the app completely, then extract this release over the existing program folder, keeping `user-data/` and `agent-data/`. Subsequent in-app updates use the corrected script. Setup updates are unaffected.
+> **First upgrade from Portable 2.2.3 or earlier:** Exit the app completely, then extract the new release over the existing program folder, keeping `user-data/` and `agent-data/`. In-app updates work normally from 2.2.4 onward. Setup updates are unaffected by this older script issue.
 
 > The installer is not code-signed yet. On first launch, Windows may say “Windows protected your PC.” Click “More info → Run anyway.” Each release includes SHA-256 checksums.
 
@@ -52,9 +53,9 @@ Both versions support in-app updates. Your settings, gallery database and Agent 
 
 **2.2.1 additions**: Let the Agent split prompts into temporary blocks, with whole-module or multiple translations inside. This update also fixes single-click history details, caret visibility over weighted text and update-manifest parsing, and adds individual-image browsing to the infinite canvas.
 
-**2.2.4 update**: Improved multi-image drops, image previews, native Tab suggestions, scroll-to-bottom on send and continuous chat deletion. MCP configuration is easier, and Pi can manage its own Skills, extensions, packages and settings through one on-demand tool. App data lives directly beside the program, and Portable updates no longer restore old managed files over the new version.
+**2.2.6 update**: Fixes intermittent gallery refresh failures, failed-thumbnail recovery and blocking folder opens. Gallery categories remember their browsing positions; image imports show reference-use records, seed pinning can be toggled repeatedly, and the simple viewer follows new batches correctly. The Agent can manage block preview images.
 
-See the [complete 2.2.4 changelog](CHANGELOG.md#224---2026-10-31) and [release downloads](https://github.com/z15087716457-stack/W.O.F_NAI_Launcher/releases/tag/v2.2.4). Agent suggestions, cache warming and translation adjustments use your own model service; their settings are configurable.
+See the [complete 2.2.6 changelog](CHANGELOG.md#226---2026-11-04) and [release downloads](https://github.com/z15087716457-stack/W.O.F_NAI_Launcher/releases/tag/v2.2.6). Agent suggestions, cache warming and translation adjustments use your own model service; their settings are configurable.
 
 ## Get started in three steps
 
@@ -220,6 +221,7 @@ Use `scripts/package_windows_release.ps1` to package the installer and portable 
 ## Acknowledgments and license
 
 - This project is forked from [Aaalice233/Aaalice_NAI_Launcher](https://github.com/Aaalice233/Aaalice_NAI_Launcher) (MIT). Thanks to the original author for their open-source work. This fork is not affiliated with the upstream author; please report problems in this repository's Issues.
+- Thanks to contributor [Miint-Sunny](https://github.com/Miint-Sunny) for 18 pull requests and their test results, covering macOS support, gallery fixes, and generation improvements.
 - The style evolution algorithm draws on ideas from [monineko/PromptCard-Studio](https://github.com/monineko/PromptCard-Studio) (GPL-3.0). This project uses an independent Dart implementation and does not copy its source code.
 - NAI Agent is based on [Pi](https://github.com/earendil-works/pi) (MIT).
 - This project is open source under the [MIT License](LICENSE). Bundled data, fonts and components follow their own licenses; see [Third-party notices](THIRD_PARTY_NOTICES.md).

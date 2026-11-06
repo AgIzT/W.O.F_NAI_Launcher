@@ -241,7 +241,7 @@ class SettingSpec {
       _c,
       _cv,
       choices: ['openDetail', 'linkedPreview'],
-      defaultValue: 'openDetail',
+      defaultValue: 'linkedPreview',
     ),
     SettingKey.outputViewer: SettingSpec._(
       _c,
@@ -263,7 +263,7 @@ class SettingSpec {
       defaultValue: false,
     ),
     SettingKey.canvasLockCamera: SettingSpec._(_t, _cv, defaultValue: false),
-    SettingKey.canvasZoomToFill: SettingSpec._(_t, _cv, defaultValue: false),
+    SettingKey.canvasZoomToFill: SettingSpec._(_t, _cv, defaultValue: true),
     SettingKey.shortcutsEnabled: SettingSpec._(_t, _sc, defaultValue: true),
     SettingKey.shortcutsInTooltips: SettingSpec._(_t, _sc, defaultValue: true),
     SettingKey.shortcutsInMenus: SettingSpec._(_t, _sc, defaultValue: false),
@@ -1907,14 +1907,22 @@ class SettingsBackupData {
 
 // ── 关于
 
-enum SettingsUpdateState { upToDate, available, checking, downloading, failed }
+enum SettingsUpdateState {
+  unchecked,
+  skipped,
+  upToDate,
+  available,
+  checking,
+  downloading,
+  failed,
+}
 
 @immutable
 class SettingsAboutData {
   const SettingsAboutData({
     this.build = '',
     this.platform = '',
-    this.update = SettingsUpdateState.upToDate,
+    this.update = SettingsUpdateState.unchecked,
     this.latest = '',
     this.releasedAt,
     this.updateBytes = 0,

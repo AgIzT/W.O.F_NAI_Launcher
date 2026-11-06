@@ -29,16 +29,17 @@ W.O.F NAI Studio 是一个 Windows 桌面上的 NovelAI 第三方客户端。它
 
 ## 下载
 
-到 [Releases](https://github.com/z15087716457-stack/W.O.F_NAI_Launcher/releases/latest) 下载最新版本，二选一：
+到 [Releases](https://github.com/z15087716457-stack/W.O.F_NAI_Launcher/releases/latest) 下载适合当前系统的版本。
 
 | 文件 | 适合谁 |
 | --- | --- |
 | `WOF_NAI_Studio_Windows_<版本>_Setup.exe` | **大多数人选这个。** 装到当前用户目录，不需要管理员权限，有开始菜单和桌面快捷方式。 |
 | `WOF_NAI_Studio_Windows_<版本>_Portable.zip` | 想放在自己指定的文件夹、U 盘或多台电脑之间带着走。解压后运行 `nai_launcher.exe`。 |
+| `WOF_NAI_Studio_macOS_<版本>_Portable.zip` | 当发布页提供该文件时，可在 macOS 13.5 及以上的 Apple 芯片和 Intel Mac 上解压使用。 |
 
-两个版本都支持应用内更新。你的设置、图库数据库和 Agent 数据都放在程序旁边的 `user-data/` 和 `agent-data/` 里，升级和卸载都不会删除它们。
+Windows 两个版本都支持应用内更新，设置、图库数据库和 Agent 数据放在程序旁边的 `user-data/` 和 `agent-data/`。Mac 数据在用户的 Application Support 目录，更新下载并校验后用 Finder 替换应用。
 
-> **旧 Portable 升级到 2.2.4**：请完全退出应用，解压新版覆盖原程序目录，保留 `user-data/` 与 `agent-data/`；本版起后续应用内更新使用修正后的脚本。Setup 不受影响。
+> **2.2.3 及更早 Portable 首次升级**：请完全退出应用，解压新版覆盖原程序目录，保留 `user-data/` 与 `agent-data/`。2.2.4 及之后可正常使用应用内更新；Setup 不受此旧脚本问题影响。
 
 > 安装包暂未做代码签名，第一次运行时 Windows 可能提示“已保护你的电脑”。点“更多信息 → 仍要运行”即可。每个版本都附有 SHA-256 校验值。
 
@@ -52,9 +53,9 @@ W.O.F NAI Studio 是一个 Windows 桌面上的 NovelAI 第三方客户端。它
 
 **2.2.1 补充**：Agent 可直接把提示词拆成临时块，块内支持整段／多段翻译；历史单击详情、权重区域光标与无限画布逐张浏览已修复或增强，并修复应用内更新清单解析。
 
-**2.2.4 更新**：完善 Agent 多图拖入、图片预览、原生 Tab 补全、发送回底和会话连续删除；MCP 配置更易用，Pi 可按需统一管理自己的 Skill、扩展、包和配置。应用数据直接存于安装目录旁，并修复 Portable 更新覆盖旧文件的问题。
+**2.2.6 更新**：修复图库偶发刷新失败、失败缩略图恢复与目录打开阻塞；图库分类记住浏览位置，导入图片可查看参考使用记录，种子可反复固定，简洁查看器正确跟随新批次；Agent 可管理块预览图。
 
-详细功能、修复与升级说明见 [2.2.4 更新日志](CHANGELOG.md#224---2026-10-31) 和 [正式版下载](https://github.com/z15087716457-stack/W.O.F_NAI_Launcher/releases/tag/v2.2.4)。Agent 建议、缓存保温及翻译调整使用你自己的模型服务，可在设置中调整相关功能。
+详细功能、修复与升级说明见 [2.2.6 更新日志](CHANGELOG.md#226---2026-11-04) 和 [正式版下载](https://github.com/z15087716457-stack/W.O.F_NAI_Launcher/releases/tag/v2.2.6)。Agent 建议、缓存保温及翻译调整使用你自己的模型服务，可在设置中调整相关功能。
 
 ## 三步上手
 
@@ -220,6 +221,7 @@ flutter build windows --release --no-tree-shake-icons
 ## 致谢与许可
 
 - 本项目分支自 [Aaalice233/Aaalice_NAI_Launcher](https://github.com/Aaalice233/Aaalice_NAI_Launcher)（MIT），感谢原作者的开源工作。本分支与上游作者无关，问题请提到本仓库的 Issues。
+- 感谢项目贡献者 [Miint-Sunny](https://github.com/Miint-Sunny) 提交 macOS 支持、图库与生图改进等 18 个 PR，并提供测试验证。
 - 画风遗传的算法思路参考 [monineko/PromptCard-Studio](https://github.com/monineko/PromptCard-Studio)（GPL-3.0），本项目为独立的 Dart 实现，未复制其源码。
 - NAI Agent 基于 [Pi](https://github.com/earendil-works/pi)（MIT）。
 - 本项目以 [MIT License](LICENSE) 开源；随附的数据、字体和组件遵循各自许可，详见 [第三方声明](THIRD_PARTY_NOTICES.md)。

@@ -1,4 +1,7 @@
+import 'dart:io';
 import 'dart:typed_data';
+import 'package:path/path.dart' as p;
+import '../../../core/utils/app_bundle_paths.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/services/desktop_app_shutdown_service.dart';
 
@@ -17,7 +20,15 @@ import 'preview_selection_provider.dart';
 import '../../screens/generation/widgets/canvas/canvas_feed_layout.dart';
 
 final localUpscaleModelManagerProvider = Provider((ref) {
-  final manager = LocalUpscaleModelManager();
+  final manager = LocalUpscaleModelManager(
+    bundledExecutable: Platform.isMacOS
+        ? p.join(
+            AppBundlePaths.toolsDirectory,
+            'local-upscale',
+            'realesrgan-ncnn-vulkan',
+          )
+        : null,
+  );
   ref.onDispose(manager.dispose);
   return manager;
 });
@@ -25,7 +36,8 @@ final localUpscaleServiceProvider = Provider(
   (ref) => LocalUpscaleService(
     ref.watch(localUpscaleModelManagerProvider),
     advanced: ref.watch(advancedUpscaleComponentManagerProvider),
-    beforeInference: () => ref.read(ragControllerProvider.notifier).suspendForGpu(),
+    beforeInference: () =>
+        ref.read(ragControllerProvider.notifier).suspendForGpu(),
     afterInference: () => ref.read(ragControllerProvider.notifier).releaseGpu(),
   ),
 );
@@ -39,7 +51,8 @@ final advancedUpscaleComponentManagerProvider = Provider((ref) {
 final localUpscaleModelsProvider = FutureProvider(
   (ref) async => [
     ...await ref.watch(localUpscaleModelManagerProvider).models(),
-    ...await ref.watch(advancedUpscaleComponentManagerProvider).models(),
+    if (Platform.isWindows)
+      ...await ref.watch(advancedUpscaleComponentManagerProvider).models(),
   ],
 );
 
@@ -76,7 +89,7 @@ class AdvancedUpscaleInstall extends Notifier<AdvancedUpscaleInstallState> {
     final remove = DesktopAppShutdownService.registerCleanup(() async {
       _cancel?.cancel();
       await _pending;
-    });
+    }, name: 'Upscale installation');
     ref.onDispose(() {
       _disposed = true;
       _cancel?.cancel();
@@ -189,7 +202,7 @@ class LocalUpscaleTask extends Notifier<LocalUpscaleTaskState> {
     final removeCleanup = DesktopAppShutdownService.registerCleanup(() async {
       _cancellation?.cancel();
       await _pending;
-    });
+    }, name: 'Local upscale');
     ref.listen(generationParamsNotifierProvider, (previous, next) {
       if (!_disposed &&
           !state.running &&

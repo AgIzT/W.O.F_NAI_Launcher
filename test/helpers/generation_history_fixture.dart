@@ -1,6 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
-import 'package:image/image.dart' as img;
 
 import 'light_theme_contrast.dart' show InMemoryLocalStorageService;
 import 'package:nai_launcher/core/utils/image_share_sanitizer.dart';
@@ -15,30 +13,19 @@ class HistoryCaptureStorage extends InMemoryLocalStorageService {
       HistoryClickBehavior.selectPreview.storageValue;
 }
 
-// Layout tests use prototype assets when present, otherwise deterministic
-// synthetic images. No external workspace or user gallery is required.
-final _syntheticImages = <String, Uint8List>{};
-Uint8List generationFixtureImage(String name) {
-  final file = File('../../mockups/generation/assets/$name.jpg');
-  if (file.existsSync()) return file.readAsBytesSync();
-  return _syntheticImages.putIfAbsent(name, () {
-    final seed = name.codeUnits.fold(0, (a, b) => a + b);
-    final image = img.Image(width: 832, height: 1216);
-    img.fill(image, color: img.ColorRgb8(40 + seed % 100, 75, 110));
-    img.fillRect(
-      image,
-      x1: 80,
-      y1: 160,
-      x2: 750,
-      y2: 1040,
-      color: img.ColorRgb8(120, 100 + seed % 100, 160),
+File generationFixtureFile(String prototypeName, {bool usePrototype = false}) =>
+    File(
+      usePrototype
+          ? '../../mockups/generation/assets/$prototypeName.jpg'
+          : 'test/fixtures/edit_image_sample.png',
     );
-    return Uint8List.fromList(img.encodePng(image));
-  });
-}
 
-List<GeneratedImage> historyCaptureImages({bool mixed = false}) {
+List<GeneratedImage> historyCaptureImages({
+  bool mixed = false,
+  bool usePrototype = false,
+}) {
   final now = DateTime.now();
+  final kind = usePrototype ? 'prototype' : 'fixture';
   final names = mixed
       ? ['canvas', 'g19', 'g07', 'g18']
       : ['canvas', 'h1', 'h2', 'g18'];
@@ -48,10 +35,14 @@ List<GeneratedImage> historyCaptureImages({bool mixed = false}) {
     for (var batch = 0; batch < names.length; batch++)
       for (var index = 0; index < counts[batch]; index++)
         () {
-          final bytes = generationFixtureImage(names[batch]);
+          final file = generationFixtureFile(
+            names[batch],
+            usePrototype: usePrototype,
+          );
+          final bytes = file.readAsBytesSync();
           final dimensions = NaiResolutionAdapter.readImageSize(bytes)!;
           return GeneratedImage(
-            id: 'capture-${mixed ? 'mixed' : 'prototype'}-$batch-$index',
+            id: 'capture-$kind-${mixed ? 'mixed' : 'plain'}-$batch-$index',
             bytes: bytes,
             width: dimensions.$1,
             height: dimensions.$2,
@@ -73,7 +64,10 @@ List<GeneratedImage> historyCaptureImages({bool mixed = false}) {
   ];
 }
 
-Future<void> prepareHistoryCaptureImages(List<GeneratedImage> images) async {
+Future<void> prepareHistoryCaptureImages(
+  List<GeneratedImage> images, {
+  bool usePrototype = false,
+}) async {
   final service = ShareImagePreparationService.instance;
   for (final image in images.where((image) => image.canDrag)) {
     final batch = image.generationRunId! - 1;
@@ -81,19 +75,16 @@ Future<void> prepareHistoryCaptureImages(List<GeneratedImage> images) async {
     final names = mixed
         ? ['canvas', 'g19', 'g07', 'g18']
         : ['canvas', 'h1', 'h2', 'g18'];
+    final file = generationFixtureFile(
+      names[batch],
+      usePrototype: usePrototype,
+    );
     service.enqueue(
       imageId: image.id,
       imageBytes: image.bytes,
-      fileName: '${image.id}.jpg',
+      fileName: '${image.id}.${usePrototype ? 'jpg' : 'png'}',
       stripMetadata: false,
-      sourceFilePath:
-          File(
-            '../../mockups/generation/assets/${names[batch]}.jpg',
-          ).existsSync()
-          ? File(
-              '../../mockups/generation/assets/${names[batch]}.jpg',
-            ).absolute.path
-          : null,
+      sourceFilePath: file.absolute.path,
     );
     await service
         .waitUntilReady(image.id, stripMetadata: false)

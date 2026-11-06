@@ -552,20 +552,6 @@ class GenVibe with _GenValue {
 }
 
 @immutable
-class GenRecentVibe with _GenValue {
-  const GenRecentVibe({
-    required this.id,
-    required this.thumb,
-    required this.name,
-  });
-  final String id;
-  final ImageProvider thumb;
-  final String name;
-  @override
-  List<Object?> get _values => [id, thumb, name];
-}
-
-@immutable
 class GenVibesData with _GenValue {
   const GenVibesData({
     this.list = const [],
@@ -573,7 +559,6 @@ class GenVibesData with _GenValue {
     this.freeCount = 4,
     this.extraCost = 2,
     this.normalize = true,
-    this.recent = const [],
   });
 
   final List<GenVibe> list;
@@ -586,17 +571,8 @@ class GenVibesData with _GenValue {
   /// 标准化强度（`normalizeVibeStrength`）。
   final bool normalize;
 
-  /// 最近用过的 Vibe（`referencePanelNotifierProvider` 的 `recentEntries`），点一下加回来。
-  final List<GenRecentVibe> recent;
   @override
-  List<Object?> get _values => [
-    list,
-    max,
-    freeCount,
-    extraCost,
-    normalize,
-    recent,
-  ];
+  List<Object?> get _values => [list, max, freeCount, extraCost, normalize];
 }
 
 enum GenPreciseType { character, style, both }
@@ -1063,14 +1039,21 @@ abstract final class GenBackdrop {
 /// 生成失败（`image_preview.dart` 按错误码映射好的标题和说明）。
 @immutable
 class GenError with _GenValue {
-  const GenError({required this.title, this.hint, this.detail});
+  const GenError({
+    required this.title,
+    this.hint,
+    this.detail,
+    this.retry = true,
+  });
   final String title;
   final String? hint;
 
   /// 原始错误（可复制）。
   final String? detail;
+  final bool retry;
+
   @override
-  List<Object?> get _values => [title, hint, detail];
+  List<Object?> get _values => [title, hint, detail, retry];
 }
 
 @immutable
@@ -1509,7 +1492,6 @@ class GenActions {
     required this.onImg2ImgRemove,
     required this.onAddVibeFiles,
     required this.onAddVibeFromLibrary,
-    required this.onAddRecentVibe,
     required this.onVibeChanged,
     required this.onEncodeVibe,
     required this.onRemoveVibe,
@@ -1609,7 +1591,6 @@ class GenActions {
     onImg2ImgRemove: () => log('onImg2ImgRemove'),
     onAddVibeFiles: () => log('onAddVibeFiles'),
     onAddVibeFromLibrary: () => log('onAddVibeFromLibrary'),
-    onAddRecentVibe: (v) => log('onAddRecentVibe($v)'),
     onVibeChanged: (v) => log('onVibeChanged($v)'),
     onEncodeVibe: (v) => log('onEncodeVibe($v)'),
     onRemoveVibe: (v) => log('onRemoveVibe($v)'),
@@ -1706,7 +1687,6 @@ class GenActions {
         onImg2ImgRemove: onImg2ImgRemove,
         onAddVibeFiles: onAddVibeFiles,
         onAddVibeFromLibrary: onAddVibeFromLibrary,
-        onAddRecentVibe: onAddRecentVibe,
         onVibeChanged: onVibeChanged,
         onEncodeVibe: onEncodeVibe,
         onRemoveVibe: onRemoveVibe,
@@ -1840,7 +1820,6 @@ class GenActions {
   // 参考图 · 风格迁移
   final VoidCallback onAddVibeFiles;
   final VoidCallback onAddVibeFromLibrary;
-  final ValueChanged<String> onAddRecentVibe;
   final ValueChanged<GenVibe> onVibeChanged;
   final ValueChanged<String> onEncodeVibe;
   final ValueChanged<String> onRemoveVibe;

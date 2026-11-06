@@ -1086,6 +1086,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get generation_variationOriginal => '原图';
 
   @override
+  String get generation_requestCostInvalid => '当前请求超出支持的范围，请减小图片尺寸或降低步数。';
+
+  @override
   String get generation_variationSizeUnsupported => '生成变体支持不超过 3 百万像素的原图。';
 
   @override
@@ -5004,6 +5007,12 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get updateMacReveal => '在访达中显示';
+
+  @override
+  String get updateMacReplaceHint => '退出当前应用后，在访达中将新版拖到原位置完成替换。';
+
+  @override
   String get updateInstallAndRestart => '安装并重启';
 
   @override
@@ -8494,6 +8503,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get update_errorCheckFailed => '检查更新失败';
 
   @override
+  String get update_errorRateLimited => 'GitHub 请求已达上限，请稍后重试。';
+
+  @override
+  String update_retryAt(String time) {
+    return '请在 $time（本地时间）后重试。';
+  }
+
+  @override
   String get update_errorCheckUnknown => '检查更新时发生未知错误';
 
   @override
@@ -8835,6 +8852,21 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get imageUse_characterMode => '角色处理';
+
+  @override
+  String imageUse_featureRecorded(String feature) {
+    return '原图使用过$feature。';
+  }
+
+  @override
+  String imageUse_referenceAvailable(String feature) {
+    return '原图使用过$feature，参考素材可通过“参考图”导入。';
+  }
+
+  @override
+  String imageUse_referenceUnavailable(String feature) {
+    return '原图使用过$feature，仅保留使用记录，未附带可导入的参考素材。';
+  }
 
   @override
   String get imageMenu_details => '详情';
@@ -14272,9 +14304,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get gen_recent => '最近';
-
-  @override
   String get gen_encoded => '已编码';
 
   @override
@@ -15711,9 +15740,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get naiAgent_mcpAdd => '添加 MCP 服务器';
-
-  @override
-  String get naiAgent_mcpName => '服务器名称';
 
   @override
   String get naiAgent_mcpConfig => '服务器配置（JSON）';
@@ -18157,7 +18183,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get set_rgPython => 'Python 解释器';
 
   @override
-  String get set_rgPythonSub => '默认用自动安装的独立环境；也可以选一个已有的 python.exe。';
+  String get set_rgPythonSub => '可选择本机已有的 Python 解释器。';
 
   @override
   String get set_rgPythonAuto => '自动';
@@ -18765,6 +18791,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get set_abLatest => '已是最新版本';
+
+  @override
+  String get set_abUnchecked => '尚未检查更新';
+
+  @override
+  String get set_abSkipped => '已忽略此版本';
 
   @override
   String get set_abChecking => '正在检查更新…';
@@ -20256,6 +20288,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get ag_memoryGlobal => '全局指令';
 
   @override
+  String get ag_memoryChatPrefix => '本会话前置指令';
+
+  @override
+  String get ag_memoryChatPrefixHint => '仅当前会话生效，放在内置提示词之前。';
+
+  @override
   String get ag_memoryWorkspace => '本工作区规则';
 
   @override
@@ -21265,6 +21303,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get set_agMcpStdio => '本地命令';
+
+  @override
+  String get set_agMcpDisplayName => '显示名称（可选）';
+
+  @override
+  String get set_agMcpDisplayNameHint => '仅用于界面，不改变工具名称。';
+
+  @override
+  String get set_agMcpIdentifier => '工具标识';
 
   @override
   String get set_agMcpAddress => '服务器地址';
@@ -22429,6 +22476,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get generation_variationOriginal => '原圖';
+
+  @override
+  String get generation_requestCostInvalid => '當前請求超出支援的範圍，請減小圖片尺寸或降低步數。';
 
   @override
   String get generation_variationSizeUnsupported => '生成變體支援不超過 3 百萬像素的原圖。';
@@ -26349,6 +26399,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   }
 
   @override
+  String get updateMacReveal => '在 Finder 中顯示';
+
+  @override
+  String get updateMacReplaceHint => '結束目前的應用程式後，在 Finder 中將新版拖到原位置完成取代。';
+
+  @override
   String get updateInstallAndRestart => '安裝並重啟';
 
   @override
@@ -29839,6 +29895,14 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get update_errorCheckFailed => '檢查更新失敗';
 
   @override
+  String get update_errorRateLimited => 'GitHub 請求已達上限，請稍後重試。';
+
+  @override
+  String update_retryAt(String time) {
+    return '請在 $time（本地時間）後重試。';
+  }
+
+  @override
   String get update_errorCheckUnknown => '檢查更新時發生未知錯誤';
 
   @override
@@ -30180,6 +30244,21 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get imageUse_characterMode => '角色處理';
+
+  @override
+  String imageUse_featureRecorded(String feature) {
+    return '原圖使用過$feature。';
+  }
+
+  @override
+  String imageUse_referenceAvailable(String feature) {
+    return '原圖使用過$feature，參考素材可通過“參考圖”匯入。';
+  }
+
+  @override
+  String imageUse_referenceUnavailable(String feature) {
+    return '原圖使用過$feature，僅保留使用記錄，未附帶可匯入的參考素材。';
+  }
 
   @override
   String get imageMenu_details => '詳情';
@@ -35617,9 +35696,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   }
 
   @override
-  String get gen_recent => '最近';
-
-  @override
   String get gen_encoded => '已編碼';
 
   @override
@@ -37056,9 +37132,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get naiAgent_mcpAdd => '新增 MCP 伺服器';
-
-  @override
-  String get naiAgent_mcpName => '伺服器名稱';
 
   @override
   String get naiAgent_mcpConfig => '伺服器配置（JSON）';
@@ -39502,7 +39575,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get set_rgPython => 'Python 直譯器';
 
   @override
-  String get set_rgPythonSub => '預設用自動安裝的獨立環境；也可以選一個已有的 python.exe。';
+  String get set_rgPythonSub => '可選擇本機已有的 Python 直譯器。';
 
   @override
   String get set_rgPythonAuto => '自動';
@@ -40110,6 +40183,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get set_abLatest => '已是最新版本';
+
+  @override
+  String get set_abUnchecked => '尚未檢查更新';
+
+  @override
+  String get set_abSkipped => '已忽略此版本';
 
   @override
   String get set_abChecking => '正在檢查更新…';
@@ -41601,6 +41680,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get ag_memoryGlobal => '全域指令';
 
   @override
+  String get ag_memoryChatPrefix => '本會話前置指令';
+
+  @override
+  String get ag_memoryChatPrefixHint => '僅當前會話生效，放在內建提示詞之前。';
+
+  @override
   String get ag_memoryWorkspace => '本工作區規則';
 
   @override
@@ -42610,6 +42695,15 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get set_agMcpStdio => '本地命令';
+
+  @override
+  String get set_agMcpDisplayName => '顯示名稱（可選）';
+
+  @override
+  String get set_agMcpDisplayNameHint => '僅用於介面，不改變工具名稱。';
+
+  @override
+  String get set_agMcpIdentifier => '工具標識';
 
   @override
   String get set_agMcpAddress => '伺服器地址';

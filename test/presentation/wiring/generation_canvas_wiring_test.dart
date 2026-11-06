@@ -1,4 +1,5 @@
 import '../../helpers/grouped_canvas_batches.dart';
+import 'dart:async';
 import 'dart:io';
 import 'dart:ui' as ui;
 
@@ -39,6 +40,7 @@ import 'package:nai_launcher/presentation/providers/subscription_provider.dart';
 import 'package:nai_launcher/presentation/providers/tips_provider.dart';
 import 'package:nai_launcher/core/utils/localization_extension.dart';
 import 'package:nai_launcher/presentation/ui/kit/ui_colors.dart';
+import 'package:nai_launcher/presentation/ui/kit/ui_glyph.dart';
 import 'package:nai_launcher/presentation/screens/generation/widgets/canvas/canvas_feed_layout.dart';
 import 'package:nai_launcher/presentation/screens/generation/widgets/canvas/canvas_tile_toolbar.dart';
 import 'package:nai_launcher/presentation/screens/generation/widgets/canvas/canvas_world_viewport.dart';
@@ -130,6 +132,7 @@ void main() {
       expect(tester.getSize(scene).width, panelWidth + 60);
       expect(tester.getSize(scene).height, viewport.height + 60);
       expect(side.camera.scale, center.camera.scale);
+      expect(side.welcome, center.welcome);
       expect(side.settings.fixed, center.settings.fixed);
       expect(side.settings.seed, center.settings.seed);
       expect(side.settings.motion, isFalse);
@@ -574,7 +577,13 @@ void main() {
     expect(logo.center.dx, closeTo(viewport.center.dx, .01));
     expect(quietCenter, closeTo(logo.center.dx, .01));
     expect(tip.center.dx, closeTo(quietCenter, .01));
-    expect(background.camera.scale, 1);
+    expect(background.welcome, isTrue);
+    final scale = viewport.width / 922;
+    expect(background.camera.scale, closeTo((880 / 1216) * scale, .00001));
+    expect(
+      background.camera.offset.dy,
+      closeTo((viewport.height - 1000 * scale) / 2 + 50 * scale, .01),
+    );
     expect(logo.left, greaterThanOrEqualTo(quietCenter - 416));
     expect(logo.right, lessThanOrEqualTo(quietCenter + 416));
     expect(tip.left, greaterThanOrEqualTo(quietCenter - 416));
@@ -587,7 +596,7 @@ void main() {
   }
 
   for (final dark in [false, true]) {
-    testWidgets('空态六种背景与 Logo 同轴，缩窗和重进不继承偏移：$dark', (tester) async {
+    testWidgets('空态各通道背景与 Logo 同轴，缩窗和重进不继承偏移：$dark', (tester) async {
       publish(const ImageGenerationState());
       final controller = container.read(
         generationCanvasCameraProvider.notifier,
@@ -637,6 +646,30 @@ void main() {
     });
   }
 
+  testWidgets('空态切换简洁查看器时两侧背景与舞台沿用同一构图', (tester) async {
+    publish(const ImageGenerationState());
+    await pump(tester, fullPage: true);
+    final canvas = tester.widget<ChannelBackdrop>(canvasBackdrop()).data;
+    final viewport = tester.getRect(find.byKey(const Key('gen-canvas')));
+    await container
+        .read(simpleOutputViewerNotifierProvider.notifier)
+        .setSimple(true);
+    await tester.pumpAndSettle();
+    final center = find.byKey(const ValueKey('gen-panel-backdrop-center'));
+    final simple = tester.widget<ChannelBackdrop>(center).data;
+    expect(tester.getRect(center), viewport);
+    expect(simple.camera, canvas.camera);
+    expect(simple.welcome, isTrue);
+    expect(find.byKey(const Key('tip-welcome-text')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    await container
+        .read(simpleOutputViewerNotifierProvider.notifier)
+        .setSimple(false);
+    await tester.pumpAndSettle();
+    expect(center, findsNothing);
+    expectWelcomeCentered(tester);
+  });
+
   testWidgets('首批从空态实际视图接续，完成后正常滚动，清空后恢复居中', (tester) async {
     storage.values[StorageKeys.canvasReducedMotion] = false;
     publish(const ImageGenerationState());
@@ -652,6 +685,13 @@ void main() {
     expect(find.byKey(const Key('tip-welcome-text')), findsNothing);
     expect(camera().offset, before.offset);
     expect(camera().scale, before.scale);
+    expect(
+      tester.widget<ChannelBackdrop>(canvasBackdrop()).data.welcome,
+      isFalse,
+    );
+    // The sibling panel rebuild is queued if layout changes during paint setup.
+    await tester.pump();
+    expectPanelBackdropAligned(tester);
     publish(ImageGenerationState(history: [image(71)]));
     await tester.pumpAndSettle();
     final viewport = tester.getRect(find.byKey(const Key('gen-canvas')));
@@ -1366,7 +1406,6 @@ void main() {
     publish(loading(9, count: 2));
     await tester.pump();
     expect(container.read(generationFocusViewProvider)!.tiles, hasLength(2));
-    container.read(generationPreviewSelectionProvider.notifier).select(old.id);
     final first = image(9, 0);
     final last = image(9, 1);
     publish(
@@ -1386,21 +1425,129 @@ void main() {
     expect(find.byKey(Key('gen-tile-${first.id}')), findsNothing);
   });
 
+  for (final grouped in [false, true]) {
+    for (final browseHistory in [false, true]) {
+      testWidgets('简洁分组=$grouped 新生成跟随新批次，手动历史=$browseHistory', (tester) async {
+        await container
+            .read(simpleViewerGroupBatchesProvider.notifier)
+            .setGrouped(grouped);
+        await container
+            .read(simpleOutputViewerNotifierProvider.notifier)
+            .setSimple(true);
+        final old = image(1, 1);
+        final previous = image(2);
+        final first = image(9);
+        final last = image(9, 1);
+        publish(
+          ImageGenerationState(
+            status: GenerationStatus.completed,
+            generationRunId: 2,
+            currentImages: [previous],
+            history: [previous, old],
+            displayImages: [previous],
+          ),
+        );
+        await pump(tester, fullPage: true);
+        container.read(generationHistoryActionsProvider).focusTile(old.id);
+        await tester.pumpAndSettle();
+        expect(
+          container.read(generationFocusViewProvider)!.tiles.single.id,
+          old.id,
+        );
+
+        publish(
+          loading(
+            9,
+            count: 2,
+          ).copyWith(history: [previous, old], displayImages: [previous]),
+        );
+        await tester.pump();
+        expect(container.read(generationFocusViewProvider)!.id, 'run:9');
+        expect(
+          container.read(generationFocusViewProvider)!.tiles,
+          hasLength(2),
+        );
+        expect(find.byKey(const Key('gen-tile-slot:run:9:0')), findsOneWidget);
+
+        if (browseHistory) {
+          // The right panel shows a batch cover when grouped, a single image
+          // otherwise. This earlier run only has its second slot in history.
+          final row = grouped ? 'run:1' : 'img:${old.id}';
+          await tester.tap(find.byKey(Key('gen-batch-tile-$row')));
+          await tester.pump();
+          expect(container.read(generationPreviewSelectionProvider), old.id);
+          expect(
+            container.read(generationCanvasGroupSelectionProvider)?.subimage,
+            1,
+          );
+        }
+        publish(
+          loading(9, count: 2).copyWith(
+            currentImages: [first],
+            history: [first, previous, old],
+            displayImages: [previous],
+            currentImage: 2,
+            progress: .4,
+          ),
+        );
+        await tester.pump();
+        final during = container.read(generationFocusViewProvider)!;
+        expect(during.tiles.first.id, browseHistory ? old.id : first.id);
+
+        publish(
+          ImageGenerationState(
+            status: GenerationStatus.completed,
+            generationRunId: 9,
+            currentImages: [first, last],
+            history: [first, last, previous, old],
+            displayImages: [first, last],
+          ),
+        );
+        await tester.pumpAndSettle();
+        final done = container.read(generationFocusViewProvider)!;
+        expect(
+          done.tiles.map((tile) => tile.id),
+          browseHistory
+              ? [old.id]
+              : grouped
+              ? [first.id, last.id]
+              : [last.id],
+        );
+        if (browseHistory) {
+          expect(container.read(generationPreviewSelectionProvider), old.id);
+          expect(
+            container.read(generationCanvasGroupSelectionProvider)?.subimage,
+            1,
+          );
+        }
+        expect(tester.takeException(), isNull);
+      });
+    }
+  }
+
   testWidgets('简单模式不挂相机，切回后定位原选择且可反复切换', (tester) async {
-    publish(ImageGenerationState(history: [image(2), image(1)]));
+    final selected = image(1, 1);
+    publish(ImageGenerationState(history: [image(2), selected]));
     await container
         .read(simpleOutputViewerNotifierProvider.notifier)
         .setSimple(true);
     await pump(tester);
     expect(find.byType(GenerationCanvasView), findsNothing);
-    container.read(generationHistoryActionsProvider).focusTile(image(1).id);
+    container.read(generationHistoryActionsProvider).focusTile(selected.id);
     for (var i = 0; i < 3; i++) {
       await container
           .read(simpleOutputViewerNotifierProvider.notifier)
           .setSimple(false);
       await tester.pumpAndSettle();
-      expect(find.byKey(Key('gen-tile-${image(1).id}')), findsOneWidget);
-      expect(container.read(generationPreviewSelectionProvider), image(1).id);
+      expect(find.byKey(Key('gen-tile-${selected.id}')), findsOneWidget);
+      expect(container.read(generationPreviewSelectionProvider), selected.id);
+      final tile = container
+          .read(canvasFeedLayoutProvider)
+          .items
+          .singleWhere((item) => item.image?.id == selected.id);
+      final focus = container.read(generationCanvasGroupSelectionProvider)!;
+      expect(focus.group, tile.group.key);
+      expect(focus.subimage, tile.subimageIndex);
       await container
           .read(simpleOutputViewerNotifierProvider.notifier)
           .setSimple(true);
@@ -1877,7 +2024,7 @@ void main() {
     expect(animation.isAnimating, isFalse);
     expect(find.byKey(const Key('canvas-inflight-tip')), findsOneWidget);
   });
-  testWidgets('固定角标、变体原图和组张数重新接回，缩放时固定角标恒定', (tester) async {
+  testWidgets('固定与变体原图标记保留，主画布不叠加批次数量', (tester) async {
     final original = GeneratedImage(
       id: 'original',
       bytes: bytes,
@@ -1913,7 +2060,7 @@ void main() {
     );
     expect(
       find.byKey(const ValueKey('canvas-batch-count:run:1')),
-      findsOneWidget,
+      findsNothing,
     );
     final pin = find.descendant(
       of: item,
@@ -1927,6 +2074,132 @@ void main() {
     await tester.pump(const Duration(milliseconds: 16));
     expect(tester.getRect(pin).width, closeTo(width, .001));
     await capture(tester, 'restored-badges');
+  });
+
+  testWidgets('画布与历史共用图片级多选，部分选中只删除实际选中的图', (tester) async {
+    addTearDown(() => tester.pumpWidget(const SizedBox()));
+    publish(ImageGenerationState(history: [image(1), image(1, 1)]));
+    await tester.runAsync(() async {
+      container.read(generationHistoryActionsProvider);
+    });
+    await pump(tester, fullPage: true);
+    Finder border(String id) => find.descendant(
+      of: find.byKey(Key('gen-tile-$id')),
+      matching: find.byWidgetPredicate(
+        (widget) => widget is Container && widget.foregroundDecoration != null,
+      ),
+    );
+    expect(border('1-0'), findsNothing);
+    expect(border('1-1'), findsNothing);
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+    await tester.tap(find.byKey(const Key('gen-tile-1-0')));
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+    await tester.pumpAndSettle();
+    expect(border('1-0'), findsOneWidget);
+    expect(border('1-1'), findsNothing);
+    expect(find.text('已选 1 张'), findsOneWidget);
+    final historyRow = find.byKey(const Key('gen-batch-tile-run:1'));
+    expect(
+      find.descendant(
+        of: historyRow,
+        matching: find.byWidgetPredicate(
+          (widget) => widget is UiGlyph && widget.path == UiGlyphs.minus,
+        ),
+      ),
+      findsOneWidget,
+    );
+    await container
+        .read(simpleViewerGroupBatchesProvider.notifier)
+        .setGrouped(false);
+    await tester.pumpAndSettle();
+    expect(find.text('已选 1 张'), findsOneWidget);
+    expect(border('1-0'), findsOneWidget);
+    await container
+        .read(simpleViewerGroupBatchesProvider.notifier)
+        .setGrouped(true);
+    await tester.pumpAndSettle();
+    expect(border('1-0'), findsOneWidget);
+    expect(border('1-1'), findsNothing);
+    container.read(generationHistoryActionsProvider).focusBatch('run:1');
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('gen-tile-1-1')));
+    await tester.pumpAndSettle();
+    expect(border('1-1'), findsOneWidget);
+    expect(find.text('已选 2 张'), findsOneWidget);
+    await tester.tap(historyRow);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('gen-history-selection')), findsNothing);
+    expect(border('1-0'), findsNothing);
+    expect(border('1-1'), findsNothing);
+    await tester.tap(find.byKey(const Key('gen-history-select')));
+    await tester.pump();
+    await tester.tap(historyRow);
+    await tester.pumpAndSettle();
+    expect(border('1-0'), findsOneWidget);
+    expect(border('1-1'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('gen-tile-1-1')));
+    await tester.pumpAndSettle();
+    expect(
+      GenScope.read(
+        tester.element(find.byKey(const Key('gen-history'))),
+      ).controller.selection.images,
+      ['1-0'],
+    );
+    await tester.tap(find.byKey(const Key('gen-history-delete-selected')));
+    await tester.pumpAndSettle();
+    await tester.runAsync(() async {
+      final removed = Completer<void>();
+      final subscription = container.listen(imageGenerationNotifierProvider, (
+        _,
+        state,
+      ) {
+        if (!state.mergedPanelImages.any((image) => image.id == '1-0')) {
+          removed.complete();
+        }
+      });
+      try {
+        await tester.tap(find.byKey(const Key('gen-confirm-ok')));
+        await removed.future.timeout(const Duration(seconds: 5));
+      } finally {
+        subscription.close();
+      }
+    });
+    await tester.pumpAndSettle();
+    expect(
+      container
+          .read(imageGenerationNotifierProvider)
+          .mergedPanelImages
+          .map((i) => i.id),
+      ['1-1'],
+    );
+    expect(find.byKey(const Key('gen-history-selection')), findsNothing);
+  });
+
+  testWidgets('单张生成也能多选画框，Esc先退出多选且相机保持', (tester) async {
+    addTearDown(() => tester.pumpWidget(const SizedBox()));
+    publish(ImageGenerationState(history: [image(1)]));
+    await pump(tester, fullPage: true);
+    final target = find.byKey(const Key('gen-tile-1-0'));
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+    await tester.tap(target);
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+    await tester.pumpAndSettle();
+    expect(find.text('已选 1 张'), findsOneWidget);
+    expect(
+      find.descendant(
+        of: target,
+        matching: find.byWidgetPredicate(
+          (widget) =>
+              widget is Container && widget.foregroundDecoration != null,
+        ),
+      ),
+      findsOneWidget,
+    );
+    final before = camera();
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('gen-history-selection')), findsNothing);
+    expect(camera(), before);
   });
   testWidgets('右击未选中图的菜单操作准确指向该图，无真实请求', (tester) async {
     publish(ImageGenerationState(history: [image(1), image(1, 1)]));

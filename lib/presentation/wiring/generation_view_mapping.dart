@@ -145,20 +145,7 @@ GenHistoryData generationHistoryView(
   DateTime? now,
   bool singleImages = false,
 }) {
-  final batches = buildHistoryBatches(state)
-      .expand(
-        (batch) => singleImages && !batch.isGenerating
-            ? batch.images.map(
-                (image) => HistoryBatch(
-                  key: 'img:${image.id}',
-                  images: [image],
-                  isGenerating: false,
-                  count: 1,
-                ),
-              )
-            : [batch],
-      )
-      .toList();
+  final batches = buildHistoryBatches(state);
   DateTime time(HistoryBatch batch) => batch.images.isEmpty
       ? now ?? DateTime.now()
       : batch.images
@@ -174,7 +161,18 @@ GenHistoryData generationHistoryView(
     autoSave: autoSave,
     pinned: pinned,
     batches: [
-      for (final batch in batches)
+      for (final batch in batches.expand(
+        (batch) => singleImages && !batch.isGenerating
+            ? batch.images.map(
+                (image) => HistoryBatch(
+                  key: 'img:${image.id}',
+                  images: [image],
+                  isGenerating: false,
+                  count: 1,
+                ),
+              )
+            : [batch],
+      ))
         GenBatch(
           id: batch.key,
           time: time(batch),
@@ -238,17 +236,29 @@ MemoryImage? _historyPendingPreview(
   );
 }
 
-GenTile generationTileView(GeneratedImage image) => GenTile(
+GenTile generationTileView(GeneratedImage image, {int? decodeEdge}) => GenTile(
   id: image.id,
   width: image.width,
   height: image.height,
-  image: MemoryImage(image.bytes),
+  image: _tileImage(image.bytes, decodeEdge),
   originalImage: image.canCompareOriginal
-      ? MemoryImage(image.originalBytes!)
+      ? _tileImage(image.originalBytes!, decodeEdge)
       : null,
   inpaintMaskBytes: image.canCompareOriginal ? image.inpaintMaskBytes : null,
   state: image.isFailedStreamSnapshot ? GenTileState.failed : GenTileState.done,
 );
+
+ImageProvider _tileImage(Uint8List bytes, int? decodeEdge) {
+  final image = MemoryImage(bytes);
+  return decodeEdge == null
+      ? image
+      : ResizeImage(
+          image,
+          width: decodeEdge,
+          height: decodeEdge,
+          policy: ResizeImagePolicy.fit,
+        );
+}
 
 GenGroup? generationFocusView(
   ImageGenerationState state, {

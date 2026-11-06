@@ -1,6 +1,7 @@
 import 'package:nai_launcher/presentation/themes/studio_typography.dart';
 import 'package:nai_launcher/presentation/widgets/common/studio_material.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:url_launcher/url_launcher.dart';
@@ -90,7 +91,8 @@ class UpdateCheckDialog extends ConsumerWidget {
             : state.versionInfo != null
             ? context.l10n.updateDownloadFailed
             : context.l10n.updateError,
-      UpdateStatus.idle => context.l10n.updateChecking,
+      UpdateStatus.idle => context.l10n.set_abUnchecked,
+      UpdateStatus.skipped => context.l10n.set_abSkipped,
     };
   }
 
@@ -107,7 +109,10 @@ class UpdateCheckDialog extends ConsumerWidget {
       UpdateStatus.installing => _buildInstallingContent(context),
       UpdateStatus.upToDate => _buildUpToDateContent(context),
       UpdateStatus.error => _buildErrorContent(context, state.errorMessage),
-      UpdateStatus.idle => _buildLoadingContent(context),
+      UpdateStatus.idle || UpdateStatus.skipped => SizedBox(
+        height: 120,
+        child: Center(child: Text(_getTitle(context, state))),
+      ),
     };
   }
 
@@ -250,7 +255,11 @@ class UpdateCheckDialog extends ConsumerWidget {
           ),
           const SizedBox(height: 14),
           Text(
-            context.l10n.updateDownloadedHint(state.versionInfo?.version ?? ''),
+            state.downloadedUpdate?.asset.requiresManualReplace == true
+                ? context.l10n.updateMacReplaceHint
+                : context.l10n.updateDownloadedHint(
+                    state.versionInfo?.version ?? '',
+                  ),
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -458,10 +467,11 @@ class UpdateCheckDialog extends ConsumerWidget {
   Widget _buildErrorContent(BuildContext context, String? errorMessage) {
     final theme = Theme.of(context);
 
-    return SizedBox(
-      height: 120,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 120),
       child: Center(
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.error_outline, size: 48, color: theme.colorScheme.error),
@@ -544,7 +554,11 @@ class UpdateCheckDialog extends ConsumerWidget {
           onPressed: ref.watch(updateTaskBusyProvider)
               ? null
               : () => _install(ref),
-          child: Text(context.l10n.updateInstallAndRestart),
+          child: Text(
+            state.downloadedUpdate?.asset.requiresManualReplace == true
+                ? context.l10n.updateMacReveal
+                : context.l10n.updateInstallAndRestart,
+          ),
         ),
       ],
       UpdateStatus.installing => const [],
@@ -558,6 +572,22 @@ class UpdateCheckDialog extends ConsumerWidget {
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
           child: Text(context.l10n.common_close),
+        ),
+        TextButton(
+          onPressed: () async {
+            await Clipboard.setData(
+              ClipboardData(
+                text:
+                    state.errorDetails ??
+                    state.errorMessage ??
+                    context.l10n.updateError,
+              ),
+            );
+            if (context.mounted) {
+              AppToast.success(context, context.l10n.common_copied);
+            }
+          },
+          child: Text(context.l10n.gen_copyDetail),
         ),
         // 下载失败时提供浏览器手动下载的退路
         if (state.versionInfo != null)
@@ -585,7 +615,7 @@ class UpdateCheckDialog extends ConsumerWidget {
           child: Text(context.l10n.common_retry),
         ),
       ],
-      UpdateStatus.idle => [
+      UpdateStatus.idle || UpdateStatus.skipped => [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
           child: Text(context.l10n.common_cancel),

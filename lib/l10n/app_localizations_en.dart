@@ -1130,6 +1130,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get generation_variationOriginal => 'ORIGINAL';
 
   @override
+  String get generation_requestCostInvalid =>
+      'This request exceeds the supported limits. Reduce the image size or steps.';
+
+  @override
   String get generation_variationSizeUnsupported =>
       'Variations support source images up to 3 megapixels.';
 
@@ -5205,6 +5209,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get updateMacReveal => 'Show in Finder';
+
+  @override
+  String get updateMacReplaceHint =>
+      'Quit this app, then use Finder to replace it with the extracted app.';
+
+  @override
   String get updateInstallAndRestart => 'Install and Restart';
 
   @override
@@ -8946,6 +8957,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get update_errorCheckFailed => 'Failed to check for updates';
 
   @override
+  String get update_errorRateLimited =>
+      'GitHub request limit reached. Please try again later.';
+
+  @override
+  String update_retryAt(String time) {
+    return 'Try again after $time (local time).';
+  }
+
+  @override
   String get update_errorCheckUnknown =>
       'An unknown error occurred while checking for updates';
 
@@ -9306,6 +9326,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get imageUse_characterMode => 'Character handling';
+
+  @override
+  String imageUse_featureRecorded(String feature) {
+    return 'The source image used $feature.';
+  }
+
+  @override
+  String imageUse_referenceAvailable(String feature) {
+    return 'The source image used $feature. Import its reference material with “References”.';
+  }
+
+  @override
+  String imageUse_referenceUnavailable(String feature) {
+    return 'The source image used $feature. Only the usage record remains; no importable reference material is attached.';
+  }
 
   @override
   String get imageMenu_details => 'Details';
@@ -14878,9 +14913,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get gen_recent => 'Recent';
-
-  @override
   String get gen_encoded => 'Encoded';
 
   @override
@@ -16370,9 +16402,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get naiAgent_mcpAdd => 'Add MCP server';
-
-  @override
-  String get naiAgent_mcpName => 'Server name';
 
   @override
   String get naiAgent_mcpConfig => 'Server configuration (JSON)';
@@ -18924,7 +18953,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get set_rgPythonSub =>
-      'Uses the standalone runtime by default; you can pick an existing python.exe.';
+      'You can select an existing local Python interpreter.';
 
   @override
   String get set_rgPythonAuto => 'Auto';
@@ -19567,6 +19596,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get set_abLatest => 'Up to date';
+
+  @override
+  String get set_abUnchecked => 'Not checked';
+
+  @override
+  String get set_abSkipped => 'Update skipped';
 
   @override
   String get set_abChecking => 'Checking for updates…';
@@ -21209,6 +21244,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ag_memoryGlobal => 'Global instructions';
 
   @override
+  String get ag_memoryChatPrefix => 'Chat pre-instructions';
+
+  @override
+  String get ag_memoryChatPrefixHint =>
+      'Applies only to this chat, before the built-in system prompt.';
+
+  @override
   String get ag_memoryWorkspace => 'Workspace rules';
 
   @override
@@ -22242,6 +22284,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get set_agMcpStdio => 'Local command';
+
+  @override
+  String get set_agMcpDisplayName => 'Display name (optional)';
+
+  @override
+  String get set_agMcpDisplayNameHint =>
+      'Shown in the interface; tool names stay unchanged.';
+
+  @override
+  String get set_agMcpIdentifier => 'Tool identifier';
 
   @override
   String get set_agMcpAddress => 'Server URL';

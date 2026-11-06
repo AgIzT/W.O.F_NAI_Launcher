@@ -169,7 +169,7 @@ final generationHistoryBatchesProvider = Provider<List<GenBatch>>((ref) {
 });
 
 final generationRefsViewProvider = Provider<GenRefsData>((ref) {
-  final fields = ref.watch(
+  ref.watch(
     generationParamsNotifierProvider.select(
       (p) => (
         p.model,
@@ -191,9 +191,6 @@ final generationRefsViewProvider = Provider<GenRefsData>((ref) {
     enabled: ref.watch(generationImg2ImgEnabledProvider),
     encoding: ref.watch(generationEncodingReferencesProvider),
     dropHover: ref.watch(generationDropHoverProvider),
-    recent: ModelSpecs.of(fields.$1).vibetransfer
-        ? ref.watch(referencePanelNotifierProvider).recentEntries
-        : const [],
   );
 });
 
@@ -220,6 +217,12 @@ final generationFavoriteImagesProvider = FutureProvider<Set<String>>((
   };
 });
 
+// Progress and camera updates reuse the draft; actual edits advance its version.
+final _generationDraftViewProvider = Provider((ref) {
+  ref.watch(bridgeDraftVersionProvider);
+  return readBridgeDraft(ref);
+});
+
 final generationViewDataProvider = Provider.autoDispose
     .family<GenViewData, AppLocalizations>((ref, l) {
       final params = ref.watch(generationParamsNotifierProvider);
@@ -235,8 +238,7 @@ final generationViewDataProvider = Provider.autoDispose
       final subscription = ref.watch(subscriptionNotifierProvider).subscription;
       final negative = ref.watch(generationNegativeTabProvider);
       final auth = ref.watch(authNotifierProvider);
-      ref.watch(bridgeDraftVersionProvider);
-      final draft = readBridgeDraft(ref);
+      final draft = ref.watch(_generationDraftViewProvider);
       final projectedCharacters = [
         for (var index = 0; index < characters.characters.length; index++)
           characters.characters[index].copyWith(
@@ -403,10 +405,17 @@ final generationViewDataProvider = Provider.autoDispose
           generation.errorMessage,
           l,
         );
+        final retry = ref
+            .read(imageGenerationNotifierProvider.notifier)
+            .lastRequest;
         error = GenError(
           title: title,
           hint: hint,
           detail: generation.errorMessage,
+          retry:
+              retry != null &&
+              auth.isAuthenticated &&
+              retry.accountId == auth.accountId,
         );
       }
       return GenViewData(

@@ -1,3 +1,4 @@
+import 'package:nai_launcher/core/utils/primary_activator.dart';
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -57,8 +58,6 @@ Future<NaiImageMetadata?> detectImportableDroppedImageMetadata(
   String fileName,
   Uint8List bytes,
 ) async {
-  if (!fileName.toLowerCase().endsWith('.png')) return null;
-
   try {
     final metadata = await ImageMetadataService().getMetadataFromBytes(bytes);
     if (metadata != null && metadata.hasData) {
@@ -179,8 +178,7 @@ class _GlobalDropHandlerState extends ConsumerState<GlobalDropHandler> {
   Widget build(BuildContext context) {
     return Shortcuts(
       shortcuts: const <ShortcutActivator, Intent>{
-        SingleActivator(LogicalKeyboardKey.keyV, control: true):
-            _PasteImageIntent(),
+        PrimaryActivator(LogicalKeyboardKey.keyV): _PasteImageIntent(),
         SingleActivator(LogicalKeyboardKey.keyV, meta: true):
             _PasteImageIntent(),
       },

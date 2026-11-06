@@ -456,6 +456,7 @@
   "img2img_inpaintReadyHint": "遮罩已载入。当前会按局部重绘方式提交，只有蒙版区域会被重新生成。",
   "img2img_inpaintMaskReady": "局部重绘遮罩已准备好",
   "generation_variationOriginal": "原图",
+  "generation_requestCostInvalid": "当前请求超出支持的范围，请减小图片尺寸或降低步数。",
   "generation_variationSizeUnsupported": "生成变体支持不超过 3 百万像素的原图。",
   "img2img_generateVariations": "生成变体",
   "img2img_directorTools": "导演工具",
@@ -2552,6 +2553,8 @@
       "version": {}
     }
   },
+  "updateMacReveal": "在访达中显示",
+  "updateMacReplaceHint": "退出当前应用后，在访达中将新版拖到原位置完成替换。",
   "updateInstallAndRestart": "安装并重启",
   "updateInstallNow": "立即安装",
   "updateInstallLater": "稍后安装",
@@ -4791,6 +4794,11 @@
   "update_errorPackageCorrupted": "更新包已损坏，请重新下载",
   "update_errorLaunchFailed": "启动更新程序失败",
   "update_errorCheckFailed": "检查更新失败",
+  "update_errorRateLimited": "GitHub 请求已达上限，请稍后重试。",
+  "update_retryAt": "请在 {time}（本地时间）后重试。",
+  "@update_retryAt": {
+    "placeholders": {"time": {"type": "String"}}
+  },
   "update_errorCheckUnknown": "检查更新时发生未知错误",
   "update_errorLogPath": "日志：{path}",
   "@update_errorLogPath": {
@@ -5040,6 +5048,24 @@
   "imageUse_importContent": "导入内容",
   "imageUse_characters": "多角色",
   "imageUse_characterMode": "角色处理",
+  "imageUse_featureRecorded": "原图使用过{feature}。",
+  "@imageUse_featureRecorded": {
+    "placeholders": {
+      "feature": {"type": "String"}
+    }
+  },
+  "imageUse_referenceAvailable": "原图使用过{feature}，参考素材可通过“参考图”导入。",
+  "@imageUse_referenceAvailable": {
+    "placeholders": {
+      "feature": {"type": "String"}
+    }
+  },
+  "imageUse_referenceUnavailable": "原图使用过{feature}，仅保留使用记录，未附带可导入的参考素材。",
+  "@imageUse_referenceUnavailable": {
+    "placeholders": {
+      "feature": {"type": "String"}
+    }
+  },
   "imageMenu_details": "详情",
   "imageMenu_creation": "创作与参考",
   "imageMenu_editAndDerive": "编辑与派生",
@@ -8112,7 +8138,6 @@
       "total": {}
     }
   },
-  "gen_recent": "最近",
   "gen_encoded": "已编码",
   "gen_encoding": "编码中",
   "gen_encode": "编码",
@@ -8742,7 +8767,6 @@
   "naiAgent_mcpBuiltin": "NAI Studio · 内置工具组",
   "naiAgent_mcpBuiltinHint": "提示词、积木、百科、图片、历史、参考图、生图和设置工具。默认按需发现，原有备份、版本校验和真实确认继续生效。",
   "naiAgent_mcpAdd": "添加 MCP 服务器",
-  "naiAgent_mcpName": "服务器名称",
   "naiAgent_mcpConfig": "服务器配置（JSON）",
   "naiAgent_mcpStatus": "查看连接状态",
   "naiAgent_mcpReconnect": "重新连接",
@@ -10127,7 +10151,7 @@
   "set_rgFind": "查找",
   "set_rgModelsMissing": "没找到。可以点“下载”，或手动选择已下载的权重目录。",
   "set_rgPython": "Python 解释器",
-  "set_rgPythonSub": "默认用自动安装的独立环境；也可以选一个已有的 python.exe。",
+  "set_rgPythonSub": "可选择本机已有的 Python 解释器。",
   "set_rgPythonAuto": "自动",
   "set_rgPythonNone": "未安装",
   "set_rgPythonPending": "选的解释器还没启用，点“使用此解释器”会按它重新安装依赖。",
@@ -10423,6 +10447,8 @@
     }
   },
   "set_abLatest": "已是最新版本",
+  "set_abUnchecked": "尚未检查更新",
+  "set_abSkipped": "已忽略此版本",
   "set_abChecking": "正在检查更新…",
   "set_abCheckFailed": "检查更新失败",
   "set_abDownloading": "正在下载 {pct}",
@@ -11394,6 +11420,8 @@
   "ag_shelfEmpty": "这个聊天还没有产物",
   "ag_shelfEmptyHint": "Agent 生成的图、你附上的图和它写的文件都会收在这里。",
   "ag_memoryGlobal": "全局指令",
+  "ag_memoryChatPrefix": "本会话前置指令",
+  "ag_memoryChatPrefixHint": "仅当前会话生效，放在内置提示词之前。",
   "ag_memoryWorkspace": "本工作区规则",
   "ag_memorySkills": "生效的 Skill",
   "ag_memoryEmpty": "还没写",
@@ -12015,6 +12043,9 @@
     }
   },
   "set_agMcpStdio": "本地命令",
+  "set_agMcpDisplayName": "显示名称（可选）",
+  "set_agMcpDisplayNameHint": "仅用于界面，不改变工具名称。",
+  "set_agMcpIdentifier": "工具标识",
   "set_agMcpAddress": "服务器地址",
   "set_agMcpCommand": "可执行命令",
   "set_agMcpArgs": "参数（每行一个）",

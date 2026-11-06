@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+
+import '../../../core/nai_agent/node_runtime_environment.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as p;
 import 'package:url_launcher/url_launcher.dart';
@@ -71,10 +73,13 @@ class NaiAgentManagement {
     String name,
     Map<String, dynamic> config, {
     String? replacing,
+    String? displayName,
   }) async {
     final current = await store.readSettings();
-    if (replacing != null &&
-        !current.mcpServers.any((s) => s.configId == replacing)) {
+    final previous = current.mcpServers
+        .where((s) => s.configId == replacing)
+        .firstOrNull;
+    if (replacing != null && previous == null) {
       throw StateError('MCP configuration changed while editing');
     }
     if (current.mcpServers.any(
@@ -93,6 +98,7 @@ class NaiAgentManagement {
       transport: config.containsKey('url') ? 'http' : 'stdio',
       enabled: config['enabled'] != false,
       exposure: config['exposure'] as String? ?? 'codemode',
+      displayName: displayName ?? previous?.displayName ?? '',
     );
     try {
       await update(
@@ -166,9 +172,16 @@ class NaiAgentManagement {
   }) async {
     cancellation?.check();
     final paths = ref.read(naiAgentRuntimePathsProvider);
-    final process = await Process.start(paths.node, [
-      p.join(p.dirname(paths.host), 'manage-resources.mjs'),
-    ], workingDirectory: p.dirname(paths.host));
+    final helper = Platform.isMacOS && input['resource'] == 'packages'
+        ? 'package-process-group.mjs'
+        : 'manage-resources.mjs';
+    final directory = p.dirname(paths.host);
+    final process = await Process.start(
+      paths.node,
+      [p.join(directory, helper)],
+      workingDirectory: directory,
+      environment: nodeRuntimeEnvironment(paths.node),
+    );
     var finished = false;
     Future<void> stop() async {
       if (Platform.isWindows) {
@@ -327,6 +340,9 @@ class NaiAgentManagement {
           }
           final name = input['name'] as String? ?? server?.name;
           if (name == null) throw const FormatException('Provide name');
+          final displayName = changes.containsKey('displayName')
+              ? changes.remove('displayName') as String? ?? ''
+              : null;
           final merged = server == null
               ? <String, dynamic>{}
               : await mcpConfig(server);
@@ -351,7 +367,12 @@ class NaiAgentManagement {
             }
           }
           final config = parseAgentMcpConfig(name, jsonEncode(merged));
-          await saveMcp(name, config, replacing: server?.configId);
+          await saveMcp(
+            name,
+            config,
+            replacing: server?.configId,
+            displayName: displayName,
+          );
           result = {'name': name, 'applies': 'next_turn'};
         } else if (['test', 'reconnect', 'login', 'logout'].contains(action)) {
           if (server == null && input['name'] == null) {

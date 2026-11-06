@@ -11,6 +11,7 @@ import '../../../core/nai_agent/pi_host_client.dart';
 import '../../../core/nai_agent/attachment_image.dart';
 import '../../../core/nai_agent/vision_access.dart';
 import 'nai_agent_settings_binding.dart' show refreshNaiAgentRuntimeSettings;
+import '../../../core/utils/app_logger.dart';
 import '../../../core/utils/nai_resolution_adapter.dart';
 import '../../../core/utils/localization_extension.dart';
 import '../../../data/services/nai_agent/agent_workspace_store.dart';
@@ -85,6 +86,7 @@ class AgentChatRuntime {
   }
 
   bool running = false, starting = false, waitingForSlot = false;
+  Future<void>? _starting, _closingHost;
   String? error, providerId, modelId, reasoningEffort;
   int usageRevision = 0;
   int importingImages = 0;
@@ -140,11 +142,13 @@ class NaiAgentWorkspaceController extends ChangeNotifier {
     required this.initialWorkspaceName,
     required this.initialChatName,
     int Function()? readModelRevision,
+    this.hostIdleTimeout = const Duration(minutes: 30),
   }) : readModelRevision = readModelRevision ?? (() => 0);
   final AgentWorkspaceStore store;
   final AgentClientFactory startClient;
   final String initialWorkspaceName, initialChatName;
   final int Function() readModelRevision;
+  final Duration hostIdleTimeout;
   Future<void> ready = Future.value();
   String? initializationError;
   AgentSettings settings = const AgentSettings();
@@ -157,7 +161,7 @@ class NaiAgentWorkspaceController extends ChangeNotifier {
   AgentChatRuntime? selected;
   bool initialized = false, _disposed = false;
   Future<void>? _closeFuture;
-  Timer? _streamNotification;
+  Timer? _streamNotification, _idleHostTimer;
   int _selectionRevision = 0;
 
   /// Read-only inventory for sidebar chat status; never creates a runtime.
@@ -167,7 +171,9 @@ class NaiAgentWorkspaceController extends ChangeNotifier {
   void _notify() {
     _streamNotification?.cancel();
     _streamNotification = null;
-    if (!_disposed) notifyListeners();
+    if (_disposed) return;
+    _updateHostIdleTimer();
+    notifyListeners();
   }
 
   void initializationFailed(Object error) {
@@ -177,15 +183,25 @@ class NaiAgentWorkspaceController extends ChangeNotifier {
 
   Future<void> loadHistory() async {
     final runtime = selected;
-    if (runtime != null &&
-        runtime.chat.sessionFile != null &&
-        runtime.client == null) {
-      try {
-        await _ensureClient(runtime);
-      } catch (error) {
-        runtime.error = _error(error, runtime);
-        _notify();
+    if (runtime == null) return;
+    try {
+      if (runtime._closingHost case final closing?) await closing;
+      if (_disposed ||
+          !identical(runtime, selected) ||
+          runtime.starting ||
+          runtime.pendingSends > 0 ||
+          runtime.client?.isClosed == false) {
+        return;
       }
+      if (runtime.chat.sessionFile != null ||
+          settings.providerId.isNotEmpty &&
+              settings.modelId.isNotEmpty &&
+              settings.mcpServers.any((server) => server.enabled)) {
+        await _ensureClient(runtime);
+      }
+    } catch (error) {
+      runtime.error = _error(error, runtime);
+      _notify();
     }
   }
 
@@ -203,6 +219,9 @@ class NaiAgentWorkspaceController extends ChangeNotifier {
     await selectWorkspace(workspace.id, restoreHistory: restoreHistory);
     initialized = true;
     _notify();
+    if (settings.mcpServers.any((server) => server.enabled)) {
+      await loadHistory();
+    }
   }
 
   Future<void> selectWorkspace(String id, {bool restoreHistory = true}) async {
@@ -241,9 +260,7 @@ class NaiAgentWorkspaceController extends ChangeNotifier {
         in _runtimes.values
             .where((r) => r.chat.id != chat.id && !_busy(r))
             .toList()) {
-      await runtime.subscription?.cancel();
-      await runtime.client?.close();
-      runtime.client = null;
+      await _disconnectHost(runtime);
       runtime.messages = [];
       runtime.historyMessages = [];
       runtime.runLimitHit = null;
@@ -277,14 +294,7 @@ class NaiAgentWorkspaceController extends ChangeNotifier {
     if (!chat.isDraft) await _rememberChat(workspace.id, chat.id);
     _notify();
     // Restoring history is entirely local; no prompt or model call is made.
-    if (restoreHistory && chat.sessionFile != null && runtime.client == null) {
-      try {
-        await _ensureClient(runtime);
-      } catch (error) {
-        runtime.error = _error(error, runtime);
-        _notify();
-      }
-    }
+    if (restoreHistory) await loadHistory();
   }
 
   Future<void> createWorkspace(String name) async {
@@ -310,11 +320,31 @@ class NaiAgentWorkspaceController extends ChangeNotifier {
     isDraft: true,
   );
 
-  Future<void> _closeRuntime(AgentChatRuntime runtime) async {
-    await runtime.subscription?.cancel();
+  Future<void> _disconnectHost(AgentChatRuntime runtime) async {
+    if (runtime._closingHost case final closing?) return closing;
+    final subscription = runtime.subscription;
+    final client = runtime.client;
+    if (subscription == null && client == null) return;
+
     runtime.subscription = null;
-    await runtime.client?.close();
     runtime.client = null;
+    final closing = () async {
+      try {
+        await subscription?.cancel();
+      } finally {
+        await client?.close();
+      }
+    }();
+    runtime._closingHost = closing;
+    try {
+      await closing;
+    } finally {
+      runtime._closingHost = null;
+    }
+  }
+
+  Future<void> _closeRuntime(AgentChatRuntime runtime) async {
+    await _disconnectHost(runtime);
     _runtimes.remove(runtime.chat.id);
   }
 
@@ -390,13 +420,7 @@ class NaiAgentWorkspaceController extends ChangeNotifier {
     final workspace = selectedWorkspace!;
     final old = chats.firstWhere((chat) => chat.id == id);
     final chat = old.isDraft
-        ? AgentChat(
-            id: old.id,
-            workspaceId: old.workspaceId,
-            title: title,
-            createdAt: old.createdAt,
-            isDraft: true,
-          )
+        ? old.copyWith(title: title)
         : await store.updateChat(workspace.id, id, title: title);
     _runtimes[id]?.chat = chat;
     chats = [
@@ -407,11 +431,98 @@ class NaiAgentWorkspaceController extends ChangeNotifier {
     _notify();
   }
 
+  Future<void> setChatPromptPrefix(AgentChat edited, String text) async {
+    final runtime = _runtimes[edited.id];
+    if (runtime == null) throw StateError('Chat missing');
+    if (text == edited.systemPromptPrefix) return;
+    if (runtime.chat.isDraft) {
+      runtime.chat = await store.saveDraftChat(runtime.chat);
+      await _persist(runtime);
+      await _rememberChat(runtime.workspace.id, runtime.chat.id);
+    }
+    runtime.chat = await store.updateChat(
+      runtime.workspace.id,
+      runtime.chat.id,
+      systemPromptPrefix: text,
+      expectedSystemPromptPrefix: edited.systemPromptPrefix,
+    );
+    await _refreshChats(runtime.workspace.id);
+    final client = runtime.client;
+    if (client != null && !client.isClosed) {
+      await client.setSystemPrompt(
+        await store.effectiveSystemPrompt(
+          runtime.workspace.id,
+          chatPrefix: runtime.chat.systemPromptPrefix,
+        ),
+      );
+    }
+    _notify();
+  }
+
   static bool _busy(AgentChatRuntime runtime) =>
       runtime.running ||
       runtime.starting ||
       runtime.waitingForSlot ||
       runtime.pendingSends > 0;
+
+  bool get _hostsIdle =>
+      !_disposed &&
+      !settings.panelExpanded &&
+      _runtimes.values.every(
+        (runtime) =>
+            !_busy(runtime) &&
+            runtime.importingImages == 0 &&
+            runtime.queue.isEmpty &&
+            runtime._suggestionCancels == 0 &&
+            runtime.compactionReason == null &&
+            runtime._closingHost == null &&
+            !_deletingChats.contains(runtime.chat.id) &&
+            !_deletingWorkspaces.contains(runtime.workspace.id),
+      );
+
+  void _updateHostIdleTimer() {
+    if (_hostsIdle &&
+        _runtimes.values.any((runtime) => runtime.client?.isClosed == false)) {
+      _idleHostTimer ??= Timer(
+        hostIdleTimeout,
+        () => unawaited(_reapIdleHosts()),
+      );
+    } else {
+      _idleHostTimer?.cancel();
+      _idleHostTimer = null;
+    }
+  }
+
+  Future<void> _reapIdleHosts() async {
+    final timer = _idleHostTimer;
+    bool stillIdle() =>
+        identical(timer, _idleHostTimer) &&
+        _hostsIdle &&
+        _runtimes.values.every(
+          (runtime) => runtime.client?.hasPendingRequests != true,
+        );
+    try {
+      if (!stillIdle()) return;
+      final runtimes = _runtimes.values
+          .where((runtime) => runtime.client?.isClosed == false)
+          .toList();
+      await Future.wait(runtimes.map(_persist));
+      if (!stillIdle()) return;
+      await Future.wait([for (final runtime in runtimes) _reapHost(runtime)]);
+    } catch (error) {
+      AppLogger.w('Could not release idle Agent hosts: $error', 'NaiAgent');
+    } finally {
+      if (identical(timer, _idleHostTimer)) _idleHostTimer = null;
+      _notify();
+    }
+  }
+
+  Future<void> _reapHost(AgentChatRuntime runtime) {
+    runtime.suggestion = null;
+    runtime.suggestionAllowed = false;
+    runtime._suggestionRevision++;
+    return _disconnectHost(runtime);
+  }
 
   Future<String> deleteChat(String chatId) async {
     final runtime = _runtimes[chatId];
@@ -592,6 +703,9 @@ class NaiAgentWorkspaceController extends ChangeNotifier {
       }
     }
     _notify();
+    if (!before.panelExpanded && settings.panelExpanded) {
+      unawaited(loadHistory());
+    }
     if (changes.containsKey('cacheWarming') ||
         changes.containsKey('nextSuggestion')) {
       for (final runtime in _runtimes.values) {
@@ -633,12 +747,18 @@ class NaiAgentWorkspaceController extends ChangeNotifier {
       for (final runtime in _runtimes.values) {
         if (runtime.client != null && !runtime.client!.isClosed) {
           await runtime.client!.setSystemPrompt(
-            await store.effectiveSystemPrompt(runtime.workspace.id),
+            await store.effectiveSystemPrompt(
+              runtime.workspace.id,
+              chatPrefix: runtime.chat.systemPromptPrefix,
+            ),
           );
         }
       }
     }
     _notify();
+    if (changes.containsKey('mcpServers') && selected?.client == null) {
+      await loadHistory();
+    }
   }
 
   Future<void> setReasoningEffort(
@@ -701,7 +821,10 @@ class NaiAgentWorkspaceController extends ChangeNotifier {
     for (final runtime in _runtimes.values.where((r) => r.workspace.id == id)) {
       if (runtime.client != null && !runtime.client!.isClosed) {
         await runtime.client!.setSystemPrompt(
-          await store.effectiveSystemPrompt(id),
+          await store.effectiveSystemPrompt(
+            id,
+            chatPrefix: runtime.chat.systemPromptPrefix,
+          ),
         );
       }
     }
@@ -873,7 +996,9 @@ class NaiAgentWorkspaceController extends ChangeNotifier {
   }
 
   Future<PiHostClient> _ensureClient(AgentChatRuntime runtime) async {
-    if (_deletingChats.contains(runtime.chat.id) ||
+    if (runtime._closingHost case final closing?) await closing;
+    if (_disposed ||
+        _deletingChats.contains(runtime.chat.id) ||
         _deletingWorkspaces.contains(runtime.workspace.id) ||
         !identical(_runtimes[runtime.chat.id], runtime)) {
       throw StateError('deleting');
@@ -894,6 +1019,8 @@ class NaiAgentWorkspaceController extends ChangeNotifier {
       throw const NaiAgentToolError('starting', 'Agent session is starting');
     }
     runtime.starting = true;
+    final starting = Completer<void>();
+    runtime._starting = starting.future;
     _notify();
     try {
       await runtime.subscription?.cancel();
@@ -910,7 +1037,10 @@ class NaiAgentWorkspaceController extends ChangeNotifier {
         runtime.workspace,
         chat,
         selection,
-        await store.effectiveSystemPrompt(runtime.workspace.id),
+        await store.effectiveSystemPrompt(
+          runtime.workspace.id,
+          chatPrefix: chat.systemPromptPrefix,
+        ),
         file != null && await file.exists() ? file : null,
       );
       if (_disposed ||
@@ -949,6 +1079,7 @@ class NaiAgentWorkspaceController extends ChangeNotifier {
       return client;
     } finally {
       runtime.starting = false;
+      starting.complete();
       _notify();
     }
   }
@@ -1833,22 +1964,26 @@ class NaiAgentWorkspaceController extends ChangeNotifier {
 
   Future<void> close() => _closeFuture ??= _close();
   Future<void> _close() async {
+    _disposed = true;
     _streamNotification?.cancel();
     _streamNotification = null;
-    for (final runtime in _runtimes.values.toList()) {
-      await _persist(runtime);
-      await runtime.subscription?.cancel();
-      await runtime.client?.close();
-      if (runtime.chat.isDraft) {
-        await store.discardDraftChat(runtime.workspace.id, runtime.chat.id);
-      }
-    }
+    _idleHostTimer?.cancel();
+    _idleHostTimer = null;
+    await ready;
+    await Future.wait(
+      _runtimes.values.toList().map((runtime) async {
+        await runtime._starting;
+        await _persist(runtime);
+        await _disconnectHost(runtime);
+        if (runtime.chat.isDraft) {
+          await store.discardDraftChat(runtime.workspace.id, runtime.chat.id);
+        }
+      }),
+    );
   }
 
   @override
   void dispose() {
-    _disposed = true;
-    _streamNotification?.cancel();
     unawaited(close());
     super.dispose();
   }

@@ -1106,6 +1106,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get generation_variationOriginal => '元画像';
 
   @override
+  String get generation_requestCostInvalid =>
+      'このリクエストは対応範囲を超えています。画像サイズかステップ数を減らしてください。';
+
+  @override
   String get generation_variationSizeUnsupported =>
       'バリエーションは 300 万画素以下の元画像に対応しています。';
 
@@ -5087,6 +5091,12 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get updateMacReveal => 'Finder に表示';
+
+  @override
+  String get updateMacReplaceHint => 'このアプリを終了してから、Finder で展開したアプリに置き換えてください。';
+
+  @override
   String get updateInstallAndRestart => 'インストールして再起動';
 
   @override
@@ -8661,6 +8671,15 @@ class AppLocalizationsJa extends AppLocalizations {
   String get update_errorCheckFailed => '更新の確認に失敗しました';
 
   @override
+  String get update_errorRateLimited =>
+      'GitHub のリクエスト上限に達しました。しばらくしてから再試行してください。';
+
+  @override
+  String update_retryAt(String time) {
+    return '$time（現地時刻）以降に再試行してください。';
+  }
+
+  @override
   String get update_errorCheckUnknown => '更新の確認中に不明なエラーが発生しました';
 
   @override
@@ -9006,6 +9025,21 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get imageUse_characterMode => 'キャラクターの処理';
+
+  @override
+  String imageUse_featureRecorded(String feature) {
+    return '元画像は$featureを使用しています。';
+  }
+
+  @override
+  String imageUse_referenceAvailable(String feature) {
+    return '元画像は$featureを使用しています。「参照画像」から参照素材を読み込めます。';
+  }
+
+  @override
+  String imageUse_referenceUnavailable(String feature) {
+    return '元画像は$featureを使用しています。使用記録のみが残っており、読み込める参照素材は含まれていません。';
+  }
 
   @override
   String get imageMenu_details => '詳細';
@@ -14470,9 +14504,6 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get gen_recent => '最近';
-
-  @override
   String get gen_encoded => 'エンコード済み';
 
   @override
@@ -15912,9 +15943,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get naiAgent_mcpAdd => 'MCP サーバーを追加';
-
-  @override
-  String get naiAgent_mcpName => 'サーバー名';
 
   @override
   String get naiAgent_mcpConfig => 'サーバー設定（JSON）';
@@ -18371,7 +18399,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get set_rgPython => 'Python インタープリター';
 
   @override
-  String get set_rgPythonSub => '既定は自動インストールの独立環境。既存の python.exe も選べます。';
+  String get set_rgPythonSub => 'このコンピューターにある Python インタープリターを選べます。';
 
   @override
   String get set_rgPythonAuto => '自動';
@@ -18980,6 +19008,12 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get set_abLatest => '最新です';
+
+  @override
+  String get set_abUnchecked => '未確認';
+
+  @override
+  String get set_abSkipped => 'この更新はスキップ済み';
 
   @override
   String get set_abChecking => '更新を確認中…';
@@ -20488,6 +20522,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get ag_memoryGlobal => '共通指示';
 
   @override
+  String get ag_memoryChatPrefix => 'このチャットの前置指示';
+
+  @override
+  String get ag_memoryChatPrefixHint => 'このチャットにのみ適用され、内蔵システムプロンプトの前に追加されます。';
+
+  @override
   String get ag_memoryWorkspace => 'ワークスペースのルール';
 
   @override
@@ -21503,6 +21543,15 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get set_agMcpStdio => 'ローカルコマンド';
+
+  @override
+  String get set_agMcpDisplayName => '表示名（任意）';
+
+  @override
+  String get set_agMcpDisplayNameHint => '画面上の表示のみ変更し、ツール名は変わりません。';
+
+  @override
+  String get set_agMcpIdentifier => 'ツール識別子';
 
   @override
   String get set_agMcpAddress => 'サーバー URL';

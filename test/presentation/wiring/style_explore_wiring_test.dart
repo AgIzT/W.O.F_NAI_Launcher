@@ -481,7 +481,6 @@ void main() {
     });
     final preferences = NaiAgentUiPreferences()..replace(agent.settings);
     agent.addListener(() => preferences.replace(agent.settings));
-    agent.ready = Future.value();
     agentDirectory = directory;
     agentController = agent;
     addTearDown(route.dispose);

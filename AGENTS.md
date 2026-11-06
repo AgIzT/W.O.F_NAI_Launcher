@@ -8,7 +8,7 @@ NovelAI Flutter 桌面客户端。业务按 `lib/core/`、`lib/data/`、`lib/pre
 - 开发运行、热重载、代码生成：查 [DEVELOPMENT.md](DEVELOPMENT.md)「构建、测试与开发命令」。
 - 准备发布、更新 README 或提交 PR：查 [DEVELOPMENT.md](DEVELOPMENT.md) 对应节。
 - 桥接/参数、模型/计费、登录、图库、画布或更新实现：定向查 [OPERATIONAL_NOTES.md](OPERATIONAL_NOTES.md) 对应章节；普通文案或格式修正不需要通读。
-- 依赖、资源和 lint 以 `pubspec.yaml`、`analysis_options.yaml` 为准；国际化源文件在 `lib/l10n/`。`app_zh_TW.arb` 与 `zh_tw_labels.dart` 由 `tool/l10n` 生成，不手改，重新生成方法见 [DEVELOPMENT.md](DEVELOPMENT.md)「资源、生成文件与发布注意事项」。
+- 依赖、资源和 lint 以 `pubspec.yaml`、`analysis_options.yaml` 为准；国际化源文件在 `lib/l10n/`。`app_zh_TW.arb` 与 `zh_tw_labels.dart` 由 `tool/l10n` 生成，不手改，重新生成方法见 [DEVELOPMENT.md](DEVELOPMENT.md)「资源与国际化」。
 
 ## 修改与验证
 
@@ -26,7 +26,7 @@ NovelAI Flutter 桌面客户端。业务按 `lib/core/`、`lib/data/`、`lib/pre
 ## 仓库边界
 
 - 本工作区只运行此目录的自研启动器，源码保持 ASCII 路径。`临时存图/` 不移动、不改名、不合并。
-- 本分支以上游 `z15087716457-stack/W.O.F_NAI_Launcher` 为基线，定制范围是 Plana 式补全与只读译名。跟进上游时先读取增量、在开发分支合入并解决行为交点，再验证定制回归；不以旧版文件整体覆盖上游，也不恢复自动切块／TranslationPill。保留上游历史和原项目归属说明；应用更新源在独立发布渠道确定前保持原配置。迁移与持续跟进见 [维护记录](docs/plana-migration-2026-11-02.md)。
+- 本分支以上游 `z15087716457-stack/W.O.F_NAI_Launcher` 为基线，定制范围是 Plana 式补全与只读译名。跟进上游时先读取增量、在开发分支合入并解决行为交点，再验证定制回归；不以旧版文件整体覆盖上游，也不恢复自动切块／TranslationPill。保留上游历史和原项目归属说明；应用更新源在独立发布渠道确定前保持原配置。迁移与持续跟进见 [迁移记录](docs/plana-migration-2026-11-02.md) 和 [本轮上游合并](docs/upstream-merge-2026-11-06.md)。
 - 不提交 API token、账号数据、本地日志、构建产物或个人工作流文件；认证调试只记录类型、长度或脱敏前缀。
 - 涉及 README 时同步修改 `README.md` 与 `README.en-US.md`，保留互相切换链接；仓库约定以中文版为准。
 - 发布前检查 LFS 数据库、版本、CHANGELOG、release notes 和 Windows release build，具体要求见 [DEVELOPMENT.md](DEVELOPMENT.md)。

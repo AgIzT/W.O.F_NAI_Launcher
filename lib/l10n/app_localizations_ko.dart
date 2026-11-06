@@ -1104,6 +1104,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get generation_variationOriginal => '원본';
 
   @override
+  String get generation_requestCostInvalid =>
+      '이 요청은 지원 범위를 초과합니다. 이미지 크기나 스텝 수를 줄여 주세요.';
+
+  @override
   String get generation_variationSizeUnsupported =>
       '변형은 300만 화소 이하의 원본 이미지를 지원합니다.';
 
@@ -5084,6 +5088,12 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get updateMacReveal => 'Finder에서 보기';
+
+  @override
+  String get updateMacReplaceHint => '현재 앱을 종료한 뒤 Finder에서 압축을 푼 앱으로 교체하세요.';
+
+  @override
   String get updateInstallAndRestart => '설치 후 다시 시작';
 
   @override
@@ -8683,6 +8693,14 @@ class AppLocalizationsKo extends AppLocalizations {
   String get update_errorCheckFailed => '업데이트를 확인하지 못했습니다';
 
   @override
+  String get update_errorRateLimited => 'GitHub 요청 한도에 도달했습니다. 잠시 후 다시 시도하세요.';
+
+  @override
+  String update_retryAt(String time) {
+    return '$time(현지 시간) 이후에 다시 시도하세요.';
+  }
+
+  @override
   String get update_errorCheckUnknown => '업데이트를 확인하는 중 알 수 없는 오류가 발생했습니다';
 
   @override
@@ -9029,6 +9047,21 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get imageUse_characterMode => '캐릭터 처리';
+
+  @override
+  String imageUse_featureRecorded(String feature) {
+    return '원본 이미지에 $feature 기능이 사용되었습니다.';
+  }
+
+  @override
+  String imageUse_referenceAvailable(String feature) {
+    return '원본 이미지에 $feature 기능이 사용되었습니다. “참조 이미지”에서 참조 자료를 가져올 수 있습니다.';
+  }
+
+  @override
+  String imageUse_referenceUnavailable(String feature) {
+    return '원본 이미지에 $feature 기능이 사용되었습니다. 사용 기록만 남아 있으며 가져올 수 있는 참조 자료는 첨부되어 있지 않습니다.';
+  }
 
   @override
   String get imageMenu_details => '상세 정보';
@@ -14503,9 +14536,6 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get gen_recent => '최근';
-
-  @override
   String get gen_encoded => '인코딩됨';
 
   @override
@@ -15950,9 +15980,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get naiAgent_mcpAdd => 'MCP 서버 추가';
-
-  @override
-  String get naiAgent_mcpName => '서버 이름';
 
   @override
   String get naiAgent_mcpConfig => '서버 설정 (JSON)';
@@ -18431,7 +18458,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get set_rgPython => 'Python 인터프리터';
 
   @override
-  String get set_rgPythonSub => '기본은 자동 설치한 독립 환경이며 기존 python.exe도 고를 수 있습니다.';
+  String get set_rgPythonSub => '이 컴퓨터에 설치된 Python 인터프리터를 선택할 수 있습니다.';
 
   @override
   String get set_rgPythonAuto => '자동';
@@ -19043,6 +19070,12 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get set_abLatest => '최신 버전';
+
+  @override
+  String get set_abUnchecked => '확인 전';
+
+  @override
+  String get set_abSkipped => '업데이트 건너뜀';
 
   @override
   String get set_abChecking => '업데이트 확인 중…';
@@ -20558,6 +20591,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get ag_memoryGlobal => '전역 지침';
 
   @override
+  String get ag_memoryChatPrefix => '이 대화의 선행 지침';
+
+  @override
+  String get ag_memoryChatPrefixHint => '현재 대화에만 적용되며 기본 시스템 프롬프트 앞에 추가됩니다.';
+
+  @override
   String get ag_memoryWorkspace => '작업 공간 규칙';
 
   @override
@@ -21574,6 +21613,15 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get set_agMcpStdio => '로컬 명령';
+
+  @override
+  String get set_agMcpDisplayName => '표시 이름(선택)';
+
+  @override
+  String get set_agMcpDisplayNameHint => '화면에만 표시되며 도구 이름은 변경되지 않습니다.';
+
+  @override
+  String get set_agMcpIdentifier => '도구 식별자';
 
   @override
   String get set_agMcpAddress => '서버 주소';
