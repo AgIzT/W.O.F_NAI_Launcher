@@ -108,9 +108,24 @@ void main() {
   test(
     'visible phrases across surfaces share one batched request and cache',
     () async {
-      await controller.setEnabled(true);
       controller.observePhrases(surface: 'main', phrases: [_sitting, _field]);
       controller.observePhrases(surface: 'character', phrases: [_sky]);
+      // Exercise shared batching and the real cache after both fields are idle.
+      // Independent wall-clock debounce deadlines can otherwise expire on
+      // opposite event-loop turns. Exact debounce timing has virtual-clock
+      // coverage in prompt_reading_strategy_test.dart.
+      await cache.namesFor(
+        tags: [_sitting, _field, _sky].map(
+          (text) => 'phrase:${AutoTagTranslationController.phraseKey(text)}',
+        ),
+        language: 'zh',
+        route: route,
+        maxPromptVersion:
+            PromptAssistantService.promptReadingTranslationPromptVersion,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 900));
+      expect(requests, isEmpty);
+      await controller.setEnabled(true);
       await _until(() => controller.phraseFor(_sky) != null);
       expect(requests, hasLength(1));
       expect(requests.single.toSet(), {_sitting, _field, _sky});

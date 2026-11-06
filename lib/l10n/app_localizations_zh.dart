@@ -19762,6 +19762,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get ag_regenerate => '重新回答';
 
   @override
+  String get ag_compacting => '压缩中…';
+
+  @override
   String get ag_starting => '正在打开聊天';
 
   @override
@@ -41152,6 +41155,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get ag_regenerate => '重新回答';
+
+  @override
+  String get ag_compacting => '壓縮中…';
 
   @override
   String get ag_starting => '正在開啟聊天';

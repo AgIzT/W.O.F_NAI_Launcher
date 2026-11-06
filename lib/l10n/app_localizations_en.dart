@@ -20682,6 +20682,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ag_regenerate => 'Regenerate';
 
   @override
+  String get ag_compacting => 'Compacting…';
+
+  @override
   String get ag_starting => 'Opening chat';
 
   @override

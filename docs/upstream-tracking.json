@@ -1,7 +1,7 @@
 {
   "upstream_repository": "z15087716457-stack/W.O.F_NAI_Launcher",
-  "upstream_base": "d754612dd226cb763a1012a23625223bfde5b946",
-  "reviewed_through": "d754612dd226cb763a1012a23625223bfde5b946",
+  "upstream_base": "b39fbf182e76ac369c6a3f5a35584ef6f5455b4a",
+  "reviewed_through": "b39fbf182e76ac369c6a3f5a35584ef6f5455b4a",
   "source_repository": "AgIzT/W.O.F_NAI_Launcher",
   "source_stable_commit": "fa3bc8ae2649d61ae0a4459890e8b5764a577137",
   "feature_source_commit": "62f920820bdcbdd6dc5bf2b00f7bd88d1f7d7be8",
@@ -21,7 +21,7 @@
   "local_fix_to_preserve": "Embed character captions before local upscaling plain request images",
   "validation": {
     "date": "2026-11-06",
-    "target_upstream": "d754612dd226cb763a1012a23625223bfde5b946",
+    "target_upstream": "b39fbf182e76ac369c6a3f5a35584ef6f5455b4a",
     "flutter": "3.47.7",
     "dart": "3.13.5",
     "flutter_full": {
@@ -30,7 +30,8 @@
       "passed": 10112,
       "skipped": 6,
       "log": "build/upstream-merge-2026-11-06/flutter-full.jsonl",
-      "suites": 941
+      "suites": 941,
+      "target_upstream": "d754612dd226cb763a1012a23625223bfde5b946"
     },
     "skip_reasons": [
       {
@@ -62,7 +63,7 @@
       "passed": 132,
       "skipped": 0,
       "failed": 0,
-      "log": "build/upstream-merge-2026-11-06/node-tests.log"
+      "log": "build/upstream-merge-2026-11-06/node-230-tests.log"
     },
     "rag_python": {
       "failed": 0,
@@ -77,21 +78,54 @@
       "failed": 0
     },
     "analyzer": {
-      "log": "build/upstream-merge-2026-11-06/analyze-final.log",
+      "log": "build/upstream-merge-2026-11-06/analyze-230.log",
       "success": true
     },
     "windows_release": {
       "temporary_cmake_patch_restored": true,
-      "version": "2.2.6+83",
+      "version": "2.3.0+85",
       "identity_validation": "passed",
       "success": true,
-      "log": "build/upstream-merge-2026-11-06/windows-release.log"
+      "log": "build/upstream-merge-2026-11-06/windows-release-230.log"
     },
     "macos_native_validation": false,
     "bundled_databases": "passed",
     "lfs_fsck": "passed",
     "app_launched": false,
-    "installation_performed": false
+    "installation_performed": false,
+    "late_flutter_run": {
+      "log": "build/upstream-merge-2026-11-06/flutter-230.jsonl",
+      "suites": 79,
+      "passed": 1062,
+      "skipped": 0,
+      "failed": 1,
+      "success": false
+    },
+    "single_case_after_fixture_fix": {
+      "log": "build/upstream-merge-2026-11-06/phrase-single-final.jsonl",
+      "suites": 1,
+      "passed": 1,
+      "skipped": 0,
+      "failed": 0,
+      "success": true
+    },
+    "changed_suites_only": {
+      "suites": 22,
+      "passed": 430,
+      "failed": 0
+    },
+    "effective_results": {
+      "method": "Reuse the full d754612d run, replace suites selected for b39fbf18 with their later results, then replace the one timer-order-dependent test with its passing fixture fix. This is not a second full run.",
+      "suites": 941,
+      "passed": 10125,
+      "skipped": 6,
+      "failed": 0
+    },
+    "native_installer_validation": {
+      "reason": "NSIS is not installed on this host; Dart updater regression passed.",
+      "performed": false
+    },
+    "test_policy": "Reuse validated results; run only affected tests for further changes. A timer-order-dependent existing test was fixed and rechecked alone."
   },
   "migration_validation": {
     "date": "2026-11-02",
@@ -178,6 +212,13 @@
       "from_commit": "9fe268da449b87487a3f0b5e8dace177c68c5ec4",
       "upstream_target": "d754612dd226cb763a1012a23625223bfde5b946",
       "upstream_commits": 36,
+      "report": "docs/upstream-merge-2026-11-06.md"
+    },
+    {
+      "date": "2026-11-06",
+      "from_commit": "a63e8d580a5d2705412d8b249f9a60c0bd8e049d",
+      "upstream_target": "b39fbf182e76ac369c6a3f5a35584ef6f5455b4a",
+      "upstream_commits": 1,
       "report": "docs/upstream-merge-2026-11-06.md"
     }
   ]

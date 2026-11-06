@@ -17,6 +17,7 @@ NovelAI Flutter 桌面客户端。业务按 `lib/core/`、`lib/data/`、`lib/pre
 - 界面文案统一写进 `lib/l10n/` 的 ARB，各语言同步补齐，改后运行 `flutter gen-l10n`；有 BuildContext 用 `context.l10n`，模型、服务等无 context 的代码用 `currentL10n`。不要在代码里内联 `zh/en/ja` 三元或只写中文；英日等布局回归用真实字体（`test/helpers/studio_capture_fonts.dart`）。
 - 代码按 Dart formatter 与现有分层风格编写。逻辑修复验证受影响路径；UI 行为变更验证实际界面，需要稳定回归覆盖时补对应测试。
 - 测试放在 `test/` 对应功能目录，使用 `flutter_test` / `mocktail`。按影响选择测试和分析范围；仅文档修改不运行 Flutter 全量测试或构建。
+- 跟进上游优先验证冲突和实际变化的调用链，复用本轮已经通过的结果，不默认重复整仓回归；出现失败时先定位，再只复测对应问题及受影响路径。不要把未改动的模块作为例行追加测试。
 - 已有开发会话时，代码修改完成必要验证后运行 `scripts/trigger_hot_reload.ps1`；需要重置状态用 `-Restart`，不要再启动第二个 attach。
 - 用户指定自行核验界面时，只构建并交付产物，不自动热重载、重启或操控应用。
 - 修改用户提示词、草稿、角色框或桥接状态须先备份并核对最新值。实际生图需用户明确授权，执行前报告单价和余额。

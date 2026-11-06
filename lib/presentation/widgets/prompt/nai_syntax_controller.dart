@@ -427,7 +427,9 @@ class NaiSyntaxController extends TextEditingController
         continue;
       }
 
-      switch (text[index]) {
+      final character = text[index];
+      final previousEmphasis = emphasis;
+      switch (character) {
         case '{':
           emphasis *= 1.05;
           break;
@@ -442,7 +444,12 @@ class NaiSyntaxController extends TextEditingController
           break;
       }
 
-      marks[index] = _markForEmphasis(emphasis);
+      // Keep a closing bracket in the highlight when it returns to neutral.
+      marks[index] =
+          _markForEmphasis(emphasis) ??
+          (character == '}' || character == ']'
+              ? _markForEmphasis(previousEmphasis)
+              : null);
       index++;
     }
   }
@@ -483,6 +490,8 @@ class NaiSyntaxController extends TextEditingController
   }
 
   _HighlightMark? _markForEmphasis(double emphasis) {
+    // The official editor omits tints less than 0.01 away from neutral.
+    if ((emphasis - 1).abs() < 0.01) return null;
     final tier = weightTier(emphasis);
     if (tier == WeightTier.none) return null;
 
