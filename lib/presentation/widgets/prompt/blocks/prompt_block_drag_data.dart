@@ -1,9 +1,12 @@
+import '../../../../data/models/prompt_block/pill_document.dart';
+
 /// 拖入生成页时使用的最小块引用。
 ///
-/// 正文和标题必须从当前块库读取，避免拖拽快照与库状态分叉。
+/// 库块使用当前库中的正文，临时块携带独立快照。
 class PromptBlockDragData {
   const PromptBlockDragData({
     required this.blockId,
+    this.temp,
     this.instanceMarker,
     this.paletteIndex,
     this.blockIds,
@@ -12,6 +15,8 @@ class PromptBlockDragData {
   });
 
   final String blockId;
+
+  final PillTempContent? temp;
 
   /// 管理页批量拖动使用；生成提示词的落点仍只取 blockId。
   final List<String>? blockIds;

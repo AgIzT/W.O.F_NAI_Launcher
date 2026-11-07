@@ -35,7 +35,7 @@ W.O.F NAI Studio 是一个 Windows 桌面上的 NovelAI 第三方客户端。它
 | --- | --- |
 | `WOF_NAI_Studio_Windows_<版本>_Setup.exe` | **大多数人选这个。** 装到当前用户目录，不需要管理员权限，有开始菜单和桌面快捷方式。 |
 | `WOF_NAI_Studio_Windows_<版本>_Portable.zip` | 想放在自己指定的文件夹、U 盘或多台电脑之间带着走。解压后运行 `nai_launcher.exe`。 |
-| `WOF_NAI_Studio_macOS_<版本>_Portable.zip` | 当发布页提供该文件时，可在 macOS 13.5 及以上的 Apple 芯片和 Intel Mac 上解压使用。 |
+| `WOF_NAI_Studio_macOS_<版本>_Portable_Test.zip` | macOS 13.5 及以上的 Apple 芯片和 Intel Mac 通用。[下载 2.3.0 通用测试包](https://github.com/z15087716457-stack/W.O.F_NAI_Launcher/releases/download/v2.3.0/WOF_NAI_Studio_macOS_2.3.0_Portable_Test.zip)。 |
 
 Windows 两个版本都支持应用内更新，设置、图库数据库和 Agent 数据放在程序旁边的 `user-data/` 和 `agent-data/`。Mac 数据在用户的 Application Support 目录，更新下载并校验后用 Finder 替换应用。
 
@@ -188,7 +188,7 @@ Windows 两个版本都支持应用内更新，设置、图库数据库和 Agent
 | 教程 | 内容 |
 | --- | --- |
 | [快速上手](docs/guide/zh-CN/quick-start.md) | 安装、登录、第一次生成、数据位置 |
-| [积木](docs/guide/zh-CN/blocks.md) | 固定 / 顺序 / 随机、锁定、权重规则、典型用法 |
+| [积木](docs/guide/zh-CN/blocks.md) | 临时块、固定 / 顺序 / 随机、锁定、权重规则、典型用法 |
 | [画风遗传](docs/guide/zh-CN/style-explore.md) | 抽候选、开始进化、两两比较、存为积木 |
 | [翻译块](docs/guide/zh-CN/translation.md) | 配置翻译模型、双语阅读、切换与还原 |
 | [标签扩展与标签百科](docs/guide/zh-CN/tags-wiki.md) | 本地标签搜索、关联标签、离线百科 |

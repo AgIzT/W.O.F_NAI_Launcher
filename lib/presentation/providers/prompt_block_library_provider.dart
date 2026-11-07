@@ -257,6 +257,7 @@ class PromptBlockLibraryNotifier extends _$PromptBlockLibraryNotifier {
     List<String>? negativeAtoms,
     PromptBlockGenerationSettings? generationSettings,
     List<PromptBlockTag> tags = const [],
+    bool isFavorite = false,
     void Function()? beforeWrite,
   }) {
     return _mutate(
@@ -269,6 +270,7 @@ class PromptBlockLibraryNotifier extends _$PromptBlockLibraryNotifier {
         negativeAtoms: negativeAtoms,
         generationSettings: generationSettings,
         tags: tags,
+        isFavorite: isFavorite,
         color: color,
         appearance: appearance,
         iconName: iconName,

@@ -136,6 +136,7 @@ class _Blocks extends PromptBlockLibraryNotifier {
     List<String>? negativeAtoms,
     PromptBlockGenerationSettings? generationSettings,
     List<PromptBlockTag> tags = const [],
+    bool isFavorite = false,
     void Function()? beforeWrite,
   }) async {
     final block = PromptBlock.create(
@@ -146,6 +147,7 @@ class _Blocks extends PromptBlockLibraryNotifier {
       negativeContent: negativeContent,
       negativeAtoms: negativeAtoms,
       generationSettings: generationSettings,
+      isFavorite: isFavorite,
     );
     state = AsyncData(
       PromptBlockLibraryState(

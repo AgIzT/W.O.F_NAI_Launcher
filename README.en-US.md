@@ -35,7 +35,7 @@ Get the package for your operating system from [Releases](https://github.com/z15
 | --- | --- |
 | `WOF_NAI_Studio_Windows_<version>_Setup.exe` | **The choice for most people.** Installs to your user directory without administrator rights, with Start menu and desktop shortcuts. |
 | `WOF_NAI_Studio_Windows_<version>_Portable.zip` | For keeping the app in a folder of your choice, on a USB drive, or taking it between computers. Extract it and run `nai_launcher.exe`. |
-| `WOF_NAI_Studio_macOS_<version>_Portable.zip` | When listed in the release, extract and use it on Apple silicon or Intel Macs running macOS 13.5 or later. |
+| `WOF_NAI_Studio_macOS_<version>_Portable_Test.zip` | For Apple silicon and Intel Macs on macOS 13.5 or later. [Download the 2.3.0 universal test build](https://github.com/z15087716457-stack/W.O.F_NAI_Launcher/releases/download/v2.3.0/WOF_NAI_Studio_macOS_2.3.0_Portable_Test.zip). |
 
 Both Windows packages support in-app updates. Settings, the gallery database and Agent data live in `user-data/` and `agent-data/` beside the program. On Mac, data lives in your Application Support directory. The app downloads and verifies updates, then opens Finder for you to replace the app.
 
@@ -188,7 +188,7 @@ See [FAQ](docs/guide/en/faq.md) for more answers.
 | Guide | Contents |
 | --- | --- |
 | [Quick start](docs/guide/en/quick-start.md) | Installation, sign-in, first generation, data locations |
-| [Blocks](docs/guide/en/blocks.md) | Fixed / Sequential / Random, locking, weight rules, common uses |
+| [Blocks](docs/guide/en/blocks.md) | Temporary blocks, Fixed / Sequential / Random, locking, weight rules, common uses |
 | [Style evolution](docs/guide/en/style-explore.md) | Drawing candidates, starting evolution, pairwise comparison, saving as blocks |
 | [Translation blocks](docs/guide/en/translation.md) | Translation model setup, bilingual reading, switching and restoring |
 | [Tag expansion and Tag Wiki](docs/guide/en/tags-wiki.md) | Local tag search, related tags, offline wiki |

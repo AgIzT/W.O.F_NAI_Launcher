@@ -106,6 +106,7 @@ abstract final class PillDocumentEditor {
     PillDocument document, {
     required int offset,
     required String blockId,
+    PillTempContent? temp,
     bool useNegativeContent = false,
     String? bundleId,
     int rollScopeMask = 1,
@@ -119,6 +120,7 @@ abstract final class PillDocumentEditor {
     final instances = Map<String, PillInstance>.of(document.instances);
     instances[marker] = PillInstance(
       blockId: blockId,
+      temp: temp,
       useNegativeContent: useNegativeContent,
       bundleId: bundleId,
       rollScopeMask: rollScopeMask,

@@ -8,6 +8,7 @@ import '../../common/studio_icons.dart';
 
 import '../../../../core/utils/localization_extension.dart';
 import '../../../../data/models/prompt_block/prompt_block.dart';
+import '../../../../data/models/prompt_block/pill_document.dart';
 import '../../../../data/models/prompt_block/prompt_block_folder.dart';
 import '../../../providers/prompt_block_palette_provider.dart';
 import '../../../utils/prompt_palette_drop.dart';
@@ -651,6 +652,7 @@ class _PromptBlockPaletteCardState
                                   for (var i = 0; i < blocks.length; i++)
                                     _PaletteChipRow(
                                       block: blocks[i],
+                                      temp: palette?.temporary[blocks[i].id],
                                       index: i,
                                       folders: folders,
                                       onInsert: widget.onInsert,
@@ -682,6 +684,7 @@ class _PromptBlockPaletteCardState
 class _PaletteChipRow extends ConsumerStatefulWidget {
   const _PaletteChipRow({
     required this.block,
+    this.temp,
     required this.index,
     required this.folders,
     required this.multiSelectMode,
@@ -691,6 +694,7 @@ class _PaletteChipRow extends ConsumerStatefulWidget {
   });
 
   final PromptBlock block;
+  final PillTempContent? temp;
   final int index;
   final List<PromptBlockFolder> folders;
 
@@ -711,11 +715,18 @@ class _PaletteChipRowState extends ConsumerState<_PaletteChipRow> {
   /// 点击插入：与块库面板同一路由——最近聚焦的药丸框光标处，
   /// 从未聚焦过时回退主提示词末尾。
   void _insertAtCaret() {
-    if (widget.onInsert != null) {
+    final temp = widget.temp;
+    if (temp == null && widget.onInsert != null) {
       unawaited(widget.onInsert!(widget.block.id));
       return;
     }
-    BlocksActions(ref, context, () => mounted).insert([widget.block.id]);
+    unawaited(
+      BlocksActions(
+        ref,
+        context,
+        () => mounted,
+      ).insert(temp == null ? [widget.block.id] : const [], temporary: temp),
+    );
   }
 
   void _remove() => ref
@@ -740,6 +751,7 @@ class _PaletteChipRowState extends ConsumerState<_PaletteChipRow> {
               BlockAppearance.values.asNameMap()[block.appearance] ??
               BlockAppearance.classic,
           focused: widget.selected,
+          temporary: widget.temp != null,
         ),
       ),
     );
@@ -785,6 +797,7 @@ class _PaletteChipRowState extends ConsumerState<_PaletteChipRow> {
                 Draggable<PromptBlockDragData>(
                   data: PromptBlockDragData(
                     blockId: block.id,
+                    temp: widget.temp,
                     paletteIndex: widget.index,
                   ),
                   rootOverlay: true,
