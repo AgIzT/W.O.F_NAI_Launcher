@@ -1,7 +1,7 @@
 {
   "upstream_repository": "z15087716457-stack/W.O.F_NAI_Launcher",
-  "upstream_base": "3ef6476bc2dae982a471bd3c3b6c75141e3ca605",
-  "reviewed_through": "3ef6476bc2dae982a471bd3c3b6c75141e3ca605",
+  "upstream_base": "61b0be1e50d5c7307460cd579cd38ad5841e0fd9",
+  "reviewed_through": "61b0be1e50d5c7307460cd579cd38ad5841e0fd9",
   "source_repository": "AgIzT/W.O.F_NAI_Launcher",
   "source_stable_commit": "fa3bc8ae2649d61ae0a4459890e8b5764a577137",
   "feature_source_commit": "62f920820bdcbdd6dc5bf2b00f7bd88d1f7d7be8",
@@ -20,6 +20,33 @@
   ],
   "local_fix_to_preserve": "Embed character captions before local upscaling plain request images",
   "validation": {
+    "date": "2026-11-08",
+    "target_upstream": "61b0be1e50d5c7307460cd579cd38ad5841e0fd9",
+    "flutter": "3.47.7",
+    "dart": "3.13.5",
+    "analyzer": {
+      "scope": "lib",
+      "success": true,
+      "log": "build/upstream-sync-2026-11-08/analyze.log"
+    },
+    "targeted_flutter_suites": {
+      "suites": 22,
+      "passed": 480,
+      "skipped": 0,
+      "failed": 0,
+      "log": "build/upstream-sync-2026-11-08/flutter-targeted.jsonl"
+    },
+    "traditional_chinese_resources": {
+      "passed": 4,
+      "failed": 0,
+      "log": "build/upstream-sync-2026-11-08/zh-tw.log"
+    },
+    "windows_native_window_reveal": {
+      "success": true,
+      "log": "build/upstream-sync-2026-11-08/native-test.log"
+    }
+  },
+  "validation_2026_11_07": {
     "date": "2026-11-07",
     "target_upstream": "3ef6476bc2dae982a471bd3c3b6c75141e3ca605",
     "flutter": "3.47.7",
@@ -258,6 +285,13 @@
       "upstream_target": "3ef6476bc2dae982a471bd3c3b6c75141e3ca605",
       "upstream_commits": 5,
       "version": "2.3.1+89"
+    },
+    {
+      "date": "2026-11-08",
+      "from_commit": "4de85a120fb0015179aac0c53d11b1adc7e5df44",
+      "upstream_target": "61b0be1e50d5c7307460cd579cd38ad5841e0fd9",
+      "upstream_commits": 1,
+      "version": "2.3.2+94"
     }
   ]
 }
