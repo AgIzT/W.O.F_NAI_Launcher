@@ -13,7 +13,7 @@
 <h3 align="center">Turn NovelAI image generation into a creative workspace you can build on and reuse</h3>
 
 <p align="center">
-  <a href="https://github.com/z15087716457-stack/W.O.F_NAI_Launcher/releases/latest"><img src="https://img.shields.io/github/v/release/z15087716457-stack/W.O.F_NAI_Launcher?label=Download&color=2f80ed" alt="Download"></a>
+  <a href="https://github.com/AgIzT/W.O.F_NAI_Launcher/releases/latest"><img src="https://img.shields.io/github/v/release/AgIzT/W.O.F_NAI_Launcher?label=Download&color=2f80ed" alt="Download"></a>
   <img src="https://img.shields.io/badge/Windows-10%20%2F%2011%20x64-0078D4?logo=windows11&logoColor=white" alt="Windows">
   <img src="https://img.shields.io/badge/Interface%20languages-%E7%AE%80%E4%B8%AD%20%2F%20%E7%B9%81%E4%B8%AD%20%2F%20EN%20%2F%20%E6%97%A5%E6%9C%AC%E8%AA%9E%20%2F%20%ED%95%9C%EA%B5%AD%EC%96%B4-555" alt="Five interface languages">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT"></a>
@@ -29,7 +29,9 @@ W.O.F NAI Studio is a third-party NovelAI desktop client for Windows. It does mo
 
 ## Download
 
-Get the package for your operating system from [Releases](https://github.com/z15087716457-stack/W.O.F_NAI_Launcher/releases/latest).
+Get the package for your operating system from [Releases](https://github.com/AgIzT/W.O.F_NAI_Launcher/releases/latest).
+
+Starting with version 2.3.2, the Plana build checks this repository for in-app updates. If your current version checks the upstream repository, download and install this build once to switch.
 
 | File | Who it's for |
 | --- | --- |

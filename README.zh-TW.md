@@ -13,7 +13,7 @@
 <h3 align="center">讓 NovelAI 生圖成為一套能累積、能重複使用的創作工作台</h3>
 
 <p align="center">
-  <a href="https://github.com/z15087716457-stack/W.O.F_NAI_Launcher/releases/latest"><img src="https://img.shields.io/github/v/release/z15087716457-stack/W.O.F_NAI_Launcher?label=%E4%B8%8B%E8%BC%89&color=2f80ed" alt="下載"></a>
+  <a href="https://github.com/AgIzT/W.O.F_NAI_Launcher/releases/latest"><img src="https://img.shields.io/github/v/release/AgIzT/W.O.F_NAI_Launcher?label=%E4%B8%8B%E8%BC%89&color=2f80ed" alt="下載"></a>
   <img src="https://img.shields.io/badge/Windows-10%20%2F%2011%20x64-0078D4?logo=windows11&logoColor=white" alt="Windows">
   <img src="https://img.shields.io/badge/%E4%BB%8B%E9%9D%A2%E8%AA%9E%E8%A8%80-%E7%AE%80%E4%B8%AD%20%2F%20%E7%B9%81%E4%B8%AD%20%2F%20EN%20%2F%20%E6%97%A5%E6%9C%AC%E8%AA%9E%20%2F%20%ED%95%9C%EA%B5%AD%EC%96%B4-555" alt="五種介面語言">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT"></a>
@@ -29,7 +29,7 @@ W.O.F NAI Studio 是 Windows 桌面上的 NovelAI 第三方用戶端。它不只
 
 ## 下載
 
-到 [Releases](https://github.com/z15087716457-stack/W.O.F_NAI_Launcher/releases/latest) 下載最新版本，二選一：
+到 [Releases](https://github.com/AgIzT/W.O.F_NAI_Launcher/releases/latest) 下載最新版本，二選一：
 
 | 檔案 | 適合誰 |
 | --- | --- |

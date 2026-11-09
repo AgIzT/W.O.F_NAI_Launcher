@@ -4,7 +4,7 @@
 
 ## 1. 설치
 
-[Releases](https://github.com/z15087716457-stack/W.O.F_NAI_Launcher/releases/latest)에서 다운로드합니다.
+[Releases](https://github.com/AgIzT/W.O.F_NAI_Launcher/releases/latest)에서 다운로드합니다.
 
 - **설치형** `WOF_NAI_Studio_Windows_<버전>_Setup.exe`: 두 번 클릭해 설치합니다. 기본 경로는 `%LOCALAPPDATA%\Programs\W.O.F NAI Studio`이며 관리자 권한이 필요하지 않습니다.
 - **포터블** `WOF_NAI_Studio_Windows_<버전>_Portable.zip`: 원하는 폴더에 압축을 풀고 안에 있는 `nai_launcher.exe`를 실행합니다.

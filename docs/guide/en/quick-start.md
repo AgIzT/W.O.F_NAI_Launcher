@@ -4,7 +4,7 @@
 
 ## 1. Install
 
-Download from [Releases](https://github.com/z15087716457-stack/W.O.F_NAI_Launcher/releases/latest):
+Download from [Releases](https://github.com/AgIzT/W.O.F_NAI_Launcher/releases/latest):
 
 - **Installer** `WOF_NAI_Studio_Windows_<version>_Setup.exe`: Double-click to install. The default location is `%LOCALAPPDATA%\Programs\W.O.F NAI Studio`; administrator rights are not required.
 - **Portable** `WOF_NAI_Studio_Windows_<version>_Portable.zip`: Extract to any folder and run `nai_launcher.exe` inside.

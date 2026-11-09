@@ -10,6 +10,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../data/models/version/release_asset_info.dart';
 import '../../data/models/version/version_info.dart';
+import '../constants/app_update_source.dart';
 import '../utils/app_logger.dart';
 import '../utils/app_bundle_paths.dart';
 import '../utils/studio_sandbox.dart';
@@ -119,7 +120,8 @@ class UpdateInstallerService {
   static const Duration _connectTimeout = Duration(seconds: 15);
   static const Duration _receiveTimeout = Duration(seconds: 60);
   static const Duration _staleFileAge = Duration(days: 14);
-  static const String _updateDirectoryName = 'nai_launcher_updates';
+  static const String _updateDirectoryName =
+      'nai_launcher_updates_${AppUpdateSource.stateNamespace}';
   static const String _pendingMetadataName = 'pending_update.json';
   static const String _resultMetadataName = 'update_result.json';
 

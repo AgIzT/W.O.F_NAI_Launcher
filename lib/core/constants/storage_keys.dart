@@ -1,3 +1,5 @@
+import 'app_update_source.dart';
+
 /// 存储键名常量
 class StorageKeys {
   StorageKeys._();
@@ -276,12 +278,17 @@ class StorageKeys {
       'notification_custom_sound_path';
 
   // Update Check Keys (更新检查相关)
-  static const String lastUpdateCheckTime = 'last_update_check_time';
+  // Fork-specific state so an upstream reminder or skip cannot hide a release.
+  static const String lastUpdateCheckTime =
+      '${AppUpdateSource.stateNamespace}_last_check_time';
   static const String lastUpdateCheckAttemptTime =
-      'last_update_check_attempt_time';
-  static const String skippedUpdateVersion = 'skipped_update_version';
-  static const String lastKnownUpdateVersion = 'last_known_update_version';
-  static const String updateRemindAfter = 'update_remind_after';
+      '${AppUpdateSource.stateNamespace}_last_check_attempt_time';
+  static const String skippedUpdateVersion =
+      '${AppUpdateSource.stateNamespace}_skipped_version';
+  static const String lastKnownUpdateVersion =
+      '${AppUpdateSource.stateNamespace}_last_known_version';
+  static const String updateRemindAfter =
+      '${AppUpdateSource.stateNamespace}_remind_after';
   static const String includePrereleaseUpdates = 'include_prerelease_updates';
 
   // Data Source Cache Settings (数据源缓存设置)

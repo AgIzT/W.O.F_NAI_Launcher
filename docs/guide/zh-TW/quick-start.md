@@ -4,7 +4,7 @@
 
 ## 1. 安裝
 
-到 [Releases](https://github.com/z15087716457-stack/W.O.F_NAI_Launcher/releases/latest) 下載：
+到 [Releases](https://github.com/AgIzT/W.O.F_NAI_Launcher/releases/latest) 下載：
 
 - **安裝版** `WOF_NAI_Studio_Windows_<版本>_Setup.exe`：按兩下安裝，預設安裝到 `%LOCALAPPDATA%\Programs\W.O.F NAI Studio`，不需要系統管理員權限。
 - **可攜版** `WOF_NAI_Studio_Windows_<版本>_Portable.zip`：解壓縮到任意資料夾，執行其中的 `nai_launcher.exe`。

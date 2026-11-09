@@ -108,6 +108,35 @@ void main() {
     storage = _FakeUpdateStorage();
   });
 
+  test('stable checks use the Plana fork release endpoint', () async {
+    final dio = Dio(BaseOptions(baseUrl: GitHubApiService.defaultBaseUrl));
+    addTearDown(dio.close);
+    dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (request, handler) {
+          expect(
+            request.uri.toString(),
+            'https://api.github.com/repos/AgIzT/W.O.F_NAI_Launcher/releases/latest',
+          );
+          handler.resolve(
+            Response<Map<String, dynamic>>(
+              requestOptions: request,
+              data: {'tag_name': 'v2.3.2'},
+            ),
+          );
+        },
+      ),
+    );
+    final service = UpdateCheckService(
+      gitHubApiService: GitHubApiService(dio: dio),
+      packageInfo: packageInfo(),
+      installationService: _FakeInstallationService(),
+      checkStorage: storage,
+    );
+
+    expect((await service.checkForUpdates())?.version, '2.3.2');
+  });
+
   for (final locale in [
     const Locale('zh'),
     const Locale('zh', 'TW'),

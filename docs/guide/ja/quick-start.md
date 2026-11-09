@@ -4,7 +4,7 @@
 
 ## 1. インストール
 
-[Releases](https://github.com/z15087716457-stack/W.O.F_NAI_Launcher/releases/latest) からダウンロードします。
+[Releases](https://github.com/AgIzT/W.O.F_NAI_Launcher/releases/latest) からダウンロードします。
 
 - **インストーラー版** `WOF_NAI_Studio_Windows_<バージョン>_Setup.exe`：ダブルクリックしてインストールします。既定の保存先は `%LOCALAPPDATA%\Programs\W.O.F NAI Studio` で、管理者権限は不要です。
 - **ポータブル版** `WOF_NAI_Studio_Windows_<バージョン>_Portable.zip`：好きなフォルダーに展開し、中の `nai_launcher.exe` を実行します。

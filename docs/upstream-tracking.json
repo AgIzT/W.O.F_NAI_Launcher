@@ -6,6 +6,7 @@
   "source_stable_commit": "fa3bc8ae2649d61ae0a4459890e8b5764a577137",
   "feature_source_commit": "62f920820bdcbdd6dc5bf2b00f7bd88d1f7d7be8",
   "migration_branch": "migration/plana",
+  "release_repository": "AgIzT/W.O.F_NAI_Launcher",
   "policy": "Preserve upstream ancestry; review and merge upstream in a development branch, then verify custom editor behavior.",
   "customizations": [
     "Chinese/English tag, character and copyright completion",

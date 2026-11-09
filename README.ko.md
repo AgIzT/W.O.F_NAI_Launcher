@@ -13,7 +13,7 @@
 <h3 align="center">NovelAI 이미지 생성을 쌓아 두고 다시 활용하는 창작 작업 공간으로 만듭니다</h3>
 
 <p align="center">
-  <a href="https://github.com/z15087716457-stack/W.O.F_NAI_Launcher/releases/latest"><img src="https://img.shields.io/github/v/release/z15087716457-stack/W.O.F_NAI_Launcher?label=%EB%8B%A4%EC%9A%B4%EB%A1%9C%EB%93%9C&color=2f80ed" alt="다운로드"></a>
+  <a href="https://github.com/AgIzT/W.O.F_NAI_Launcher/releases/latest"><img src="https://img.shields.io/github/v/release/AgIzT/W.O.F_NAI_Launcher?label=%EB%8B%A4%EC%9A%B4%EB%A1%9C%EB%93%9C&color=2f80ed" alt="다운로드"></a>
   <img src="https://img.shields.io/badge/Windows-10%20%2F%2011%20x64-0078D4?logo=windows11&logoColor=white" alt="Windows">
   <img src="https://img.shields.io/badge/%EC%9D%B8%ED%84%B0%ED%8E%98%EC%9D%B4%EC%8A%A4%20%EC%96%B8%EC%96%B4-%E7%AE%80%E4%B8%AD%20%2F%20%E7%B9%81%E4%B8%AD%20%2F%20EN%20%2F%20%E6%97%A5%E6%9C%AC%E8%AA%9E%20%2F%20%ED%95%9C%EA%B5%AD%EC%96%B4-555" alt="5가지 인터페이스 언어">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT"></a>
@@ -29,7 +29,7 @@ W.O.F NAI Studio는 Windows 데스크톱용 NovelAI 서드파티 클라이언트
 
 ## 다운로드
 
-[Releases](https://github.com/z15087716457-stack/W.O.F_NAI_Launcher/releases/latest)에서 최신 버전을 다운로드합니다. 다음 두 가지 중 하나를 선택합니다.
+[Releases](https://github.com/AgIzT/W.O.F_NAI_Launcher/releases/latest)에서 최신 버전을 다운로드합니다. 다음 두 가지 중 하나를 선택합니다.
 
 | 파일 | 권장 대상 |
 | --- | --- |

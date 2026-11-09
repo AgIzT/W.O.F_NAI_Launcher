@@ -13,7 +13,7 @@
 <h3 align="center">把 NovelAI 生图变成一套可以积累、可以复用的创作工作台</h3>
 
 <p align="center">
-  <a href="https://github.com/z15087716457-stack/W.O.F_NAI_Launcher/releases/latest"><img src="https://img.shields.io/github/v/release/z15087716457-stack/W.O.F_NAI_Launcher?label=%E4%B8%8B%E8%BD%BD&color=2f80ed" alt="下载"></a>
+  <a href="https://github.com/AgIzT/W.O.F_NAI_Launcher/releases/latest"><img src="https://img.shields.io/github/v/release/AgIzT/W.O.F_NAI_Launcher?label=%E4%B8%8B%E8%BD%BD&color=2f80ed" alt="下载"></a>
   <img src="https://img.shields.io/badge/Windows-10%20%2F%2011%20x64-0078D4?logo=windows11&logoColor=white" alt="Windows">
   <img src="https://img.shields.io/badge/%E7%95%8C%E9%9D%A2-%E7%AE%80%E4%B8%AD%20%2F%20%E7%B9%81%E4%B8%AD%20%2F%20EN%20%2F%20%E6%97%A5%E6%9C%AC%E8%AA%9E%20%2F%20%ED%95%9C%EA%B5%AD%EC%96%B4-555" alt="五种界面语言">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT"></a>
@@ -29,7 +29,9 @@ W.O.F NAI Studio 是一个 Windows 桌面上的 NovelAI 第三方客户端。它
 
 ## 下载
 
-到 [Releases](https://github.com/z15087716457-stack/W.O.F_NAI_Launcher/releases/latest) 下载适合当前系统的版本。
+到 [Releases](https://github.com/AgIzT/W.O.F_NAI_Launcher/releases/latest) 下载适合当前系统的版本。
+
+Plana 定制版从 2.3.2 开始在软件内检查本仓库的发布。若当前版本使用上游更新源，请先从这里下载并覆盖安装一次。
 
 | 文件 | 适合谁 |
 | --- | --- |

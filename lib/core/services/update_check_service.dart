@@ -5,6 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../data/datasources/remote/github_api_service.dart';
 import '../../../data/models/version/version_info.dart';
+import '../constants/app_update_source.dart';
 import '../storage/local_storage_service.dart';
 import 'app_installation_service.dart';
 import '../utils/localization_extension.dart';
@@ -203,12 +204,6 @@ class UpdateCheckService {
 
   final DateTime Function() _now;
 
-  /// 默认仓库所有者
-  static const String defaultOwner = 'z15087716457-stack';
-
-  /// 默认仓库名称
-  static const String defaultRepo = 'W.O.F_NAI_Launcher';
-
   /// 默认检查间隔（24小时）
   static const Duration defaultCheckInterval = Duration(hours: 24);
 
@@ -299,8 +294,8 @@ class UpdateCheckService {
 
     try {
       final latestRelease = await _gitHubApiService.fetchLatestRelease(
-        owner: defaultOwner,
-        repo: defaultRepo,
+        owner: AppUpdateSource.owner,
+        repo: AppUpdateSource.repository,
         currentVersion: currentVersion,
         platform: _installationService.getReleaseAssetPreference(),
         includePrerelease: shouldIncludePrerelease(),
