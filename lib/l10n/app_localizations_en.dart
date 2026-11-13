@@ -22364,4 +22364,31 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get promptCompletion_expand =>
       'Full list and Wiki preview (right-click a suggestion to preview it)';
+
+  @override
+  String get navShell_updateDownloading => 'Downloading update';
+
+  @override
+  String get navShell_updateReady => 'Restart to update';
+
+  @override
+  String navShell_updateAvailableVersion(String version) {
+    return '$version available to download';
+  }
+
+  @override
+  String navShell_updateReadyVersion(String version) {
+    return '$version ready';
+  }
+
+  @override
+  String navShell_updateDownloadProgress(int percent) {
+    return '$percent% · Keep using Studio';
+  }
+
+  @override
+  String get navShell_updateRetryHint => 'View details and retry';
+
+  @override
+  String get updateDownloadInBackground => 'Download in background';
 }

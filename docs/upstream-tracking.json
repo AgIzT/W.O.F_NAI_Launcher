@@ -1,7 +1,7 @@
 {
   "upstream_repository": "z15087716457-stack/W.O.F_NAI_Launcher",
-  "upstream_base": "61b0be1e50d5c7307460cd579cd38ad5841e0fd9",
-  "reviewed_through": "61b0be1e50d5c7307460cd579cd38ad5841e0fd9",
+  "upstream_base": "eeca563f198763085e0f593dba2bd53b60213590",
+  "reviewed_through": "eeca563f198763085e0f593dba2bd53b60213590",
   "source_repository": "AgIzT/W.O.F_NAI_Launcher",
   "source_stable_commit": "fa3bc8ae2649d61ae0a4459890e8b5764a577137",
   "feature_source_commit": "62f920820bdcbdd6dc5bf2b00f7bd88d1f7d7be8",
@@ -21,6 +21,32 @@
   ],
   "local_fix_to_preserve": "Embed character captions before local upscaling plain request images",
   "validation": {
+    "date": "2026-11-13",
+    "target_upstream": "eeca563f198763085e0f593dba2bd53b60213590",
+    "flutter": "3.47.7",
+    "dart": "3.13.5",
+    "analyzer": {
+      "scope": "lib",
+      "success": true,
+      "log": "build/upstream-sync-2.3.3/analyze.log"
+    },
+    "targeted_flutter_suites": {
+      "suites": 24,
+      "passed": 542,
+      "skipped": 1,
+      "failed": 0,
+      "skip_reason": "Optional live RTX test requires RUN_ADVANCED_UPSCALE_AUDIT=1 and the cached SDK archive.",
+      "log": "build/upstream-sync-2.3.3/flutter-targeted.jsonl"
+    },
+    "traditional_chinese_resources": {
+      "passed": 4,
+      "failed": 0,
+      "log": "build/upstream-sync-2.3.3/zh-tw.log"
+    },
+    "bundled_databases": "passed",
+    "lfs_fsck": "passed"
+  },
+  "validation_2026_11_08": {
     "date": "2026-11-08",
     "target_upstream": "61b0be1e50d5c7307460cd579cd38ad5841e0fd9",
     "flutter": "3.47.7",
@@ -293,6 +319,13 @@
       "upstream_target": "61b0be1e50d5c7307460cd579cd38ad5841e0fd9",
       "upstream_commits": 1,
       "version": "2.3.2+94"
+    },
+    {
+      "date": "2026-11-13",
+      "from_commit": "d8fd3887c878c787cabdaee380f7a19bba0beb6f",
+      "upstream_target": "eeca563f198763085e0f593dba2bd53b60213590",
+      "upstream_commits": 2,
+      "version": "2.3.3+100"
     }
   ]
 }

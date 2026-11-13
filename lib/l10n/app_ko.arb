@@ -12038,5 +12038,33 @@
   "promptReading_autoTranslate": "모델로 자동 번역",
   "modelSettings_promptReadingHint": "전체 번역은 읽기용이며 프롬프트를 변경하지 않습니다.",
   "promptCompletion_works": "작품",
-  "promptCompletion_expand": "전체 목록 및 Wiki 미리보기 (후보를 우클릭하면 바로 미리보기)"
+  "promptCompletion_expand": "전체 목록 및 Wiki 미리보기 (후보를 우클릭하면 바로 미리보기)",
+  "navShell_updateDownloading": "업데이트 다운로드 중",
+  "navShell_updateReady": "다시 시작하여 업데이트",
+  "navShell_updateAvailableVersion": "{version} 다운로드 가능",
+  "navShell_updateReadyVersion": "{version} 준비 완료",
+  "navShell_updateDownloadProgress": "{percent}% · Studio를 계속 사용할 수 있습니다",
+  "navShell_updateRetryHint": "자세한 내용 확인 및 재시도",
+  "updateDownloadInBackground": "백그라운드에서 다운로드",
+  "@navShell_updateAvailableVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@navShell_updateReadyVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@navShell_updateDownloadProgress": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  }
 }

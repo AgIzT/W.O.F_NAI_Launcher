@@ -12038,5 +12038,33 @@
   "promptReading_autoTranslate": "モデルで自動翻訳",
   "modelSettings_promptReadingHint": "全文翻訳は閲覧用です。プロンプトは変更しません。",
   "promptCompletion_works": "作品",
-  "promptCompletion_expand": "候補一覧と Wiki プレビュー（候補を右クリックで直接プレビュー）"
+  "promptCompletion_expand": "候補一覧と Wiki プレビュー（候補を右クリックで直接プレビュー）",
+  "navShell_updateDownloading": "更新をダウンロード中",
+  "navShell_updateReady": "再起動して更新",
+  "navShell_updateAvailableVersion": "{version} をダウンロードできます",
+  "navShell_updateReadyVersion": "{version} の準備ができました",
+  "navShell_updateDownloadProgress": "{percent}% · Studio は引き続き使えます",
+  "navShell_updateRetryHint": "詳細を確認して再試行",
+  "updateDownloadInBackground": "バックグラウンドでダウンロード",
+  "@navShell_updateAvailableVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@navShell_updateReadyVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@navShell_updateDownloadProgress": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  }
 }

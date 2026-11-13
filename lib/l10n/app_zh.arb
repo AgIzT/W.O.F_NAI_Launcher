@@ -12038,5 +12038,33 @@
   "promptReading_autoTranslate": "自动使用模型翻译",
   "modelSettings_promptReadingHint": "全文翻译仅供阅读，不修改提示词。",
   "promptCompletion_works": "作品",
-  "promptCompletion_expand": "完整列表与 Wiki 预览（右键候选可直接预览）"
+  "promptCompletion_expand": "完整列表与 Wiki 预览（右键候选可直接预览）",
+  "navShell_updateDownloading": "正在下载更新",
+  "navShell_updateReady": "重启以完成更新",
+  "navShell_updateAvailableVersion": "{version} 可供下载",
+  "navShell_updateReadyVersion": "{version} 已就绪",
+  "navShell_updateDownloadProgress": "{percent}% · 可继续使用 Studio",
+  "navShell_updateRetryHint": "点击查看原因并重试",
+  "updateDownloadInBackground": "后台下载",
+  "@navShell_updateAvailableVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@navShell_updateReadyVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@navShell_updateDownloadProgress": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  }
 }

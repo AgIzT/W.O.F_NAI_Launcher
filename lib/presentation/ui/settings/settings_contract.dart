@@ -1723,6 +1723,9 @@ class SettingsUpscaleModel {
     this.received = 0,
     this.total = 0,
     this.speed = 0,
+    this.status,
+    this.diagnostics,
+    this.cancelling = false,
     this.isDefault = false,
   });
 
@@ -1742,12 +1745,17 @@ class SettingsUpscaleModel {
   final int received;
   final int total;
   final int speed;
+
+  /// Localized installation stage or failure, with copyable safe details.
+  final String? status, diagnostics;
+  final bool cancelling;
   final bool isDefault;
 }
 
 @immutable
 class SettingsUpscaleData {
   const SettingsUpscaleData({
+    this.busy = false,
     this.gpuName,
     this.vramGb = 0,
     this.caps = const {},
@@ -1757,6 +1765,8 @@ class SettingsUpscaleData {
     this.rtx,
     this.seedOffloadMaxBlocks = 32,
   });
+
+  final bool busy;
 
   /// 显卡检测（新增）；null = 没检测到独显。
   final String? gpuName;
@@ -2068,6 +2078,7 @@ class SettingsActions {
     // 本地放大
     this.onUpscaleInstall = _noId,
     this.onUpscaleCancel = _noId,
+    this.onUpscaleCopyDiagnostics = _noId,
     this.onUpscaleRemove = _noId,
     this.onUpscaleImport = _none,
     // 桥接
@@ -2291,6 +2302,7 @@ class SettingsActions {
   /// 下载 / 安装 [SettingsUpscaleModel.id]（下载都需要用户点）。
   final ValueChanged<String> onUpscaleInstall;
   final ValueChanged<String> onUpscaleCancel;
+  final ValueChanged<String> onUpscaleCopyDiagnostics;
 
   /// 界面已确认过。
   final ValueChanged<String> onUpscaleRemove;

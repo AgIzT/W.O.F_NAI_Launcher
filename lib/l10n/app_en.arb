@@ -12040,5 +12040,33 @@
   "promptReading_autoTranslate": "Translate automatically with a model",
   "modelSettings_promptReadingHint": "Full-text translation is for reading and does not modify prompts.",
   "promptCompletion_works": "Works",
-  "promptCompletion_expand": "Full list and Wiki preview (right-click a suggestion to preview it)"
+  "promptCompletion_expand": "Full list and Wiki preview (right-click a suggestion to preview it)",
+  "navShell_updateDownloading": "Downloading update",
+  "navShell_updateReady": "Restart to update",
+  "navShell_updateAvailableVersion": "{version} available to download",
+  "@navShell_updateAvailableVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "navShell_updateReadyVersion": "{version} ready",
+  "@navShell_updateReadyVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "navShell_updateDownloadProgress": "{percent}% · Keep using Studio",
+  "@navShell_updateDownloadProgress": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "navShell_updateRetryHint": "View details and retry",
+  "updateDownloadInBackground": "Download in background"
 }

@@ -392,6 +392,7 @@ SettingsViewData settingsViewData(
       ref.watch(settingsUpscaleOperationProvider),
       ref.watch(advancedUpscaleInstallProvider),
       workflow,
+      l10n: context.l10n,
       gpu: page == SettingsPageId.upscale
           ? ref.watch(settingsGpuProvider).valueOrNull
           : null,

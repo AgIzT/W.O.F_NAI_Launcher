@@ -21617,4 +21617,31 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get promptCompletion_expand => '候補一覧と Wiki プレビュー（候補を右クリックで直接プレビュー）';
+
+  @override
+  String get navShell_updateDownloading => '更新をダウンロード中';
+
+  @override
+  String get navShell_updateReady => '再起動して更新';
+
+  @override
+  String navShell_updateAvailableVersion(String version) {
+    return '$version をダウンロードできます';
+  }
+
+  @override
+  String navShell_updateReadyVersion(String version) {
+    return '$version の準備ができました';
+  }
+
+  @override
+  String navShell_updateDownloadProgress(int percent) {
+    return '$percent% · Studio は引き続き使えます';
+  }
+
+  @override
+  String get navShell_updateRetryHint => '詳細を確認して再試行';
+
+  @override
+  String get updateDownloadInBackground => 'バックグラウンドでダウンロード';
 }
