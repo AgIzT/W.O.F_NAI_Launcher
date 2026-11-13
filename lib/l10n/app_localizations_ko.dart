@@ -21677,6 +21677,9 @@ class AppLocalizationsKo extends AppLocalizations {
       '입력을 약 0.8초 멈추면 사전과 캐시에 없는 표시된 태그와 문장을 일괄 번역합니다. 일시적인 네트워크 오류는 제한된 횟수로 재시도합니다. 모델 및 API에서 태그 번역 모델을 설정하세요. 끄면 기존 번역만 표시합니다.';
 
   @override
+  String get promptReading_autoTranslate => '모델로 자동 번역';
+
+  @override
   String get modelSettings_promptReadingHint => '전체 번역은 읽기용이며 프롬프트를 변경하지 않습니다.';
 
   @override

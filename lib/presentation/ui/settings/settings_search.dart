@@ -45,6 +45,7 @@ String settingTitle(BuildContext context, SettingKey k) {
     SettingKey.settingsFontScale => l.set_apScale,
     SettingKey.workspaceFontScale => l.set_workspaceFontScale,
     SettingKey.promptAutocomplete => l.set_promptAutocomplete,
+    SettingKey.autoPromptTranslation => l.promptReading_autoTranslate,
     SettingKey.language => l.set_apLanguage,
     SettingKey.reduceMotion => l.set_apReduceMotion,
     SettingKey.completionSound => l.set_apSound,
@@ -138,6 +139,7 @@ String settingSection(BuildContext context, SettingKey k) {
     SettingKey.wheelWeight ||
     SettingKey.wheelModifier ||
     SettingKey.relatedTags ||
+    SettingKey.autoPromptTranslation ||
     SettingKey.promptAutocomplete => l.set_gnInput,
     SettingKey.imageSavePath || SettingKey.autoSave => l.set_stSave,
     SettingKey.vibePath || SettingKey.galleryQuality => l.set_stAssets,
@@ -213,6 +215,7 @@ String settingValue(BuildContext context, SettingKey k, SettingsValues v) {
 /// 整个设置的搜索索引（按目录顺序）。
 /// 只参与匹配的同义词（不分语言，主要是英文键和常见说法）。
 const _synonyms = <SettingKey, String>{
+  SettingKey.autoPromptTranslation: '自动翻译 自動翻譯 auto translation tag readings',
   SettingKey.simpleViewerGroupBatches: 'simple viewer batch group',
   SettingKey.thumbnailCacheLimitGb: 'thumbnail cache global limit GB GiB',
   SettingKey.costWarning: 'anlas cost',

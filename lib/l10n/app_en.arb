@@ -12037,6 +12037,7 @@
   "promptReading_completionHint": "Search tags, characters and series in Chinese or English.",
   "promptReading_fillMissing": "Fill missing readings for visible tags and sentences",
   "promptReading_autoTranslateHint": "After a 0.8-second typing pause, batch-translate visible tags and sentences missing from the dictionary and cache. Temporary network failures receive limited retries. Set a tag translation model in Models & APIs. When off, show available readings only.",
+  "promptReading_autoTranslate": "Translate automatically with a model",
   "modelSettings_promptReadingHint": "Full-text translation is for reading and does not modify prompts.",
   "promptCompletion_works": "Works",
   "promptCompletion_expand": "Full list and Wiki preview (right-click a suggestion to preview it)"

@@ -22351,6 +22351,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'After a 0.8-second typing pause, batch-translate visible tags and sentences missing from the dictionary and cache. Temporary network failures receive limited retries. Set a tag translation model in Models & APIs. When off, show available readings only.';
 
   @override
+  String get promptReading_autoTranslate =>
+      'Translate automatically with a model';
+
+  @override
   String get modelSettings_promptReadingHint =>
       'Full-text translation is for reading and does not modify prompts.';
 

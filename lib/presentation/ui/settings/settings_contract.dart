@@ -70,6 +70,7 @@ enum SettingKey {
   settingsFontScale, // 设置页与对话框字号 0.8–1.5
   workspaceFontScale, // 创作文字，与界面字号独立
   promptAutocomplete, // 输入补全
+  autoPromptTranslation,
   language, // zh / zh_TW / en / ja / ko
   reduceMotion, // 现有画布“减少动态效果”（也让视觉通道停微动）
   completionSound,
@@ -228,6 +229,11 @@ class SettingSpec {
       defaultValue: 1.0,
     ),
     SettingKey.promptAutocomplete: SettingSpec._(_t, _ge, defaultValue: true),
+    SettingKey.autoPromptTranslation: SettingSpec._(
+      _t,
+      _ge,
+      defaultValue: false,
+    ),
     SettingKey.language: SettingSpec._(
       _c,
       _ap,

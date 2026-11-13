@@ -12035,6 +12035,7 @@
   "promptReading_completionHint": "支持中英文搜索标签、角色和作品。",
   "promptReading_fillMissing": "补齐可见标签与句子的缺失译名",
   "promptReading_autoTranslateHint": "停笔约 0.8 秒后批量补译可见标签与句子，优先使用词库和缓存；临时网络故障会有限重试。需在「模型与接口」配置标签翻译模型。关闭后只显示已有译名。",
+  "promptReading_autoTranslate": "自动使用模型翻译",
   "modelSettings_promptReadingHint": "全文翻译仅供阅读，不修改提示词。",
   "promptCompletion_works": "作品",
   "promptCompletion_expand": "完整列表与 Wiki 预览（右键候选可直接预览）"

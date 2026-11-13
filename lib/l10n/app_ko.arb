@@ -12035,6 +12035,7 @@
   "promptReading_completionHint": "중국어와 영어로 태그, 캐릭터, 작품을 검색합니다.",
   "promptReading_fillMissing": "표시된 태그와 문장의 누락된 번역 채우기",
   "promptReading_autoTranslateHint": "입력을 약 0.8초 멈추면 사전과 캐시에 없는 표시된 태그와 문장을 일괄 번역합니다. 일시적인 네트워크 오류는 제한된 횟수로 재시도합니다. 모델 및 API에서 태그 번역 모델을 설정하세요. 끄면 기존 번역만 표시합니다.",
+  "promptReading_autoTranslate": "모델로 자동 번역",
   "modelSettings_promptReadingHint": "전체 번역은 읽기용이며 프롬프트를 변경하지 않습니다.",
   "promptCompletion_works": "작품",
   "promptCompletion_expand": "전체 목록 및 Wiki 미리보기 (후보를 우클릭하면 바로 미리보기)"

@@ -200,7 +200,6 @@ SettingsViewData settingsViewData(
       : const AsyncLoading<SettingsStorageData>();
   final generation = ref.watch(generationRequestParamsProvider);
   final metrics = ref.watch(anlasUsageMetricsProvider).valueOrNull?.at(now);
-  final translation = config.interfaceFor(LauncherInterface.translate);
   final tagTranslation = config.interfaceFor(LauncherInterface.tagTranslate);
   final blacklist = ref.watch(onlineGalleryBlacklistNotifierProvider);
   final danbooru = ref.watch(danbooruAuthProvider);
@@ -306,7 +305,9 @@ SettingsViewData settingsViewData(
       hourlyUsage: metrics?.hourly ?? const [],
       warningsToday: metrics?.warnings ?? 0,
       maxSingleToday: metrics?.maxDeduction ?? 0,
-      translationModel: translation.isConfigured ? translation.model : null,
+      translationModel: tagTranslation.isConfigured
+          ? tagTranslation.model
+          : null,
       ragTagsReady:
           ragSettings.enabledFor(RagSource.tags) && ragStatus.available,
     ),

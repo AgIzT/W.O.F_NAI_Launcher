@@ -255,9 +255,14 @@ class SettingsGenerationPage extends StatelessWidget {
                 ),
               ),
             ),
+            SettingKeyRow(
+              SettingKey.autoPromptTranslation,
+              title: l.promptReading_autoTranslate,
+              subtitle: l.promptReading_autoTranslateHint,
+              control: const SetSwitch(SettingKey.autoPromptTranslation),
+            ),
             SettingsRow(
-              title: l.set_gnTranslate,
-              subtitle: l.set_gnTranslateSub,
+              title: l.set_mdTaskTag,
               control: SettingsJump(
                 page: SettingsPageId.models,
                 value: Text(

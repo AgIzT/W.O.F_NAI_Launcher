@@ -21607,6 +21607,9 @@ class AppLocalizationsJa extends AppLocalizations {
       '入力が約0.8秒止まると、辞書とキャッシュにない表示中のタグと文をまとめて翻訳します。一時的な通信障害は回数を限って再試行します。「モデルとAPI」でタグ翻訳モデルを設定してください。オフの場合は既存の訳のみ表示します。';
 
   @override
+  String get promptReading_autoTranslate => 'モデルで自動翻訳';
+
+  @override
   String get modelSettings_promptReadingHint => '全文翻訳は閲覧用です。プロンプトは変更しません。';
 
   @override

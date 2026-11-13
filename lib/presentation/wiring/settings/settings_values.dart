@@ -12,6 +12,7 @@ import '../../../core/services/update_check_service.dart';
 import '../../../core/utils/app_language.dart';
 import '../../../core/utils/app_logger.dart';
 import '../../../core/utils/hive_storage_helper.dart';
+import '../../../core/wiki/auto_tag_translation_controller.dart';
 import '../../../data/models/settings/proxy_settings.dart';
 import '../../../data/models/upscale/local_upscale_models.dart';
 import '../../providers/account_manager_provider.dart';
@@ -82,6 +83,9 @@ final settingsValuesProvider = Provider<SettingsValues>((ref) {
     SettingKey.fontFamily: font == FontConfig.defaultFont ? 'system' : font.key,
     SettingKey.settingsFontScale: ref.watch(settingsFontScaleProvider),
     ...ref.watch(workspaceTextSettingValuesProvider),
+    SettingKey.autoPromptTranslation: ref.watch(
+      autoTagTranslationProvider.select((controller) => controller.enabled),
+    ),
     SettingKey.language: AppLanguage.fromLocale(locale).storageCode,
     SettingKey.reduceMotion: ref.watch(canvasReducedMotionNotifierProvider),
     SettingKey.completionSound: sound.soundEnabled,
@@ -236,6 +240,8 @@ class SettingsValueStore {
         await ref.read(workspaceFontScaleProvider.notifier).setFontScale(n);
       case SettingKey.promptAutocomplete:
         ref.read(autocompleteSettingsProvider.notifier).set(b);
+      case SettingKey.autoPromptTranslation:
+        await ref.read(autoTagTranslationProvider).setEnabled(b);
       case SettingKey.language:
         await ref.read(localeNotifierProvider.notifier).setLocale(text!);
       case SettingKey.reduceMotion:

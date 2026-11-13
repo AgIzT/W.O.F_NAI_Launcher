@@ -175,6 +175,16 @@ void main() {
     await t.pump(const Duration(seconds: 5));
   });
 
+  testWidgets('自动翻译可从搜索定位到提示词输入并开启', (t) async {
+    final rec = await pumpSettings(t, initialQuery: '自动翻译');
+    await tap(t, 'jump-autoPromptTranslation');
+    expect(rec.pages.single, SettingsPageId.generation);
+    expect(find.text('自动使用模型翻译'), findsOneWidget);
+    await tap(t, 'switch-autoPromptTranslation');
+    expect(rec.changes.single, (SettingKey.autoPromptTranslation, true));
+    await t.pump(const Duration(seconds: 5));
+  });
+
   testWidgets('已修改的项有蓝点，“恢复本页默认”先确认', (t) async {
     final rec = await pumpSettings(t, page: SettingsPageId.generation);
     expect(find.byKey(const Key('settings-modified-dot')), findsWidgets);
