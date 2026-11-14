@@ -1408,6 +1408,7 @@ class GenSlots {
     this.toolSheet,
     this.emptyCanvas,
     this.agentToggle,
+    this.canvasNotice,
     this.viewerControls,
     this.historyCaptionInset = true,
     this.preserveHistory = false,
@@ -1420,6 +1421,9 @@ class GenSlots {
 
   /// 仅应用启用 Agent 集成时提供。
   final Widget? agentToggle;
+
+  /// Transient canvas result notice; the canvas owns toolbar avoidance.
+  final Widget? canvasNotice;
 
   /// 简洁查看器的展示选项，不改变画布数据。
   final Widget? viewerControls;

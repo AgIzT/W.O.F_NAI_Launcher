@@ -251,6 +251,7 @@ class PromptBlockLibraryNotifier extends _$PromptBlockLibraryNotifier {
     double thumbnailOffsetX = 0.0,
     double thumbnailOffsetY = 0.0,
     double thumbnailScale = 1.0,
+    List<PromptBlockThumbnail> additionalThumbnails = const [],
     int? sortOrder,
     List<String>? atoms,
     String negativeContent = '',
@@ -278,6 +279,7 @@ class PromptBlockLibraryNotifier extends _$PromptBlockLibraryNotifier {
         thumbnailOffsetX: thumbnailOffsetX,
         thumbnailOffsetY: thumbnailOffsetY,
         thumbnailScale: thumbnailScale,
+        additionalThumbnails: additionalThumbnails,
         sortOrder: sortOrder,
         beforeWrite: beforeWrite,
       ),
@@ -366,9 +368,24 @@ class PromptBlockLibraryNotifier extends _$PromptBlockLibraryNotifier {
       _mutate((repository) => repository.moveBlock(blockId, folderId));
 
   Future<void> deleteBlock(String blockId) async {
-    final thumbnail = state.valueOrNull?.blockById(blockId)?.thumbnail;
+    final thumbnails =
+        state.valueOrNull?.blockById(blockId)?.thumbnails ??
+        const <PromptBlockThumbnail>[];
     await _mutate((repository) => repository.deleteBlock(blockId));
-    await deletePromptBlockThumbnail(thumbnail);
+    await _discardThumbnails(thumbnails.map((image) => image.path));
+  }
+
+  Future<void> _discardThumbnails(Iterable<String> paths) async {
+    final candidates = paths.toSet();
+    if (candidates.isEmpty) return;
+    final used = {
+      for (final block
+          in await ref.read(promptBlockStorageProvider).getBlocks())
+        for (final image in block.thumbnails) image.path,
+    };
+    for (final path in candidates.difference(used)) {
+      await deletePromptBlockThumbnail(path);
+    }
   }
 
   /// 批量删除块：循环单块删除，末尾单次整库 reload（不走 N 次 [_mutate]）。
@@ -379,7 +396,10 @@ class PromptBlockLibraryNotifier extends _$PromptBlockLibraryNotifier {
     final repository = ref.read(promptBlockRepositoryProvider);
     final thumbnails = {
       for (final id in blockIds)
-        if (state.valueOrNull?.blockById(id)?.thumbnail case final path?) path,
+        for (final image
+            in state.valueOrNull?.blockById(id)?.thumbnails ??
+                const <PromptBlockThumbnail>[])
+          image.path,
     };
     try {
       for (final blockId in blockIds) {
@@ -390,9 +410,7 @@ class PromptBlockLibraryNotifier extends _$PromptBlockLibraryNotifier {
       state = AsyncError(error, stackTrace);
       rethrow;
     }
-    for (final path in thumbnails.nonNulls) {
-      await deletePromptBlockThumbnail(path);
-    }
+    await _discardThumbnails(thumbnails);
   }
 
   /// 批量移动块到目标文件夹（null = 根目录），末尾单次整库 reload。
@@ -521,49 +539,54 @@ class PromptBlockLibraryNotifier extends _$PromptBlockLibraryNotifier {
         }
         PromptBlock placed;
         if (existing != null || mode == PromptBlockTransferMode.copy) {
-          String? imagePath;
-          if (source.thumbnail case final path?) {
-            final file = File(path);
+          final copiedImages = <PromptBlockThumbnail>[];
+          for (final image in source.thumbnails) {
+            final file = File(image.path);
             if (await file.exists()) {
-              imagePath = await savePromptBlockThumbnail(
+              final imagePath = await savePromptBlockThumbnail(
                 await file.readAsBytes(),
               );
               createdThumbnails.add(imagePath);
+              copiedImages.add(image.copyWith(path: imagePath));
             }
           }
           if (existing != null) {
-            if (existing.thumbnail case final path?) oldThumbnails.add(path);
+            oldThumbnails.addAll(
+              existing.thumbnails.map((image) => image.path),
+            );
             placed = await repository.updateBlock(
-              source.copyWith(
-                id: existing.id,
-                lineageId: source.lineageKey,
-                folderId: existing.folderId,
-                sortOrder: existing.sortOrder,
-                isFavorite: existing.isFavorite,
-                thumbnail: imagePath,
-                isArchived: false,
-                createdAt: existing.createdAt,
-                useCount: existing.useCount,
-                sourcePath: null,
-                sourceHash: null,
-                importedAt: null,
-              ),
+              source
+                  .withThumbnails(copiedImages)
+                  .copyWith(
+                    id: existing.id,
+                    lineageId: source.lineageKey,
+                    folderId: existing.folderId,
+                    sortOrder: existing.sortOrder,
+                    isFavorite: existing.isFavorite,
+                    isArchived: false,
+                    createdAt: existing.createdAt,
+                    useCount: existing.useCount,
+                    sourcePath: null,
+                    sourceHash: null,
+                    importedAt: null,
+                  ),
             );
           } else {
-            placed = source.copyWith(
-              id: const Uuid().v4(),
-              lineageId: source.lineageKey,
-              folderId: null,
-              isFavorite: false,
-              thumbnail: imagePath,
-              isArchived: false,
-              useCount: 0,
-              sourcePath: null,
-              sourceHash: null,
-              importedAt: null,
-              createdAt: DateTime.now(),
-              updatedAt: DateTime.now(),
-            );
+            placed = source
+                .withThumbnails(copiedImages)
+                .copyWith(
+                  id: const Uuid().v4(),
+                  lineageId: source.lineageKey,
+                  folderId: null,
+                  isFavorite: false,
+                  isArchived: false,
+                  useCount: 0,
+                  sourcePath: null,
+                  sourceHash: null,
+                  importedAt: null,
+                  createdAt: DateTime.now(),
+                  updatedAt: DateTime.now(),
+                );
             await repository.importBlocks([placed]);
             placed = await repository.moveBlock(placed.id, null);
           }
@@ -624,23 +647,10 @@ class PromptBlockLibraryNotifier extends _$PromptBlockLibraryNotifier {
         }
       }
       state = AsyncData(_toState(await repository.load()));
-      for (final path in oldThumbnails) {
-        if (![
-          ...state.valueOrNull!.blocks,
-          ...state.valueOrNull!.archivedBlocks,
-        ].any((block) => block.thumbnail == path)) {
-          await deletePromptBlockThumbnail(path);
-        }
-      }
+      await _discardThumbnails(oldThumbnails);
     } catch (error, stackTrace) {
       state = AsyncError(error, stackTrace);
-      for (final path in createdThumbnails) {
-        if (!(await repository.load()).blocks.any(
-          (block) => block.thumbnail == path,
-        )) {
-          await deletePromptBlockThumbnail(path);
-        }
-      }
+      await _discardThumbnails(createdThumbnails);
       rethrow;
     }
   }
@@ -741,7 +751,7 @@ class PromptBlockLibraryNotifier extends _$PromptBlockLibraryNotifier {
             for (final block
                 in state.valueOrNull?.blocksInFolderTree(folderId) ??
                     const <PromptBlock>[])
-              if (block.thumbnail case final path?) path,
+              for (final image in block.thumbnails) image.path,
           }
         : const <String>{};
     await _mutate(
@@ -751,9 +761,7 @@ class PromptBlockLibraryNotifier extends _$PromptBlockLibraryNotifier {
         destinationFolderId: destinationFolderId,
       ),
     );
-    for (final path in thumbnails) {
-      await deletePromptBlockThumbnail(path);
-    }
+    await _discardThumbnails(thumbnails);
   }
 
   /// TXT 单文件导入：只新增，同来源已存在的文件跳过，不覆盖任何块。

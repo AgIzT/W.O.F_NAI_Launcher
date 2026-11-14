@@ -1,7 +1,7 @@
 {
   "upstream_repository": "z15087716457-stack/W.O.F_NAI_Launcher",
-  "upstream_base": "eeca563f198763085e0f593dba2bd53b60213590",
-  "reviewed_through": "eeca563f198763085e0f593dba2bd53b60213590",
+  "upstream_base": "5cb759b3d5349de6305847f93e9b361c78ed1950",
+  "reviewed_through": "5cb759b3d5349de6305847f93e9b361c78ed1950",
   "source_repository": "AgIzT/W.O.F_NAI_Launcher",
   "source_stable_commit": "fa3bc8ae2649d61ae0a4459890e8b5764a577137",
   "feature_source_commit": "62f920820bdcbdd6dc5bf2b00f7bd88d1f7d7be8",
@@ -21,30 +21,45 @@
   ],
   "local_fix_to_preserve": "Embed character captions before local upscaling plain request images",
   "validation": {
-    "date": "2026-11-13",
-    "target_upstream": "eeca563f198763085e0f593dba2bd53b60213590",
+    "date": "2026-11-14",
+    "target_upstream": "5cb759b3d5349de6305847f93e9b361c78ed1950",
     "flutter": "3.47.7",
     "dart": "3.13.5",
     "analyzer": {
       "scope": "lib",
       "success": true,
-      "log": "build/upstream-sync-2.3.3/analyze.log"
+      "log": "build/upstream-sync-2.3.4/analyze.log"
     },
-    "targeted_flutter_suites": {
-      "suites": 24,
-      "passed": 542,
-      "skipped": 1,
-      "failed": 0,
-      "skip_reason": "Optional live RTX test requires RUN_ADVANCED_UPSCALE_AUDIT=1 and the cached SDK archive.",
-      "log": "build/upstream-sync-2.3.3/flutter-targeted.jsonl"
+    "code_generation": {
+      "success": true,
+      "log": "build/upstream-sync-2.3.4/codegen.log"
     },
-    "traditional_chinese_resources": {
-      "passed": 4,
+    "multilingual_resources": {
+      "success": true,
+      "traditional_chinese_tests_passed": 4,
+      "log": "build/upstream-sync-2.3.4/zh-tw.log"
+    },
+    "affected_and_custom_flutter_suites": {
+      "suites": 61,
+      "passed": 921,
+      "skipped": 0,
       "failed": 0,
-      "log": "build/upstream-sync-2.3.3/zh-tw.log"
+      "log": "build/upstream-sync-2.3.4/flutter-targeted.jsonl"
+    },
+    "node": {
+      "passed": 160,
+      "skipped": 0,
+      "failed": 0,
+      "log": "build/upstream-sync-2.3.4/node.log"
+    },
+    "windows_release_payload": {
+      "passed": 3,
+      "failed": 0
     },
     "bundled_databases": "passed",
-    "lfs_fsck": "passed"
+    "lfs_fsck": "passed",
+    "custom_update_repository": "AgIzT/W.O.F_NAI_Launcher",
+    "windows_and_macos_release": "Pending tag-triggered release workflow; see docs/upstream-merge-2026-11-14.md for final publication evidence."
   },
   "validation_2026_11_08": {
     "date": "2026-11-08",
@@ -326,6 +341,40 @@
       "upstream_target": "eeca563f198763085e0f593dba2bd53b60213590",
       "upstream_commits": 2,
       "version": "2.3.3+100"
+    },
+    {
+      "date": "2026-11-14",
+      "from_commit": "7e0a0f6f00eaebc65a73c2a01181f6f243c17834",
+      "upstream_target": "5cb759b3d5349de6305847f93e9b361c78ed1950",
+      "upstream_commits": 2,
+      "version": "2.3.4+103",
+      "report": "docs/upstream-merge-2026-11-14.md"
     }
-  ]
+  ],
+  "validation_2026_11_13": {
+    "date": "2026-11-13",
+    "target_upstream": "eeca563f198763085e0f593dba2bd53b60213590",
+    "flutter": "3.47.7",
+    "dart": "3.13.5",
+    "analyzer": {
+      "scope": "lib",
+      "success": true,
+      "log": "build/upstream-sync-2.3.3/analyze.log"
+    },
+    "targeted_flutter_suites": {
+      "suites": 24,
+      "passed": 542,
+      "skipped": 1,
+      "failed": 0,
+      "skip_reason": "Optional live RTX test requires RUN_ADVANCED_UPSCALE_AUDIT=1 and the cached SDK archive.",
+      "log": "build/upstream-sync-2.3.3/flutter-targeted.jsonl"
+    },
+    "traditional_chinese_resources": {
+      "passed": 4,
+      "failed": 0,
+      "log": "build/upstream-sync-2.3.3/zh-tw.log"
+    },
+    "bundled_databases": "passed",
+    "lfs_fsck": "passed"
+  }
 }

@@ -37,7 +37,7 @@ Starting with version 2.3.2, the Plana build checks this repository for in-app u
 | --- | --- |
 | `WOF_NAI_Studio_Windows_<version>_Setup.exe` | **The choice for most people.** Installs to your user directory without administrator rights, with Start menu and desktop shortcuts. |
 | `WOF_NAI_Studio_Windows_<version>_Portable.zip` | For keeping the app in a folder of your choice, on a USB drive, or taking it between computers. Extract it and run `nai_launcher.exe`. |
-| `WOF_NAI_Studio_macOS_<version>_Portable.zip` | For Apple silicon and Intel Macs on macOS 13.5 or later. [Download the 2.3.3 universal package](https://github.com/AgIzT/W.O.F_NAI_Launcher/releases/download/v2.3.3/WOF_NAI_Studio_macOS_2.3.3_Portable.zip). |
+| `WOF_NAI_Studio_macOS_<version>_Portable.zip` | For Apple silicon and Intel Macs on macOS 13.5 or later. [Download the 2.3.4 universal package](https://github.com/AgIzT/W.O.F_NAI_Launcher/releases/download/v2.3.4/WOF_NAI_Studio_macOS_2.3.4_Portable.zip). |
 
 Both Windows packages support in-app updates. Settings, the gallery database and Agent data live in `user-data/` and `agent-data/` beside the program. On Mac, data lives in your Application Support directory. The app downloads and verifies updates, then opens Finder for you to replace the app.
 
@@ -57,9 +57,9 @@ Both Windows packages support in-app updates. Settings, the gallery database and
 
 **2.3.0** brings automatic fit in the image viewer, canvas decoding at display size, incremental gallery RAG indexing, idle Agent host cleanup, and fixes to generation quotes and retries. Windows in-app updates show installation progress, and GitHub Actions builds the macOS universal test package.
 
-**2.3.3** adds a sidebar update button and background downloads, and improves window resizing, multiline text selection, droplet animation and local upscale download progress. Windows and universal Mac packages are included. The Mac package is ad-hoc signed and has not been notarized by Apple; see the first-launch instructions below.
+**2.3.4** adds multiple block preview images with independent crops and five rows of hover-card tags. External agents can use enabled Skills and native Studio tools through MCP or the command line, with operations and artifacts in separate external sessions. It also improves image history compression, cache warming, empty-response errors, reference import, enhance dimensions and window dragging from the online image viewer. Windows and universal Mac packages are included. The Mac package is ad-hoc signed and has not been notarized by Apple; see the first-launch instructions below.
 
-Turn on automatic model translation under Generation & Anlas → Prompt Input in Settings. See the [2.3.3 changelog](CHANGELOG.md#233---2026-11-13) and [release downloads](https://github.com/AgIzT/W.O.F_NAI_Launcher/releases/tag/v2.3.3).
+Turn on automatic model translation under Generation & Anlas → Prompt Input in Settings. See the [2.3.4 changelog](CHANGELOG.md#234---2026-11-14) and [release downloads](https://github.com/AgIzT/W.O.F_NAI_Launcher/releases/tag/v2.3.4).
 
 ## Get started in three steps
 

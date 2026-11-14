@@ -42,6 +42,7 @@ import 'simple_viewer_wiring.dart';
 import '../providers/nai_agent/nai_agent_window_controller.dart';
 import '../providers/nai_agent/nai_agent_workspace_provider.dart';
 import 'nai_agent/agent_toggle_wiring.dart';
+import 'nai_agent/agent_canvas_notice_wiring.dart';
 import '../screens/generation/widgets/generation_welcome.dart';
 
 class GenerationRoute extends ConsumerStatefulWidget {
@@ -268,6 +269,7 @@ class _GenerationWiringState extends ConsumerState<GenerationWiring> {
             GenerationPanelBackdropWiring(canvasViewport: viewport),
         emptyCanvas: (_) => const GenerationWelcome(),
         agentToggle: agentAvailable ? const AgentToggleWiring() : null,
+        canvasNotice: agentAvailable ? const AgentCanvasNoticeWiring() : null,
         historyCaptionInset: !agentExpanded,
         preserveHistory: agentExpanded,
         viewerControls: simpleViewer ? const SimpleViewerGroupControl() : null,
