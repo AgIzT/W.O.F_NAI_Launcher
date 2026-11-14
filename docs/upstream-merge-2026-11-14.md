@@ -34,4 +34,25 @@ Flutter 范围包括上游新增／修改测试，以及补全、只读译名、
 
 ## 发布状态
 
-源代码验证完成后，通过 `v2.3.4` 标签触发本仓库的双平台 Release 工作流，构建 Windows Setup／Portable 与 macOS 通用包。最终工作流、发布资产和校验结果在发布完成后补充到此处。
+`v2.3.4` 固定源码 `9882017c7d1744d9ee909914614c7d760ccedb70`，通过本仓库双平台工作流发布，未重写任何既有发布标签：
+
+- [正式发布页](https://github.com/AgIzT/W.O.F_NAI_Launcher/releases/tag/v2.3.4)
+- [成功的 Windows、Mac 与发布工作流](https://github.com/AgIzT/W.O.F_NAI_Launcher/actions/runs/43559418355)
+- [更新清单](https://github.com/AgIzT/W.O.F_NAI_Launcher/releases/download/v2.3.4/release_manifest.json)
+- [公开 SHA-256](https://github.com/AgIzT/W.O.F_NAI_Launcher/releases/download/v2.3.4/checksums.txt)
+
+Release 为最新稳定版，9 个附件齐全。更新清单版本为 `2.3.4+103`，三类资产的大小、SHA-256 与 GitHub 摘要相符，下载地址均指向本仓库；公开正文与附带更新说明一致，包含本次上游更新及 Plana 定制保留说明。
+
+| 文件 | 字节数 | SHA-256 |
+| --- | ---: | --- |
+| `WOF_NAI_Studio_Windows_2.3.4_Setup.exe` | 200,707,916 | `eb6113938c281adf3ee1397189b00514408f64f29e827bd86ae381ff0a59f485` |
+| `WOF_NAI_Studio_Windows_2.3.4_Portable.zip` | 323,784,033 | `5b4c660e377fffb0d1e7dbd03940a5115646e0008b4aa24a3f224282e84a5a73` |
+| `WOF_NAI_Studio_macOS_2.3.4_Portable.zip` | 409,765,766 | `135bb58c30e5024dd7ada9e6ad3f346ec2474ae3246e552d5feb1f235cf118d5` |
+
+三份成品从本次成功构建下载，实际文件大小与 SHA-256 均和正式发布资产、更新清单、公开总校验及单独校验文件一致。
+
+Windows 便携包 15,558 个文件，15,556 个文件的内部清单及 15,557 条内部 SHA-256 全部通过。46 个 Agent 生产源文件按换行规范与发布源码一致，包含四个新增模块；版本、源码提交、AOT、Node 24.18.0、Pi 1.5.0 及 4 个数据库哈希、SQLite `quick_check` 通过。主程序存储身份为 `com.example/nai_launcher`，显示名为 W.O.F NAI Studio。Setup 成品的实际哈希与公开校验一致，没有运行安装器或启动、替换用户程序。
+
+Mac 包包含 17,643 个文件，46 个 Agent 生产源文件按换行规范核对一致；版本、源码提交、AOT、Node 24.18.0、Pi 1.5.0 及 4 个数据库哈希通过。检查了 41 个 Mach-O 文件，共用文件包含 arm64／x86_64，架构专用 npm 模块按目标提供。最低 macOS 13.5，仍为临时签名，未做 Mac 实机启动验收。
+
+发布后再次拉取上游，目标仍为 `5cb759b3`，落后 0 个提交。核验记录作为普通后续文档提交补入 `migration/plana`，发布标签保持不变；完整本地证据在忽略目录 `build/upstream-sync-2.3.4/`。

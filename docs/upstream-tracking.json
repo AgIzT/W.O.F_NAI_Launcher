@@ -59,7 +59,38 @@
     "bundled_databases": "passed",
     "lfs_fsck": "passed",
     "custom_update_repository": "AgIzT/W.O.F_NAI_Launcher",
-    "windows_and_macos_release": "Pending tag-triggered release workflow; see docs/upstream-merge-2026-11-14.md for final publication evidence."
+    "windows_release": {
+      "success": true,
+      "files": 15558,
+      "internal_hashes": 15557,
+      "agent_source_files": 46,
+      "databases": "Hashes and SQLite quick_check passed",
+      "data_identity": "com.example/nai_launcher",
+      "package_validation": "passed"
+    },
+    "macos_release": {
+      "success": true,
+      "architectures": [
+        "arm64",
+        "x86_64"
+      ],
+      "native_files": 41,
+      "agent_source_files": 46,
+      "package_validation": "passed",
+      "native_launch_validation": false
+    },
+    "release": {
+      "tag": "v2.3.4",
+      "version": "2.3.4+103",
+      "source_commit": "9882017c7d1744d9ee909914614c7d760ccedb70",
+      "url": "https://github.com/AgIzT/W.O.F_NAI_Launcher/releases/tag/v2.3.4",
+      "workflow_run": "https://github.com/AgIzT/W.O.F_NAI_Launcher/actions/runs/43559418355",
+      "latest_stable": true,
+      "assets": 9,
+      "published_asset_hashes": "All three downloaded packages match GitHub asset digests, release manifest, checksums.txt and per-file checksums",
+      "report": "docs/upstream-merge-2026-11-14.md",
+      "local_evidence": "build/upstream-sync-2.3.4/published/verification.json"
+    }
   },
   "validation_2026_11_08": {
     "date": "2026-11-08",
